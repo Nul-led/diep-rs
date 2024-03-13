@@ -1,1 +1,1 @@
-# diep-client
+# diep-rs
