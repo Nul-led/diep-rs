@@ -12,7 +12,7 @@ interface GUI {
     setStatus(level: number, levelbarState: number, score: number, scorebarState: number, className: string, playerName: string): void;
     setStats(classImage: CanvasImageSource, killedBy: string, level: number, score: number, timeAlive: number): void;
     setAttributes(attributes: Attribute[], unallocated: number): void;
-    setClasses(classes: ({ className: string, classImage: CanvasImageSource })[])
+    setClasses(classes: ({ className: string, classImage: CanvasImageSource })[]): void;
     // these have no ui impl yet
     //setClassTree(): void;
     //setSpawnMenu(): void;
