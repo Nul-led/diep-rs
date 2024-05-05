@@ -1,0 +1,17 @@
+{
+  "name": "diep-rs-web",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "build": "esbuild src/index.ts --bundle --outfile=dist/bundle.js",
+    "watch": "esbuild src/index.ts --bundle --outfile=dist/bundle.js --watch"
+  },
+  "keywords": [],
+  "author": "Nulled",
+  "license": "MIT",
+  "devDependencies": {
+    "esbuild": "^0.19.2",
+    "ts-loader": "^9.4.4",
+    "typescript": "^5.1.6"
+  }
+}

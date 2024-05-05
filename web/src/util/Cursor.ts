@@ -1,0 +1,1 @@
+export type Cursor = "default" | "pointer" | "text" | "none" | "wait" | "help" | "move" | "crosshair" | "not-allowed" | "zoom-in" | "zoom-out";
