@@ -10,15 +10,15 @@ export default abstract class Widget extends Renderable {
     }
 
     public renderCentered(ctx: Renderable, x: number, y: number) {
-        ctx.canvas.drawImage(this.renderable, Math.floor(x - this.canvas.canvas.width / 2), Math.floor(y - this.canvas.canvas.height / 2));
+        ctx.canvas.drawImage(this.renderable, Math.floor(x - this.canvasWidth / 2), Math.floor(y - this.canvasHeight / 2));
     }
 
     public renderVerticallyCentered(ctx: Renderable, x: number, y: number) {
-        ctx.canvas.drawImage(this.renderable, Math.floor(x), Math.floor(y - this.canvas.canvas.height / 2));
+        ctx.canvas.drawImage(this.renderable, Math.floor(x), Math.floor(y - this.canvasHeight / 2));
     }
 
     public renderHorizontallyCentered(ctx: Renderable, x: number, y: number) {
-        ctx.canvas.drawImage(this.renderable, Math.floor(x - this.canvas.canvas.width / 2), Math.floor(y));
+        ctx.canvas.drawImage(this.renderable, Math.floor(x - this.canvasWidth / 2), Math.floor(y));
     }
 }
 

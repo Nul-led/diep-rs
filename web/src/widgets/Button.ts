@@ -82,15 +82,15 @@ export default class Button extends InteractableWidget {
     }
 
     public renderCentered(ctx: Renderable, x: number, y: number) {
-        ctx.canvas.drawImage(this.renderable, Math.floor(x - this.canvas.canvas.width / 2), Math.floor(y - this.canvas.canvas.height / 2));
+        ctx.canvas.drawImage(this.renderable, Math.floor(x - this.canvasWidth / 2), Math.floor(y - this.canvasHeight / 2));
     }
 
     public renderVerticallyCentered(ctx: Renderable, x: number, y: number) {
-        ctx.canvas.drawImage(this.renderable, Math.floor(x - this._strokeWidth.screenSpace() * 2), Math.floor(y - this.canvas.canvas.height / 2));
+        ctx.canvas.drawImage(this.renderable, Math.floor(x - this._strokeWidth.screenSpace() * 2), Math.floor(y - this.canvasHeight / 2));
     }
 
     public renderHorizontallyCentered(ctx: Renderable, x: number, y: number) {
-        ctx.canvas.drawImage(this.renderable, Math.floor(x - this.canvas.canvas.width / 2), Math.floor(y - this._strokeWidth.screenSpace() * 2));
+        ctx.canvas.drawImage(this.renderable, Math.floor(x - this.canvasWidth / 2), Math.floor(y - this._strokeWidth.screenSpace() * 2));
     }
 
     /* getters & setters for non public attributes */

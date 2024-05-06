@@ -9,20 +9,20 @@ export default class Image extends Widget {
     }
     
     constructor(
-        protected _source: HTMLImageElement | HTMLCanvasElement | OffscreenCanvas,
+        protected _source: null | HTMLImageElement | HTMLCanvasElement | OffscreenCanvas = null,
     ) {
         super();
     }
 
     public get renderable(): CanvasImageSource {
-        return this._source;
+        return this._source || this.canvas.canvas;
     }
 
     /* getters & setters for non public attributes */
 
     public get source() { return this._source; }
 
-    public set source(val: string | HTMLImageElement | HTMLCanvasElement | OffscreenCanvas) {
+    public set source(val: null | string | HTMLImageElement | HTMLCanvasElement | OffscreenCanvas) {
         if (this._source === val) return;
         if(typeof val === "string") {
             const img = new HTMLImageElement;
