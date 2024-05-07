@@ -20,8 +20,8 @@ export class TextButton extends Button {
         const fillColor = this._fillColor;
 
         if(fillColor) {
-            if(this.isPressed) fillColor.blendWith(0.2, Color.BLACK);
-            else if (this.isHovered) fillColor.blendWith(0.2, Color.WHITE);
+            if(this.isPressed || this._mockPress) fillColor.blendWith(0.2, Color.BLACK);
+            else if (this.isHovered || this._mockHover) fillColor.blendWith(0.2, Color.WHITE);
         }
 
         this.canvas.translate(strokeWidth * 2, strokeWidth * 2);
@@ -41,7 +41,7 @@ export class TextButton extends Button {
         this.canvas.globalAlpha = 0.2;
         this.canvas.fillStyle = Color.BLACK.toCSS();
         
-        if(this.isPressed) {
+        if(this.isPressed || this._mockPress) {
             this.canvas.fillRect(0, 0, this._width, this._height * 7 / 12);
         } else {
             this.canvas.fillRect(0, this._height * 7 / 12, this._width, this._height * 7 / 12);

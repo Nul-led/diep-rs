@@ -28,9 +28,13 @@ export default class ImageButton extends Button {
 
         this.canvas.drawImage(this.imageWidget.renderable, Math.floor(this._width - this.imageWidget.canvasWidth / 2), Math.floor(this._height - this.imageWidget.canvasHeight / 2), this._width, this._height);
 
-        if(this.isHovered || this.isPressed) {
+        if(this.isPressed || this._mockPress) {
             this.canvas.globalAlpha = 0.2;
-            this.canvas.fillStyle = this.isHovered ? Color.WHITE.toCSS() : Color.BLACK.toCSS();
+            this.canvas.fillStyle = Color.BLACK.toCSS();
+            this.canvas.fillRect(0, 0, this._width, this._height);
+        } else if(this.isHovered || this._mockHover) {
+            this.canvas.globalAlpha = 0.2;
+            this.canvas.fillStyle = Color.WHITE.toCSS();
             this.canvas.fillRect(0, 0, this._width, this._height);
         }
 
@@ -39,6 +43,8 @@ export default class ImageButton extends Button {
         return this.canvas.canvas;
     }
 
+    /* getters & setters for non public attributes */
+
     public get fillColor() { throw "Unusable property"; }
-    public set fillColor(val: Color | null) { throw "Unusable property"; }
+    public set fillColor(_: Color | null) { throw "Unusable property"; }
 }

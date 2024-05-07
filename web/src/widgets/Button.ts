@@ -15,8 +15,8 @@ export default class Button extends InteractableWidget {
         protected _fillColor: Color | null = Color.WHITE,
         protected _strokeColor: Color | null = Color.BLACK,
         protected _strokeWidth: number = 10,
-        protected _forceHover: boolean = false,
-        protected _forcePress: boolean = false,
+        protected _mockHover: boolean = false,
+        protected _mockPress: boolean = false,
     ) {
         super();
     }
@@ -45,8 +45,8 @@ export default class Button extends InteractableWidget {
         const fillColor = this._fillColor;
 
         if(fillColor) {
-            if(this.isPressed) fillColor.blendWith(0.2, Color.BLACK);
-            else if (this.isHovered) fillColor.blendWith(0.2, Color.WHITE);
+            if(this.isPressed || this._mockPress) fillColor.blendWith(0.2, Color.BLACK);
+            else if (this.isHovered || this._mockHover) fillColor.blendWith(0.2, Color.WHITE);
         }
 
         this.canvas.translate(strokeWidth * 2, strokeWidth * 2);
@@ -66,7 +66,7 @@ export default class Button extends InteractableWidget {
         this.canvas.globalAlpha = 0.2;
         this.canvas.fillStyle = Color.BLACK.toCSS();
         
-        if(this.isPressed) {
+        if(this.isPressed || this._mockPress) {
             this.canvas.fillRect(0, 0, this._width, this._height * 7 / 12);
         } else {
             this.canvas.fillRect(0, this._height * 7 / 12, this._width, this._height * 7 / 12);
@@ -151,20 +151,20 @@ export default class Button extends InteractableWidget {
         this._strokeWidth = val;
     }
 
-    public get forceHover() { return this._forceHover; }
+    public get forceHover() { return this._mockHover; }
 
     public set forceHover(val: boolean) {
-        if (this._forceHover === val) return;
+        if (this._mockHover === val) return;
         this.redraw = true;
-        this._forceHover = val;
+        this._mockHover = val;
     }
 
-    public get forcePress() { return this._forcePress; }
+    public get forcePress() { return this._mockPress; }
 
     public set forcePress(val: boolean) {
-        if (this._forcePress === val) return;
+        if (this._mockPress === val) return;
         this.redraw = true;
-        this._forcePress = val;
+        this._mockPress = val;
     }
 }
 
