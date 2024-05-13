@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>diep.io</title>
+        
+        <link href="https://fonts.googleapis.com/css?family=Ubuntu:700" rel="stylesheet" type="text/css"/>
+
+        <style>
+          body {
+            background-color: #fff;
+            margin: 0px;
+            font-family: 'Ubuntu';
+          }
+
+          /*#loading {
+            color: #FFFFFF;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 48pt;
+            font-family: sans-serif;
+            font-weight: bold;
+            cursor: default;
+          }*/
+    
+          #canvas {
+            position: absolute;
+            /*top: 0px;
+            left: 0px;
+            width: 100%;
+            height: 100%;*/
+          }
+
+          #fontLoader {
+            position: absolute;
+            font-size: 0px;
+            left: -1000px;
+          }
+    
+          /*#textInputContainer {
+            display: none;
+            position: absolute;
+          }
+    
+          #textInput {
+            background-color: transparent;
+            font-family: "Ubuntu";
+            padding: 0;
+            border: 0;
+            outline: none;
+          }*/
+        </style>
+
+    </head>
+
+    <body>
+        <!--span id="loading">Loading...</span-->
+        <canvas id="canvas" width="800" height="800"></canvas>
+        <span id="fontLoader">fontLoader</span>
+        <!--div id="textInputContainer"><input id="textInput"></div-->
+        
+        <script src="./main.bundle.js"></script>
+    </body>
+</html>

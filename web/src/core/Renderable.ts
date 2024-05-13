@@ -29,7 +29,7 @@ export default class Renderable {
     }
 
     public get canvasHeight(): number {
-        return this.canvas.canvas.width;
+        return this.canvas.canvas.height;
     }
 
     public set canvasWidth(value: number) {

@@ -1,11 +1,13 @@
 import Viewport from "../../core/Viewport";
 import Color from "../../util/Color";
 import Button from "../Button";
+import Animation from "../../util/Animation";
 
 export default class Checkbox extends Button {
     public constructor(
         protected _isChecked: boolean = false,
         protected _checkColor: Color | null = Color.BLACK,
+        public checkAnimation: Animation = new Animation(),
         protected _x: number = 0,
         protected _y: number = 0,
         protected _width: number = 1,
@@ -16,42 +18,48 @@ export default class Checkbox extends Button {
         protected _mockHover: boolean = false,
         protected _mockPress: boolean = false,
     ) {
-        super(_x, _y, _width, _height, _fillColor, _strokeColor, _strokeWidth, _mockHover, _mockPress);
+        super();
+    }
+
+    onClick(): void {
+        this.isChecked = !this.isChecked;    
     }
 
     public get renderable(): CanvasImageSource {
-        this.redraw ||= this.interact(this.getInteractablePath());
+        if(this.interact()) this.redraw = true;
+        if(this.checkAnimation.step(this.isChecked)) this.redraw = true;
         if (!this.redraw && !Viewport.guiZoomChanged) return this.canvas.canvas;
         this.redraw = false;
 
         const strokeWidth = this._strokeWidth.screenSpace();
+        const width = this._width.screenSpace();
+        const height = this._height.screenSpace();
 
-        this.canvasSize = { width: this._width + strokeWidth * 4, height: this._height + strokeWidth * 4 };
+        this.canvasSize = { width: width + strokeWidth, height: height + strokeWidth };
 
         this.canvas.save();
-
-        this.canvas.translate(strokeWidth * 2, strokeWidth * 2);
 
         if(strokeWidth && this._strokeColor) {
             this.canvas.lineWidth = strokeWidth;
             this.canvas.lineJoin = "round";
             this.canvas.strokeStyle = this._strokeColor.toCSS();
-            this.canvas.strokeRect(0, 0, this._width, this._height);
+            this.canvas.strokeRect(strokeWidth / 2, strokeWidth / 2, width, height);
         }
 
         if(this._fillColor) {
-            let fillColor = this._fillColor;
-            if(this.isPressed || this._mockPress) fillColor.blendWith(0.2, Color.BLACK);
-            else if(this.isHovered || this._mockHover) fillColor.blendWith(0.2, Color.WHITE); 
-            this.canvas.fillStyle = fillColor.toCSS();
-            this.canvas.fillRect(0, 0, this._width, this._height);
+            this.canvas.fillStyle = this._fillColor.toCSS();
+            this.canvas.fillRect(strokeWidth / 2, strokeWidth / 2, width, height);
         }
 
-        if(this.isChecked && this._checkColor) {
+        if(this._checkColor) {
             this.canvas.fillStyle = this._checkColor.toCSS();
-            this.canvas.fillRect(this._width * 0.075, this._height * 0.075, this._width * 0.85, this._height * 0.85);
+            const w = (width * 0.75) * this.checkAnimation.latest;
+            const h = (height * 0.75) * this.checkAnimation.latest;
+            const x = strokeWidth / 2 + (width - w) / 2;
+            const y = strokeWidth / 2 + (height - h) / 2;
+            this.canvas.fillRect(x, y, w, h);
         }
-
+        
         this.canvas.restore();
 
         return this.canvas.canvas;

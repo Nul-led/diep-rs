@@ -30,9 +30,20 @@ export default class Color {
         return `rgb(${this.r},${this.g},${this.b})`;
     }
 
+    public clone() {
+        return new Color(this.toInt());
+    }
+
     public blendWith(factor: number, color: Color) {
         this.r = Math.round(color.r * factor + this.r * (1 - factor));
         this.g = Math.round(color.g * factor + this.g * (1 - factor));
         this.b = Math.round(color.b * factor + this.b * (1 - factor));
+    }
+
+    public blendTogether(factor: number, color: Color) {
+        const r = Math.round(color.r * factor + this.r * (1 - factor));
+        const g = Math.round(color.g * factor + this.g * (1 - factor));
+        const b = Math.round(color.b * factor + this.b * (1 - factor));
+        return Color.fromRGB(r, g, b);
     }
 }

@@ -27,49 +27,49 @@ export default class Button extends InteractableWidget {
 
     protected getInteractablePath(): Path2D {
         const path = new Path2D();
-        path.rect(this._x, this._y, this._width, this._height);
+        path.rect(this._x.screenSpace(), this._y.screenSpace(), this._width.screenSpace(), this._height.screenSpace());
         return path;
     }
 
     public get renderable(): CanvasImageSource {
-        this.redraw ||= this.interact(this.getInteractablePath());
+        if(this.interact()) this.redraw = true;
         if (!this.redraw && !Viewport.guiZoomChanged) return this.canvas.canvas;
         this.redraw = false;
 
         const strokeWidth = this._strokeWidth.screenSpace();
+        const width = this._width.screenSpace();
+        const height = this._height.screenSpace();
 
-        this.canvasSize = { width: this._width + strokeWidth * 4, height: this._height + strokeWidth * 4 };
+        this.canvasSize = { width: width + strokeWidth, height: height + strokeWidth };
 
         this.canvas.save();
 
-        const fillColor = this._fillColor;
+        const fillColor = this._fillColor?.clone();
 
         if(fillColor) {
             if(this.isPressed || this._mockPress) fillColor.blendWith(0.2, Color.BLACK);
             else if (this.isHovered || this._mockHover) fillColor.blendWith(0.2, Color.WHITE);
         }
 
-        this.canvas.translate(strokeWidth * 2, strokeWidth * 2);
-
         if(strokeWidth && this._strokeColor) {
             this.canvas.lineWidth = strokeWidth;
             this.canvas.lineJoin = "round";
             this.canvas.strokeStyle = this._strokeColor.toCSS();
-            this.canvas.strokeRect(0, 0, this._width, this._height);
+            this.canvas.strokeRect(strokeWidth / 2, strokeWidth / 2, width, height);
         }
 
         if(fillColor) {
             this.canvas.fillStyle = fillColor.toCSS();
-            this.canvas.fillRect(0, 0, this._width, this._height);
+            this.canvas.fillRect(strokeWidth / 2, strokeWidth / 2, width, height);
         }
 
         this.canvas.globalAlpha = 0.2;
         this.canvas.fillStyle = Color.BLACK.toCSS();
         
         if(this.isPressed || this._mockPress) {
-            this.canvas.fillRect(0, 0, this._width, this._height * 7 / 12);
+            this.canvas.fillRect(strokeWidth / 2, strokeWidth / 2, width, height * 7 / 12);
         } else {
-            this.canvas.fillRect(0, this._height * 7 / 12, this._width, this._height * 7 / 12);
+            this.canvas.fillRect(strokeWidth / 2, strokeWidth / 2 + height * 7 / 12, width, height - height * 7 / 12);
         }
 
         this.canvas.restore();
@@ -78,19 +78,15 @@ export default class Button extends InteractableWidget {
     }
 
     public render(ctx: Renderable, x: number, y: number) {
-        ctx.canvas.drawImage(this.renderable, Math.floor(x - this._strokeWidth.screenSpace() * 2), Math.floor(y - this._strokeWidth.screenSpace() * 2));
-    }
-
-    public renderCentered(ctx: Renderable, x: number, y: number) {
-        ctx.canvas.drawImage(this.renderable, Math.floor(x - this.canvasWidth / 2), Math.floor(y - this.canvasHeight / 2));
+        ctx.canvas.drawImage(this.renderable, Math.floor(x - this._strokeWidth.screenSpace() / 2), Math.floor(y - this._strokeWidth.screenSpace() / 2));
     }
 
     public renderVerticallyCentered(ctx: Renderable, x: number, y: number) {
-        ctx.canvas.drawImage(this.renderable, Math.floor(x - this._strokeWidth.screenSpace() * 2), Math.floor(y - this.canvasHeight / 2));
+        ctx.canvas.drawImage(this.renderable, Math.floor(x - this._strokeWidth.screenSpace() / 2), Math.floor(y - this.canvasHeight / 2));
     }
 
     public renderHorizontallyCentered(ctx: Renderable, x: number, y: number) {
-        ctx.canvas.drawImage(this.renderable, Math.floor(x - this.canvasWidth / 2), Math.floor(y - this._strokeWidth.screenSpace() * 2));
+        ctx.canvas.drawImage(this.renderable, Math.floor(x - this.canvasWidth / 2), Math.floor(y - this._strokeWidth.screenSpace() / 2));
     }
 
     /* getters & setters for non public attributes */

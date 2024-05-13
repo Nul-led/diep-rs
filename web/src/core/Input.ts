@@ -1,4 +1,5 @@
 import { Cursor } from "../util/Cursor";
+import Viewport from "./Viewport";
 
 interface Mouse {
     x: number;
@@ -86,5 +87,65 @@ export default class Input {
     public static keyDown: Set<KeyEvent> = new Set();
     public static keyUp: Set<KeyEvent> = new Set();
     public static keyPress: Set<KeyEvent> = new Set();
+
+    public static init() {
+        window.addEventListener("mousemove", e => {
+            this.mouse.x = e.clientX * window.devicePixelRatio;
+            this.mouse.y = e.clientY * window.devicePixelRatio;
+        });
+
+        window.addEventListener("mousedown", e => {
+            this.mouse.leftDown = Boolean(e.buttons & 1 << 0);
+            this.mouse.rightDown = Boolean(e.buttons & 1 << 1);
+            this.mouse.wheelDown = Boolean(e.buttons & 1 << 2);
+        });
+
+        window.addEventListener("mouseup", e => {
+            this.mouse.leftDown = Boolean(e.buttons & 1 << 0);
+            this.mouse.rightDown = Boolean(e.buttons & 1 << 1);
+            this.mouse.wheelDown = Boolean(e.buttons & 1 << 2);
+        });
+
+        window.addEventListener("click", () => {
+            this.mouse.clicked = true;
+        });
+
+        window.addEventListener("wheel", e => {
+            this.mouse.wheelDelta = e.deltaY;
+        });
+
+        window.addEventListener("keydown", e => {
+            const event = this.mapping[e.code];
+            if (event === undefined) return;
+            this.keyDown.add(event);
+        });
+
+        window.addEventListener("keyup", e => {
+            const event = this.mapping[e.code];
+            if (event === undefined) return;
+            this.keyUp.add(event);
+        });
+
+        window.addEventListener("keypress", e => {
+            const event = this.mapping[e.code];
+            if (event === undefined) return;
+            this.keyPress.add(event);
+        });
+
+        const canvas = Viewport.ctx.canvas.canvas;
+        canvas.ondragstart = canvas.oncontextmenu = e => e.preventDefault();
+    }
+
+    public static startFrame() {
+        this.mouse.cursor = "default";
+    }
+
+    public static endFrame() {
+        this.keyPress.clear();
+        for (const key of Array.from(this.keyUp)) this.keyDown.delete(key);
+        this.keyUp.clear();
+        this.mouse.clicked = false;
+        Viewport.ctx.canvas.canvas.style.cursor = this.mouse.cursor;
+    }
 }
 

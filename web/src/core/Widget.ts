@@ -39,12 +39,12 @@ export abstract class InteractableWidget extends Widget implements Interactable 
 
     protected abstract getInteractablePath(): Path2D;
 
-    public interact(path: Path2D): boolean {
-        const isHovered = !this.isUnHoverable && Viewport.ctx.canvas.isPointInPath(path, Input.mouse.x, Input.mouse.y);
+    public interact(): boolean {
+        const isHovered = !this.isUnHoverable && Viewport.ctx.canvas.isPointInPath(this.getInteractablePath(), Input.mouse.x, Input.mouse.y);
         const isClicked = !this.isUnPressable && isHovered && this.isPressed && Input.mouse.clicked;
         const isPressed = !this.isUnPressable && isHovered && Input.mouse.leftDown;
 
-        const hasInteracted = this.isHovered === isHovered && this.isClicked === isClicked && this.isPressed === isPressed;
+        const hasInteracted = this.isHovered !== isHovered || this.isClicked !== isClicked || this.isPressed !== isPressed;
 
         this.isHovered = isHovered;
         this.isClicked = isClicked;

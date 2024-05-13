@@ -41,7 +41,7 @@ export default class TextArea extends Text {
         this.canvas.textBaseline = "middle";
         this.canvas.textAlign = this._textAlign;
 
-            
+        // TODO
 
         const x = this.calculateMargin();
         const y = this.canvasHeight / 2;

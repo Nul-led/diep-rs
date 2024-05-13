@@ -1,5 +1,78 @@
 import { clamp } from "./Clamp";
 
+export enum AnimationType {
+    EaseInSine = "easeInSine",
+    EaseOutSine = "easeOutSine",
+    EaseInOutSine = "easeInOutSine",
+    EaseInQuad = "easeInQuad",
+    EaseOutQuad = "easeOutQuad",
+    EaseInOutQuad = "easeInOutQuad",
+    EaseInCubic = "easeInCubic",
+    EaseOutCubic = "easeOutCubic",
+    EaseInOutCubic = "easeInOutCubic",
+    EaseInQuart = "easeInQuart",
+    EaseOutQuart = "easeOutQuart",
+    EaseInOutQuart = "easeInOutQuart",
+    EaseInQuint = "easeInQuint",
+    EaseOutQuint = "easeOutQuint",
+    EaseInOutQuint = "easeInOutQuint",
+    EaseInExpo = "easeInExpo",
+    EaseOutExpo = "easeOutExpo",
+    EaseInOutExpo = "easeInOutExpo",
+    EaseInCirc = "easeInCirc",
+    EaseOutCirc = "easeOutCirc",
+    EaseInOutCirc = "easeInOutCirc",
+    EaseInBack = "easeInBack",
+    EaseOutBack = "easeOutBack",
+    EaseInOutBack = "easeInOutBack",
+    EaseInElastic = "easeInElastic",
+    EaseOutElastic = "easeOutElastic",
+    EaseInOutElastic = "easeInOutElastic",
+    EaseOutBounce = "easeOutBounce",
+    EaseInBounce = "easeInBounce",
+    EaseInOutBounce = "easeInOutBounce",
+}
+
+export default class Animation {
+    constructor(
+        public animationType: AnimationType = AnimationType.EaseInOutSine,
+        public timeStep: number = 0.05,
+        public timer: number = 0,
+        public latest: number = 0,
+        public isClamped: boolean = true,
+    ) { }
+
+    stepForward(): boolean {
+        if (this.isClamped) {
+            if(this.timer === 1) return false;
+            this.timer = clamp(this.timer + this.timeStep, 0, 1);
+        }
+        else this.timer += this.timeStep;
+        this.latest = this.timer[this.animationType]();
+        return true;
+    }
+
+    stepBackward(): boolean {
+        if (this.isClamped) {
+            if(this.timer === 0) return false;
+            this.timer = clamp(this.timer - this.timeStep, 0, 1);
+        }
+        else this.timer -= this.timeStep;
+        this.latest = this.timer[this.animationType]();
+        return true;
+    }
+
+    step(isForward: boolean): boolean {
+        if (this.isClamped) {
+            if((isForward && this.timer === 1) || (!isForward && this.timer === 0)) return false;
+            this.timer = clamp(this.timer + (isForward ? this.timeStep : -this.timeStep), 0, 1);
+        }
+        else this.timer += (isForward ? this.timeStep : -this.timeStep);
+        this.latest = this.timer[this.animationType]();
+        return true;
+    }
+}
+
 declare global {
     interface Number {
         blendWith(wanted: number): number;
@@ -64,78 +137,78 @@ Number.prototype.easeOutSine = function () {
     return Math.sin((this as number) * (Math.PI / 2));
 };
 
-Number.prototype.easeInOutSine = function() {
+Number.prototype.easeInOutSine = function () {
     return -0.5 * (Math.cos(Math.PI * (this as number)) - 1);
 };
 
-Number.prototype.easeInQuad = function() {
+Number.prototype.easeInQuad = function () {
     return (this as number) * (this as number);
 };
 
-Number.prototype.easeOutQuad = function() {
+Number.prototype.easeOutQuad = function () {
     return (this as number) * (2 - (this as number));
 };
 
-Number.prototype.easeInOutQuad = function() {
+Number.prototype.easeInOutQuad = function () {
     return (this as number) < 0.5 ? 2 * (this as number) * (this as number) : - 1 + (4 - 2 * (this as number)) * (this as number);
 };
 
-Number.prototype.easeInCubic = function() {
+Number.prototype.easeInCubic = function () {
     return (this as number) * (this as number) * (this as number);
 };
 
-Number.prototype.easeOutCubic = function() {
+Number.prototype.easeOutCubic = function () {
     const t1 = (this as number) - 1;
     return t1 * t1 * t1 + 1;
 };
 
-Number.prototype.easeInOutCubic = function() {
+Number.prototype.easeInOutCubic = function () {
     return (this as number) < 0.5 ? 4 * (this as number) * (this as number) * (this as number) : ((this as number) - 1) * (2 * (this as number) - 2) * (2 * (this as number) - 2) + 1;
 };
 
-Number.prototype.easeInQuart = function() {
+Number.prototype.easeInQuart = function () {
     return (this as number) * (this as number) * (this as number) * (this as number);
 };
 
-Number.prototype.easeOutQuart = function() {
+Number.prototype.easeOutQuart = function () {
     const t1 = (this as number) - 1;
     return 1 - t1 * t1 * t1 * t1;
 };
 
-Number.prototype.easeInOutQuart = function() {
+Number.prototype.easeInOutQuart = function () {
     const t1 = (this as number) - 1;
     return (this as number) < 0.5 ? 8 * (this as number) * (this as number) * (this as number) * (this as number) : 1 - 8 * t1 * t1 * t1 * t1;
 };
 
-Number.prototype.easeInQuint = function() {
+Number.prototype.easeInQuint = function () {
     return (this as number) * (this as number) * (this as number) * (this as number) * (this as number);
 };
 
-Number.prototype.easeOutQuint = function() {
+Number.prototype.easeOutQuint = function () {
     const t1 = (this as number) - 1;
     return 1 + t1 * t1 * t1 * t1 * t1;
 };
 
-Number.prototype.easeInOutQuint = function() {
+Number.prototype.easeInOutQuint = function () {
     const t1 = (this as number) - 1;
     return (this as number) < 0.5 ? 16 * (this as number) * (this as number) * (this as number) * (this as number) * (this as number) : 1 + 16 * t1 * t1 * t1 * t1 * t1;
 };
 
-Number.prototype.easeInExpo = function() {
+Number.prototype.easeInExpo = function () {
     if ((this as number) === 0) {
         return 0;
     }
     return Math.pow(2, 10 * ((this as number) - 1));
 };
 
-Number.prototype.easeOutExpo = function() {
+Number.prototype.easeOutExpo = function () {
     if ((this as number) === 1) {
         return 1;
     }
     return (-Math.pow(2, -10 * (this as number)) + 1);
 };
 
-Number.prototype.easeInOutExpo = function() {
+Number.prototype.easeInOutExpo = function () {
     if ((this as number) === 0 || (this as number) === 1) {
         return (this as number);
     }
@@ -147,17 +220,17 @@ Number.prototype.easeInOutExpo = function() {
     return 0.5 * (-Math.pow(2, -10 * scaledTime1) + 2);
 };
 
-Number.prototype.easeInCirc = function() {
+Number.prototype.easeInCirc = function () {
     const scaledTime = (this as number) / 1;
     return -1 * (Math.sqrt(1 - scaledTime * (this as number)) - 1);
 };
 
-Number.prototype.easeOutCirc = function() {
+Number.prototype.easeOutCirc = function () {
     const t1 = (this as number) - 1;
     return Math.sqrt(1 - t1 * t1);
 };
 
-Number.prototype.easeInOutCirc = function() {
+Number.prototype.easeInOutCirc = function () {
     const scaledTime = (this as number) * 2;
     const scaledTime1 = scaledTime - 2;
     if (scaledTime < 1) {
@@ -166,16 +239,16 @@ Number.prototype.easeInOutCirc = function() {
     return 0.5 * (Math.sqrt(1 - scaledTime1 * scaledTime1) + 1);
 };
 
-Number.prototype.easeInBack = function(magnitude: number = 1.70158) {
+Number.prototype.easeInBack = function (magnitude: number = 1.70158) {
     return (this as number) * (this as number) * ((magnitude + 1) * (this as number) - magnitude);
 };
 
-Number.prototype.easeOutBack = function(magnitude: number = 1.70158) {
+Number.prototype.easeOutBack = function (magnitude: number = 1.70158) {
     const scaledTime = ((this as number) / 1) - 1;
     return (scaledTime * scaledTime * ((magnitude + 1) * scaledTime + magnitude)) + 1;
 };
 
-Number.prototype.easeInOutBack = function(magnitude: number = 1.70158) {
+Number.prototype.easeInOutBack = function (magnitude: number = 1.70158) {
     const scaledTime = (this as number) * 2;
     const scaledTime2 = scaledTime - 2;
     const s = magnitude * 1.525;
@@ -185,7 +258,7 @@ Number.prototype.easeInOutBack = function(magnitude: number = 1.70158) {
     return 0.5 * (scaledTime2 * scaledTime2 * ((s + 1) * scaledTime2 + s) + 2);
 };
 
-Number.prototype.easeInElastic = function(magnitude: number = 0.7) {
+Number.prototype.easeInElastic = function (magnitude: number = 0.7) {
     if ((this as number) === 0 || (this as number) === 1) {
         return (this as number);
     }
@@ -196,7 +269,7 @@ Number.prototype.easeInElastic = function(magnitude: number = 0.7) {
     return -(Math.pow(2, 10 * scaledTime1) * Math.sin((scaledTime1 - s) * (2 * Math.PI) / p));
 };
 
-Number.prototype.easeOutElastic = function(magnitude: number = 0.7) {
+Number.prototype.easeOutElastic = function (magnitude: number = 0.7) {
     if ((this as number) === 0 || (this as number) === 1) {
         return (this as number);
     }
@@ -206,7 +279,7 @@ Number.prototype.easeOutElastic = function(magnitude: number = 0.7) {
     return (Math.pow(2, -10 * scaledTime) * Math.sin((scaledTime - s) * (2 * Math.PI) / p)) + 1;
 };
 
-Number.prototype.easeInOutElastic = function(magnitude: number = 0.65) {
+Number.prototype.easeInOutElastic = function (magnitude: number = 0.65) {
     if ((this as number) === 0 || (this as number) === 1) {
         return (this as number);
     }
@@ -220,7 +293,7 @@ Number.prototype.easeInOutElastic = function(magnitude: number = 0.65) {
     return (Math.pow(2, -10 * scaledTime1) * Math.sin((scaledTime1 - s) * (2 * Math.PI) / p) * 0.5) + 1;
 };
 
-Number.prototype.easeOutBounce = function() {
+Number.prototype.easeOutBounce = function () {
     const scaledTime = (this as number) / 1;
     if (scaledTime < (1 / 2.75)) {
         return 7.5625 * scaledTime * scaledTime;
@@ -236,11 +309,11 @@ Number.prototype.easeOutBounce = function() {
     }
 };
 
-Number.prototype.easeInBounce = function() {
+Number.prototype.easeInBounce = function () {
     return 1 - (1 - (this as number)).easeOutBounce();
 };
 
-Number.prototype.easeInOutBounce = function() {
+Number.prototype.easeInOutBounce = function () {
     if ((this as number) < 0.5) {
         return ((this as number) * 2).easeInBounce() * 0.5;
     }
