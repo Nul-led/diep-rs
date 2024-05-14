@@ -133,3 +133,7 @@ dist
 # Added by cargo
 
 /target
+
+
+# Bundle
+/public/*.bundle.js
