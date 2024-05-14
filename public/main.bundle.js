@@ -97,181 +97,6 @@
       ctx.canvas.drawImage(this.renderable, Math.floor(x - this.canvasWidth / 2), Math.floor(y));
     }
   };
-  var InteractableWidget = class extends Widget {
-    constructor() {
-      super(...arguments);
-      this.isUnHoverable = false;
-      this.isUnPressable = false;
-      this.onHoverCursor = "pointer";
-      this.onPressCursor = null;
-      this.isHovered = false;
-      this.isPressed = false;
-      this.isClicked = false;
-    }
-    interact() {
-      const isHovered = !this.isUnHoverable && Viewport.ctx.canvas.isPointInPath(this.getInteractablePath(), Input.mouse.x, Input.mouse.y);
-      const isClicked = !this.isUnPressable && isHovered && this.isPressed && Input.mouse.clicked;
-      const isPressed = !this.isUnPressable && isHovered && Input.mouse.leftDown;
-      const hasInteracted = this.isHovered !== isHovered || this.isClicked !== isClicked || this.isPressed !== isPressed;
-      this.isHovered = isHovered;
-      this.isClicked = isClicked;
-      this.isPressed = isPressed;
-      if (this.isHovered) {
-        if (this.onHoverCursor)
-          Input.mouse.cursor = this.onHoverCursor;
-        this.onHover();
-      }
-      if (this.isPressed) {
-        if (this.onPressCursor)
-          Input.mouse.cursor = this.onPressCursor;
-        this.onPress();
-      }
-      if (this.isClicked) {
-        this.onClick();
-      }
-      return hasInteracted;
-    }
-  };
-
-  // src/util/Clamp.ts
-  var clamp = (val, min, max) => Math.min(Math.max(val, min), max);
-
-  // src/widgets/Slider.ts
-  var Slider = class extends InteractableWidget {
-    constructor(_x = 0, _y = 0, _width = 100, _height = 20, step = 0.01, _value = 0, _barColor = Color.BLACK, _valueColor = Color.WHITE) {
-      super();
-      this._x = _x;
-      this._y = _y;
-      this._width = _width;
-      this._height = _height;
-      this.step = step;
-      this._value = _value;
-      this._barColor = _barColor;
-      this._valueColor = _valueColor;
-      this.redraw = true;
-      this.isSliding = false;
-    }
-    onHover() {
-    }
-    onClick() {
-    }
-    onPress() {
-      this.isSliding = true;
-    }
-    getInteractablePath() {
-      const path = new Path2D();
-      const x = this._x.screenSpace();
-      const y = this._y.screenSpace();
-      const w = this._width.screenSpace();
-      const h = this._height.screenSpace();
-      path.rect(x, y + h * 0.25, w, h);
-      path.arc(x + Math.max(w * this._value, h / 2), y + h * 0.625, h * 0.625, 0, Math.PI * 2);
-      return path;
-    }
-    get renderable() {
-      this.interact();
-      if (this.isSliding) {
-        if (!Input.mouse.leftDown)
-          this.isSliding = false;
-        this.value = clamp((Input.mouse.x - this._x.screenSpace()) / this._width.screenSpace(), 0, 1);
-        Input.mouse.cursor = "pointer";
-      }
-      if (!this.redraw && !Viewport.guiZoomChanged)
-        return this.canvas.canvas;
-      this.redraw = false;
-      const width = this._width.screenSpace();
-      const height = this._height.screenSpace();
-      const maxHeight = height * 1.25;
-      this.canvasSize = { width: width + maxHeight / 2, height: maxHeight };
-      this.canvas.save();
-      this.canvas.lineCap = "round";
-      this.canvas.lineWidth = height;
-      this.canvas.strokeStyle = this._barColor.toCSS();
-      this.canvas.beginPath();
-      this.canvas.moveTo(maxHeight / 2, maxHeight / 2);
-      this.canvas.lineTo(width, maxHeight / 2);
-      this.canvas.stroke();
-      this.canvas.lineWidth = height;
-      this.canvas.strokeStyle = this._valueColor.toCSS();
-      this.canvas.beginPath();
-      this.canvas.moveTo(maxHeight / 2, maxHeight / 2);
-      this.canvas.lineTo(Math.max(width * this._value, maxHeight / 2), maxHeight / 2);
-      this.canvas.stroke();
-      this.canvas.beginPath();
-      this.canvas.arc(Math.max(width * this._value, maxHeight / 2), maxHeight / 2, height / 2, 0, Math.PI * 2);
-      this.canvas.lineWidth = maxHeight - height;
-      this.canvas.strokeStyle = Color.BLACK.toCSS();
-      this.canvas.stroke();
-      this.canvas.fillStyle = this._valueColor.toCSS();
-      this.canvas.fill();
-      this.canvas.restore();
-      return this.canvas.canvas;
-    }
-    /* getters & setters for non public attributes */
-    get x() {
-      return this._x;
-    }
-    set x(val) {
-      if (this._x === val)
-        return;
-      this.redraw = true;
-      this._x = val;
-    }
-    get y() {
-      return this._y;
-    }
-    set y(val) {
-      if (this._y === val)
-        return;
-      this.redraw = true;
-      this._y = val;
-    }
-    get width() {
-      return this._width;
-    }
-    set width(val) {
-      if (this._width === val)
-        return;
-      this.redraw = true;
-      this._width = val;
-    }
-    get height() {
-      return this._height;
-    }
-    set height(val) {
-      if (this._height === val)
-        return;
-      this.redraw = true;
-      this._height = val;
-    }
-    get value() {
-      return this._value;
-    }
-    set value(val) {
-      if (this._value === val)
-        return;
-      this.redraw = true;
-      this._value = val;
-    }
-    get barColor() {
-      return this._barColor;
-    }
-    set barColor(val) {
-      if (this._barColor === val)
-        return;
-      this.redraw = true;
-      this._barColor = val;
-    }
-    get valueColor() {
-      return this._valueColor;
-    }
-    set valueColor(val) {
-      if (this._valueColor === val)
-        return;
-      this.redraw = true;
-      this._valueColor = val;
-    }
-  };
 
   // src/widgets/Text.ts
   var Text = class extends Widget {
@@ -364,6 +189,76 @@
     }
   };
 
+  // src/widgets/TextArea.ts
+  var TextArea = class extends Text {
+    constructor(_text = "", _fontSize = 16, _textAlign = "left", _fillColor = Color.WHITE, _strokeColor = Color.BLACK, _strokeWidthFactor = 0.2) {
+      super(_text, _fontSize, _fillColor, _strokeColor, _strokeWidthFactor);
+      this._text = _text;
+      this._fontSize = _fontSize;
+      this._textAlign = _textAlign;
+      this._fillColor = _fillColor;
+      this._strokeColor = _strokeColor;
+      this._strokeWidthFactor = _strokeWidthFactor;
+    }
+    calculateMargin() {
+      return this._strokeWidthFactor * this._fontSize.screenSpace() * 2;
+    }
+    calculateWidth() {
+      this.canvas.font = `${this._fontSize.screenSpace()}px Ubuntu`;
+      const margin = this.calculateMargin() * 2;
+      return Math.max(1, ...this._text.split("\n").map((e) => this.canvas.measureText(e).width + margin));
+    }
+    calculateHeight() {
+      return Math.max(1, this._fontSize.screenSpace() * 1.4 * this._text.split("\n").length);
+    }
+    get renderable() {
+      if (!this.redraw && !Viewport.guiZoomChanged)
+        return this.canvas.canvas;
+      this.redraw = false;
+      const fontSize = this._fontSize.screenSpace();
+      this.canvasSize = { width: this.calculateWidth(), height: this.calculateHeight() };
+      this.canvas.font = `${fontSize}px Ubuntu`;
+      this.canvas.textBaseline = "middle";
+      this.canvas.textAlign = this._textAlign;
+      let x;
+      switch (this._textAlign) {
+        case "left":
+          x = this.calculateMargin();
+          break;
+        case "center":
+          x = this.canvasWidth / 2;
+          break;
+        case "right":
+          x = this.canvasWidth - this.calculateMargin();
+          break;
+      }
+      const lines = this._text.split("\n");
+      for (let i = 0; i < lines.length; ++i) {
+        const y = Math.max(1, this._fontSize.screenSpace() * 1.4) * (i + 0.5);
+        if (this._strokeWidthFactor && this._strokeColor) {
+          this.canvas.fillStyle = this._strokeColor.toCSS();
+          this.canvas.lineWidth = fontSize * this._strokeWidthFactor;
+          this.canvas.strokeText(lines[i], x, y);
+        }
+        if (this._fillColor) {
+          this.canvas.fillStyle = this._fillColor.toCSS();
+          this.canvas.fillText(lines[i], x, y);
+        }
+      }
+      return this.canvas.canvas;
+    }
+    /* getters & setters for non public attributes */
+    get textAlign() {
+      return this._textAlign;
+    }
+    set textAlign(val) {
+      if (this._textAlign === val)
+        return;
+      this.redraw = true;
+      this._textAlign = val;
+    }
+  };
+
   // src/core/Viewport.ts
   var Viewport = class {
     static {
@@ -399,10 +294,7 @@
       this.ctx.canvasSize = { width: this.width, height: this.height };
     }
     static {
-      this.a = new Slider(100, 100, 200, 20, 0.01, 1, Color.BLACK, Color.fromRGB(255, 0, 0));
-    }
-    static {
-      this.b = new Text("Slider widget value: 0", 25);
+      this.a = new TextArea("test test test\ntest1 28382382838\nthis   is   a    very long         string        :)))))))", 16, "right");
     }
     /*
         this.canvas.save();
@@ -414,9 +306,7 @@
     static render() {
       this.resize();
       this.ctx.canvas.reset();
-      this.a.render(this.ctx, this.a.x.screenSpace(), this.a.y.screenSpace());
-      this.b.text = "Slider widget value: " + this.a.value.toFixed(2);
-      this.b.renderCentered(this.ctx, this.a.x.screenSpace() + this.a.canvasWidth / 2, this.a.y.screenSpace() - 20 .screenSpace());
+      this.a.render(this.ctx, 500, 500);
     }
   };
   Number.prototype.screenSpace = function() {

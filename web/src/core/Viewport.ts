@@ -6,6 +6,7 @@ import Image from "../widgets/Image";
 import ProgressBar from "../widgets/ProgressBar";
 import Slider from "../widgets/Slider";
 import Text from "../widgets/Text";
+import TextArea from "../widgets/TextArea";
 import Checkbox from "../widgets/buttons/Checkbox";
 import ImageButton from "../widgets/buttons/ImageButton";
 import { TextButton } from "../widgets/buttons/TextButton";
@@ -31,9 +32,7 @@ export default class Viewport {
         this.ctx.canvasSize = { width: this.width, height: this.height };
     }
 
-    protected static a: Slider = new Slider(100, 100, 200, 20, 0.01, 1, Color.BLACK, Color.fromRGB(255, 0, 0));
-
-    protected static b: Text = new Text("Slider widget value: 0", 25);
+    protected static a: TextArea = new TextArea("test test test\ntest1 28382382838\nthis   is   a    very long         string        :)))))))", 16, "right");
 
     /*
         this.canvas.save();
@@ -46,9 +45,7 @@ export default class Viewport {
     public static render() {
         this.resize();
         this.ctx.canvas.reset();
-        this.a.render(this.ctx, this.a.x.screenSpace(), this.a.y.screenSpace());
-        this.b.text = "Slider widget value: " + this.a.value.toFixed(2);
-        this.b.renderCentered(this.ctx, this.a.x.screenSpace() + this.a.canvasWidth / 2, this.a.y.screenSpace() - (20).screenSpace());
+        this.a.render(this.ctx, 500, 500);
     }
 }
 

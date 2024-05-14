@@ -7,10 +7,10 @@ export default class TextArea extends Text {
     public constructor(
         protected _text: string = "",
         protected _fontSize: number = 16,
+        protected _textAlign: "left" | "center" | "right" = "left",
         protected _fillColor: Color | null = Color.WHITE,
         protected _strokeColor: Color | null = Color.BLACK,
         protected _strokeWidthFactor: number = 0.2,
-        protected _textAlign: "left" | "center" | "right" = "left",
     ) {
         super(_text, _fontSize, _fillColor, _strokeColor, _strokeWidthFactor);
     }
@@ -41,25 +41,33 @@ export default class TextArea extends Text {
         this.canvas.textBaseline = "middle";
         this.canvas.textAlign = this._textAlign;
 
+        let x;
+        switch(this._textAlign) {
+            case "left":
+                x = this.calculateMargin();
+                break;
+            case "center":
+                x = this.canvasWidth / 2;
+                break;
+            case "right":
+                x = this.canvasWidth - this.calculateMargin();
+                break;
+        }
+
         const lines = this._text.split("\n");
         for (let i = 0; i < lines.length; ++i) {
+            const y = Math.max(1, this._fontSize.screenSpace() * 1.4) * (i + 0.5);
 
-        }
-
-        // TODO
-
-        const x = this.calculateMargin();
-        const y = this.canvasHeight / 2;
-
-        if (this._strokeWidthFactor && this._strokeColor) {
-            this.canvas.fillStyle = this._strokeColor.toCSS();
-            this.canvas.lineWidth = fontSize * this._strokeWidthFactor;
-            this.canvas.strokeText(this._text, x, y);
-        }
-
-        if (this._fillColor) {
-            this.canvas.fillStyle = this._fillColor.toCSS();
-            this.canvas.fillText(this._text, x, y);
+            if (this._strokeWidthFactor && this._strokeColor) {
+                this.canvas.fillStyle = this._strokeColor.toCSS();
+                this.canvas.lineWidth = fontSize * this._strokeWidthFactor;
+                this.canvas.strokeText(lines[i], x, y);
+            }
+    
+            if (this._fillColor) {
+                this.canvas.fillStyle = this._fillColor.toCSS();
+                this.canvas.fillText(lines[i], x, y);
+            }
         }
 
         return this.canvas.canvas;
