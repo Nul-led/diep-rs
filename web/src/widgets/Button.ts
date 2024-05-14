@@ -21,9 +21,9 @@ export default class Button extends InteractableWidget {
         super();
     }
 
-    onHover(): void { }
-    onPress(): void { }
-    onClick(): void { }
+    public onHover(): void { }
+    public onPress(): void { }
+    public onClick(): void { }
 
     protected getInteractablePath(): Path2D {
         const path = new Path2D();
@@ -32,7 +32,7 @@ export default class Button extends InteractableWidget {
     }
 
     public get renderable(): CanvasImageSource {
-        if(this.interact()) this.redraw = true;
+        if (this.interact()) this.redraw = true;
         if (!this.redraw && !Viewport.guiZoomChanged) return this.canvas.canvas;
         this.redraw = false;
 
@@ -46,27 +46,27 @@ export default class Button extends InteractableWidget {
 
         const fillColor = this._fillColor?.clone();
 
-        if(fillColor) {
-            if(this.isPressed || this._mockPress) fillColor.blendWith(0.2, Color.BLACK);
+        if (fillColor) {
+            if (this.isPressed || this._mockPress) fillColor.blendWith(0.2, Color.BLACK);
             else if (this.isHovered || this._mockHover) fillColor.blendWith(0.2, Color.WHITE);
         }
 
-        if(strokeWidth && this._strokeColor) {
+        if (strokeWidth && this._strokeColor) {
             this.canvas.lineWidth = strokeWidth;
             this.canvas.lineJoin = "round";
             this.canvas.strokeStyle = this._strokeColor.toCSS();
             this.canvas.strokeRect(strokeWidth / 2, strokeWidth / 2, width, height);
         }
 
-        if(fillColor) {
+        if (fillColor) {
             this.canvas.fillStyle = fillColor.toCSS();
             this.canvas.fillRect(strokeWidth / 2, strokeWidth / 2, width, height);
         }
 
         this.canvas.globalAlpha = 0.2;
         this.canvas.fillStyle = Color.BLACK.toCSS();
-        
-        if(this.isPressed || this._mockPress) {
+
+        if (this.isPressed || this._mockPress) {
             this.canvas.fillRect(strokeWidth / 2, strokeWidth / 2, width, height * 7 / 12);
         } else {
             this.canvas.fillRect(strokeWidth / 2, strokeWidth / 2 + height * 7 / 12, width, height - height * 7 / 12);

@@ -41,6 +41,11 @@ export default class TextArea extends Text {
         this.canvas.textBaseline = "middle";
         this.canvas.textAlign = this._textAlign;
 
+        const lines = this._text.split("\n");
+        for (let i = 0; i < lines.length; ++i) {
+
+        }
+
         // TODO
 
         const x = this.calculateMargin();

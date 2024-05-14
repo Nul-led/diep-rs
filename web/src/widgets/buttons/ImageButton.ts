@@ -19,8 +19,8 @@ export default class ImageButton extends Button {
     }
 
     public get renderable(): CanvasImageSource {
-        if(this.interact()) this.redraw = true;
-        if(this.imageWidget.redraw) this.redraw = true;
+        if (this.interact()) this.redraw = true;
+        if (this.imageWidget.redraw) this.redraw = true;
         if (!this.redraw && !Viewport.guiZoomChanged) return this.canvas.canvas;
         this.redraw = false;
 
@@ -32,7 +32,7 @@ export default class ImageButton extends Button {
 
         this.canvas.save();
 
-        if(strokeWidth && this._strokeColor) {
+        if (strokeWidth && this._strokeColor) {
             this.canvas.lineWidth = strokeWidth;
             this.canvas.lineJoin = "round";
             this.canvas.strokeStyle = this._strokeColor.toCSS();
@@ -40,12 +40,12 @@ export default class ImageButton extends Button {
         }
 
         this.canvas.drawImage(this.imageWidget.renderable, strokeWidth / 2, strokeWidth / 2, width, height);
-        
-        if(this.isPressed || this._mockPress) {
+
+        if (this.isPressed || this._mockPress) {
             this.canvas.globalAlpha = 0.2;
             this.canvas.fillStyle = Color.BLACK.toCSS();
             this.canvas.fillRect(strokeWidth / 2, strokeWidth / 2, width, height);
-        } else if(this.isHovered || this._mockHover) {
+        } else if (this.isHovered || this._mockHover) {
             this.canvas.globalAlpha = 0.2;
             this.canvas.fillStyle = Color.WHITE.toCSS();
             this.canvas.fillRect(strokeWidth / 2, strokeWidth / 2, width, height);

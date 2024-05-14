@@ -21,7 +21,7 @@ export default class Checkbox extends Button {
         super();
     }
 
-    onClick(): void {
+    public onClick(): void {
         this.isChecked = !this.isChecked;    
     }
 

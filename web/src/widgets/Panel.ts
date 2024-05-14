@@ -31,14 +31,14 @@ export default class Panel extends Widget {
 
         this.canvas.translate(strokeWidth * 2, strokeWidth * 2);
 
-        if(strokeWidth && this._strokeColor) {
+        if (strokeWidth && this._strokeColor) {
             this.canvas.lineWidth = strokeWidth;
             this.canvas.lineJoin = this._lineJoin;
             this.canvas.strokeStyle = this._strokeColor.toCSS();
             this.canvas.strokeRect(0, 0, this._width, this._height);
         }
 
-        if(fillColor) {
+        if (fillColor) {
             this.canvas.fillStyle = fillColor.toCSS();
             this.canvas.fillRect(0, 0, this._width, this._height);
         }

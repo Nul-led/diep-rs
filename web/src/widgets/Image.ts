@@ -14,7 +14,7 @@ export default class Image extends Widget {
         img.onload = () => widget.redraw = true;
         return widget;
     }
-    
+
     constructor(
         protected _source: null | HTMLImageElement | HTMLCanvasElement | OffscreenCanvas = null,
     ) {
@@ -22,7 +22,7 @@ export default class Image extends Widget {
     }
 
     public get renderable(): CanvasImageSource {
-        if(this._source instanceof HTMLImageElement && !this._source.complete) return cachedPreLoaderImg;
+        if (this._source instanceof HTMLImageElement && !this._source.complete) return cachedPreLoaderImg;
         return this._source || this.canvas.canvas;
     }
 
@@ -32,7 +32,7 @@ export default class Image extends Widget {
 
     public set source(val: null | string | HTMLImageElement | HTMLCanvasElement | OffscreenCanvas) {
         if (this._source === val) return;
-        if(typeof val === "string") {
+        if (typeof val === "string") {
             const img = document.createElement("img");
             img.src = val;
             img.onload = () => this.redraw = true;

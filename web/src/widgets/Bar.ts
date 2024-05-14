@@ -20,11 +20,11 @@ export default class Bar extends Widget {
     public get renderable(): CanvasImageSource {
         if (!this.redraw && !Viewport.guiZoomChanged) return this.canvas.canvas;
         this.redraw = false;
-        
+
         const width = this._width.screenSpace();
         const outerHeight = this._outerHeight.screenSpace();
         const maxStroke = Math.max(this.innerHeightFactor * outerHeight, outerHeight) + 1; // + 1 px to account for subpixel offsets
-        
+
         this.canvasSize = { width: width + maxStroke / 2, height: maxStroke };
 
         this.canvas.save();

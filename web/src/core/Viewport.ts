@@ -4,6 +4,7 @@ import Bar from "../widgets/Bar";
 import Button from "../widgets/Button";
 import Image from "../widgets/Image";
 import ProgressBar from "../widgets/ProgressBar";
+import Slider from "../widgets/Slider";
 import Text from "../widgets/Text";
 import Checkbox from "../widgets/buttons/Checkbox";
 import ImageButton from "../widgets/buttons/ImageButton";
@@ -30,15 +31,9 @@ export default class Viewport {
         this.ctx.canvasSize = { width: this.width, height: this.height };
     }
 
-    protected static a: ProgressBar = new ProgressBar(new Text("100%", 150 / 1.4), 300, 0.5, Color.WHITE, 0.75, Color.BLACK, 150);
+    protected static a: Slider = new Slider(100, 100, 200, 20, 0.01, 1, Color.BLACK, Color.fromRGB(255, 0, 0));
 
-    protected static b: Button = new Button(100, 100, 200, 200, Color.fromRGB(0, 0, 255), Color.BLACK, 20, false, false);
-
-    protected static c: Checkbox = new Checkbox(true, Color.fromRGB(255,0,0), new Animation(AnimationType.EaseInOutExpo, 0.05), 100, 100, 50, 50, Color.WHITE, Color.BLACK, 20, false, false);
-
-    protected static d: TextButton = new TextButton(new Text("test button", 20), 100, 100, 200, 200, Color.fromRGB(0, 0, 255), Color.BLACK, 20, false, false);
-
-    protected static e: ImageButton = new ImageButton(Image.fromURL("https://assets.hager.com/step-content/P/HA_22410449/10/std.lang.all/WDI100.webp"), 100, 100, 200, 200, Color.BLACK, 20, false, false);
+    protected static b: Text = new Text("Slider widget value: 0", 25);
 
     /*
         this.canvas.save();
@@ -51,12 +46,9 @@ export default class Viewport {
     public static render() {
         this.resize();
         this.ctx.canvas.reset();
-        //this.a.renderCentered(this.ctx, this.width / 2, this.height / 2);
-        //this.b.render(this.ctx, this.b.x.screenSpace(), this.b.y.screenSpace());
-        //this.b.renderVerticallyCentered(this.ctx, (this.b.x + this.b.width / 2).screenSpace(), (this.b.y).screenSpace());
-        //this.c.render(this.ctx, this.c.x.screenSpace(), this.c.y.screenSpace());
-        //this.d.render(this.ctx, this.d.x.screenSpace(), this.d.y.screenSpace());
-        this.e.render(this.ctx, this.e.x.screenSpace(), this.e.y.screenSpace());
+        this.a.render(this.ctx, this.a.x.screenSpace(), this.a.y.screenSpace());
+        this.b.text = "Slider widget value: " + this.a.value.toFixed(2);
+        this.b.renderCentered(this.ctx, this.a.x.screenSpace() + this.a.canvasWidth / 2, this.a.y.screenSpace() - (20).screenSpace());
     }
 }
 

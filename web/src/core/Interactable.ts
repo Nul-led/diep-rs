@@ -8,9 +8,9 @@ export interface Interactable {
 
     isUnHoverable: boolean;
     isUnPressable: boolean;
-    
+
     onHoverCursor: Cursor | null;
-    onPressCursor: Cursor | null; 
+    onPressCursor: Cursor | null;
 
     onHover(): void;
     onPress(): void;

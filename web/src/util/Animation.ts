@@ -44,7 +44,7 @@ export default class Animation {
 
     stepForward(): boolean {
         if (this.isClamped) {
-            if(this.timer === 1) return false;
+            if (this.timer === 1) return false;
             this.timer = clamp(this.timer + this.timeStep, 0, 1);
         }
         else this.timer += this.timeStep;
@@ -54,7 +54,7 @@ export default class Animation {
 
     stepBackward(): boolean {
         if (this.isClamped) {
-            if(this.timer === 0) return false;
+            if (this.timer === 0) return false;
             this.timer = clamp(this.timer - this.timeStep, 0, 1);
         }
         else this.timer -= this.timeStep;
@@ -64,7 +64,7 @@ export default class Animation {
 
     step(isForward: boolean): boolean {
         if (this.isClamped) {
-            if((isForward && this.timer === 1) || (!isForward && this.timer === 0)) return false;
+            if ((isForward && this.timer === 1) || (!isForward && this.timer === 0)) return false;
             this.timer = clamp(this.timer + (isForward ? this.timeStep : -this.timeStep), 0, 1);
         }
         else this.timer += (isForward ? this.timeStep : -this.timeStep);
