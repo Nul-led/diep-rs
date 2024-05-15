@@ -43,7 +43,7 @@ pub enum Shape {
         offset: f32, // the offset of the lower side
     },
     Kite {
-        width: f32, // >= 0
+        width: f32,  // >= 0
         height: f32, // >= 0
     },
     /// Needs to be convex for collision detection

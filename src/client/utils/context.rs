@@ -5,6 +5,8 @@ use web_sys::{
     CanvasRenderingContext2d, HtmlCanvasElement, OffscreenCanvas, OffscreenCanvasRenderingContext2d,
 };
 
+/* Disclaimer: While there are a few conversions marked as unsafe, they are safe as long as you treat the converted context as the conversion target (ie not accessing unsupported methods and properties) */
+
 #[derive(Clone, Debug)]
 pub struct Context(CanvasRenderingContext2d);
 
@@ -103,6 +105,10 @@ impl From<OffscreenContext> for Context {
 
 impl From<Context> for OffscreenContext {
     fn from(value: Context) -> Self {
-        Self(unsafe { value.0.unchecked_into::<OffscreenCanvasRenderingContext2d>() })
+        Self(unsafe {
+            value
+                .0
+                .unchecked_into::<OffscreenCanvasRenderingContext2d>()
+        })
     }
 }
