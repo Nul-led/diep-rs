@@ -1,5 +1,6 @@
 import AppInfo from "../components/AppInfo";
 import Changelog from "../components/Changelog";
+import InfoHeader from "../components/InfoHeader";
 import Animation, { AnimationType } from "../util/Animation";
 import Color from "../util/Color";
 import Bar from "../widgets/Bar";
@@ -48,6 +49,7 @@ export default class Viewport {
 
     public static a = new AppInfo();
     public static b = new Changelog();
+    public static c = new InfoHeader();
 
     /*
         this.canvas.save();
@@ -62,6 +64,7 @@ export default class Viewport {
         this.ctx.canvas.reset();
         this.a.render(this.ctx);
         this.b.render(this.ctx);
+        this.c.render(this.ctx);
     }
 }
 
