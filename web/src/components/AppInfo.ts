@@ -10,8 +10,8 @@ export default class AppInfo extends Component {
         public readonly lines: TextArea = new TextArea("0 players", 16, "right"),
         public x: number = -20,
         public y: number = -198,
-        public anchorX: ScreenAnchorX = ScreenAnchorX.Right,
-        public anchorY: ScreenAnchorY = ScreenAnchorY.Bottom,
+        public anchorX: ScreenAnchorX = ScreenAnchorX.Max,
+        public anchorY: ScreenAnchorY = ScreenAnchorY.Max,
     ) {
         super();
     }

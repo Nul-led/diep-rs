@@ -10,8 +10,8 @@ export default class Changelog extends Component {
         public readonly lines: TextArea = new TextArea("test entry\ntest entry 2", 16),
         public x: number = 30,
         public y: number = 30,
-        public anchorX: ScreenAnchorX = ScreenAnchorX.Left,
-        public anchorY: ScreenAnchorY = ScreenAnchorY.Top,
+        public anchorX: ScreenAnchorX = ScreenAnchorX.Min,
+        public anchorY: ScreenAnchorY = ScreenAnchorY.Min,
     ) {
         super();
     }

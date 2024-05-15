@@ -7,11 +7,11 @@ export default class ProgressBar extends Bar {
     constructor(
         public readonly textWidget: Text = new Text(),
         protected _width: number = 1.0,
-        protected _value: number = 0.0,
+        protected _outerHeight: number = 1.0,
         protected _innerColor: Color = Color.WHITE,
-        protected _innerHeightFactor: number = 0.75,
         protected _outerColor: Color = Color.BLACK,
-        protected _outerHeight: number = 24.0,
+        protected _innerHeightFactor: number = 0.75,
+        protected _value: number = 0.0,
     ) {
         super();
     }
@@ -41,7 +41,7 @@ export default class ProgressBar extends Bar {
         this.canvas.strokeStyle = this._innerColor.toCSS();
         this.canvas.beginPath();
         this.canvas.moveTo(outerHeight / 2, outerHeight / 2);
-        this.canvas.lineTo(width * this._value, outerHeight / 2);
+        this.canvas.lineTo(Math.max(width * this._value, maxStroke / 2), outerHeight / 2);
         this.canvas.stroke();
 
         this.canvas.restore();

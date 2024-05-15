@@ -1,6 +1,7 @@
 import AppInfo from "../components/AppInfo";
 import Changelog from "../components/Changelog";
 import InfoHeader from "../components/InfoHeader";
+import PlayerStatus from "../components/PlayerStatus";
 import Animation, { AnimationType } from "../util/Animation";
 import Color from "../util/Color";
 import Bar from "../widgets/Bar";
@@ -16,15 +17,15 @@ import { TextButton } from "../widgets/buttons/TextButton";
 import Renderable from "./Renderable";
 
 export enum ScreenAnchorX {
-    Left = 0,
-    Center = 1,
-    Right = 2,
+    Min = 0,
+    Half = 1,
+    Max = 2,
 }
 
 export enum ScreenAnchorY {
-    Top = 3,
-    Center = 4,
-    Bottom = 5,
+    Min = 3,
+    Half = 4,
+    Max = 5,
 }
 
 export default class Viewport {
@@ -50,6 +51,7 @@ export default class Viewport {
     public static a = new AppInfo();
     public static b = new Changelog();
     public static c = new InfoHeader();
+    public static d = new PlayerStatus();
 
     /*
         this.canvas.save();
@@ -65,6 +67,7 @@ export default class Viewport {
         this.a.render(this.ctx);
         this.b.render(this.ctx);
         this.c.render(this.ctx);
+        this.d.render(this.ctx);
     }
 }
 
@@ -81,11 +84,11 @@ Number.prototype.screenSpace = function () {
 
 Number.prototype.anchoredScreenSpace = function (anchor: ScreenAnchorX | ScreenAnchorY) {
     switch (anchor) {
-        case ScreenAnchorX.Left: return (this as number) * Viewport.guiZoomFactor;
-        case ScreenAnchorX.Center: return Viewport.width / 2 + (this as number) * Viewport.guiZoomFactor;
-        case ScreenAnchorX.Right: return Viewport.width + (this as number) * Viewport.guiZoomFactor;
-        case ScreenAnchorY.Top: return (this as number) * Viewport.guiZoomFactor;
-        case ScreenAnchorY.Center: return Viewport.height / 2 + (this as number) * Viewport.guiZoomFactor;
-        case ScreenAnchorY.Bottom: return Viewport.height + (this as number) * Viewport.guiZoomFactor;
+        case ScreenAnchorX.Min: return (this as number) * Viewport.guiZoomFactor;
+        case ScreenAnchorX.Half: return Viewport.width / 2 + (this as number) * Viewport.guiZoomFactor;
+        case ScreenAnchorX.Max: return Viewport.width + (this as number) * Viewport.guiZoomFactor;
+        case ScreenAnchorY.Min: return (this as number) * Viewport.guiZoomFactor;
+        case ScreenAnchorY.Half: return Viewport.height / 2 + (this as number) * Viewport.guiZoomFactor;
+        case ScreenAnchorY.Max: return Viewport.height + (this as number) * Viewport.guiZoomFactor;
     }
 }
