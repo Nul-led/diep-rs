@@ -63,13 +63,7 @@ export default class Animation {
     }
 
     step(isForward: boolean): boolean {
-        if (this.isClamped) {
-            if ((isForward && this.timer === 1) || (!isForward && this.timer === 0)) return false;
-            this.timer = clamp(this.timer + (isForward ? this.timeStep : -this.timeStep), 0, 1);
-        }
-        else this.timer += (isForward ? this.timeStep : -this.timeStep);
-        this.latest = this.timer[this.animationType]();
-        return true;
+        return isForward ? this.stepForward() : this.stepBackward();
     }
 }
 
