@@ -1,17 +1,13 @@
 import Renderable from "./Renderable";
-import Viewport from "./Viewport";
+import { ScreenAnchorX, ScreenAnchorY } from "./Viewport";
 
 export abstract class Component {
-    public x: number = 0;
-    public y: number = 0;
-
-    public get guiX(): number {
-        return this.x * Viewport.guiZoomFactor;
-    }
-
-    public get guiY(): number {
-        return this.y * Viewport.guiZoomFactor;
-    }
+    public constructor(
+        public x: number = 0,
+        public y: number = 0,
+        public anchorX: ScreenAnchorX = ScreenAnchorX.Left,
+        public anchorY: ScreenAnchorY = ScreenAnchorY.Top,
+    ) { }
 
     public abstract render(ctx: Renderable): void;
 }

@@ -1,3 +1,4 @@
+import AppInfo from "../components/AppInfo";
 import Animation, { AnimationType } from "../util/Animation";
 import Color from "../util/Color";
 import Bar from "../widgets/Bar";
@@ -11,6 +12,18 @@ import Checkbox from "../widgets/buttons/Checkbox";
 import ImageButton from "../widgets/buttons/ImageButton";
 import { TextButton } from "../widgets/buttons/TextButton";
 import Renderable from "./Renderable";
+
+export enum ScreenAnchorX {
+    Left = 0,
+    Center = 1,
+    Right = 2,
+}
+
+export enum ScreenAnchorY {
+    Top = 3,
+    Center = 4,
+    Bottom = 5,
+}
 
 export default class Viewport {
     public static maxWidth: number = 1920;
@@ -32,7 +45,7 @@ export default class Viewport {
         this.ctx.canvasSize = { width: this.width, height: this.height };
     }
 
-    protected static a: TextArea = new TextArea("😀 test test test\ntest1 28382382838\nthis   is   a    very long         string        :)))))))", 16, "center");
+    public static a = new AppInfo();
 
     /*
         this.canvas.save();
@@ -45,16 +58,28 @@ export default class Viewport {
     public static render() {
         this.resize();
         this.ctx.canvas.reset();
-        this.a.render(this.ctx, 500, 500);
+        this.a.render(this.ctx)
     }
 }
 
 declare global {
     interface Number {
         screenSpace(): number;
+        anchoredScreenSpace(anchor: ScreenAnchorX | ScreenAnchorY): number;
     }
 }
 
 Number.prototype.screenSpace = function () {
-    return this as number * Viewport.guiZoomFactor;
+    return (this as number) * Viewport.guiZoomFactor;
+}
+
+Number.prototype.anchoredScreenSpace = function (anchor: ScreenAnchorX | ScreenAnchorY) {
+    switch (anchor) {
+        case ScreenAnchorX.Left: return (this as number) * Viewport.guiZoomFactor;
+        case ScreenAnchorX.Center: return Viewport.width / 2 + (this as number) * Viewport.guiZoomFactor;
+        case ScreenAnchorX.Right: return Viewport.width + (this as number) * Viewport.guiZoomFactor;
+        case ScreenAnchorY.Top: return (this as number) * Viewport.guiZoomFactor;
+        case ScreenAnchorY.Center: return Viewport.height / 2 + (this as number) * Viewport.guiZoomFactor;
+        case ScreenAnchorY.Bottom: return Viewport.height + (this as number) * Viewport.guiZoomFactor;
+    }
 }
