@@ -1,5 +1,5 @@
 use bevy::{
-    ecs::system::{Query, Res},
+    ecs::system::{Query, Res, ResMut},
     math::Vec2,
 };
 use bevy_xpbd_2d::components::Position;
@@ -84,7 +84,40 @@ pub fn render_grid(
 }
 
 pub fn render_borders(
-    r_viewport: Res<Viewport>,
+    q_game: Query<(&Game)
+    r_viewport: ResMut<Viewport>,
 ) {
-    
+    r_viewport.borders.min =
+
 }
+
+
+/*
+    public static renderBorders(ctx: Context) {
+        borderCoordinateMapping.minX = ((borderCoordinateMapping.minX * 4.0) + Arena.minX) / 5.0;
+        borderCoordinateMapping.minY = (borderCoordinateMapping.minY * 4.0 + Arena.minY) / 5.0;
+        borderCoordinateMapping.maxX = (borderCoordinateMapping.maxX * 4.0 + Arena.maxX) / 5.0;
+        borderCoordinateMapping.maxY = (borderCoordinateMapping.maxY * 4.0 + Arena.maxY) / 5.0;
+
+        const borderMinX = Math.max(0, this.screenX(borderCoordinateMapping.minX));
+        const borderMinY = Math.max(0, this.screenY(borderCoordinateMapping.minY));
+        const borderMaxX = Math.min(this.screenWidth, this.screenX(borderCoordinateMapping.maxX));
+        const borderMaxY = Math.min(this.screenHeight, this.screenY(borderCoordinateMapping.maxY));
+
+        ctx.save();
+
+        ctx.globalAlpha = 0.1; // TODO border alpha convar
+        ctx.fillStyle = Color.BLACK; // TODO border color convar
+
+        ctx.fillRect(0, borderMinY, borderMinX, this.screenHeight - borderMinY);
+        ctx.fillRect(0, 0, borderMaxX, borderMinY);
+        ctx.fillRect(borderMaxX, 0, this.screenWidth - borderMaxX, borderMaxY);
+        ctx.fillRect(borderMinX, borderMaxY, this.screenWidth - borderMinX, this.screenHeight - borderMaxY);
+
+        ctx.restore();
+    }
+
+
+*/
+
+pub fn render_indicators() {}

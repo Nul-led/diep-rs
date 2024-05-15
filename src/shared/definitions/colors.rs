@@ -1,6 +1,8 @@
+use serde::{Deserialize, Serialize};
+
 use crate::shared::util::paint::Paint;
 
-#[derive(Clone, Copy, Debug, Default, Hash, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Clone, Copy, Serialize, Deserialize, Default, PartialEq)]
 pub enum Colors {
     /// Borders #555555
     Gray1,

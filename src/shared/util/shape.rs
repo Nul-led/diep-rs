@@ -1,6 +1,7 @@
 use bevy::math::Vec2;
+use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Serialize, Deserialize, PartialEq)]
 pub enum Shape {
     Segment {
         start: Vec2,

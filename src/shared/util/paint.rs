@@ -1,6 +1,8 @@
+use serde::{Deserialize, Serialize};
+
 use crate::shared::definitions::colors::Colors;
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Serialize, Deserialize, PartialEq)]
 pub enum Paint {
     /// Using this variant in networked components is highly recommended as we don't need to send over the color to the client
     ColorId(Colors),
