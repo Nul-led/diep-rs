@@ -8,6 +8,5 @@ pub enum Inputs {
     Down,
     Left,
     Right,
-
     Mouse(Vec2),
 }

@@ -32,7 +32,7 @@ export default class Viewport {
         this.ctx.canvasSize = { width: this.width, height: this.height };
     }
 
-    protected static a: TextArea = new TextArea("test test test\ntest1 28382382838\nthis   is   a    very long         string        :)))))))", 16, "right");
+    protected static a: TextArea = new TextArea("😀 test test test\ntest1 28382382838\nthis   is   a    very long         string        :)))))))", 16, "center");
 
     /*
         this.canvas.save();

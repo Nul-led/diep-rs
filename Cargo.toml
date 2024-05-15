@@ -8,11 +8,11 @@ client = []
 server = []
 
 [dependencies]
+anyhow = "1.0.83"
 bevy = "0.13.2"
 bevy_xpbd_2d = "0.4.2"
 cfg-if = "1.0.0"
-lightyear = { version = "0.14.1", features = [
-    "webtransport",
-    "websocket",
-] }
+lightyear = { version = "0.14.1", features = ["webtransport", "websocket", "xpbd_2d"] }
 rand = "0.8.5"
+serde = { version = "1.0.201", features = ["derive"] }
+tracing = "0.1.40"

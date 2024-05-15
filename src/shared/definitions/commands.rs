@@ -1,5 +1,5 @@
 #[derive(Clone, Debug, Default, PartialEq, PartialOrd, Eq, Ord)]
-pub enum Commands {
+pub enum Actions {
     #[default]
     Suicide,
     Godmode,

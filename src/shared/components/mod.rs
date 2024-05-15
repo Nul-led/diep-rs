@@ -1,9 +1,5 @@
 pub mod cannon;
 pub mod camera;
 pub mod game;
-pub mod health;
 pub mod indicator;
-pub mod name;
-pub mod opacity;
-pub mod score;
-pub mod style;
+pub mod object;

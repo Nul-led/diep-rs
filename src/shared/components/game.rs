@@ -11,6 +11,7 @@ pub struct MapInfo {
 pub struct ServerInfo {
     pub max_tps: f32,
     pub tps: f32,
+    pub players: u32,
 }
 
 #[derive(Clone, Copy, Debug, Default, Component)]
@@ -19,3 +20,5 @@ pub struct LobbyInfo {
     pub waiting_for_players: Option<u16>,
 }
 
+//#[derive(Clone, Debug, Default, Component)]
+//pub struct Scoreboard(Vec<ScoreboardEntry>);

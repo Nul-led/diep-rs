@@ -7,34 +7,56 @@ use super::{drawinfo::DrawInfo, shape::Shape};
 
 #[derive(Clone, Debug, Default)]
 pub struct ChildObjectConfig {
-    // Determines if the object should be rendered before or after the parent object
+    /// Visibility of the object
     pub is_visible: bool,
+
+    /// Determines if the object should be rendered before or after the parent object
     pub is_behind_parent: bool,
+
+    /// Indicates whether or not the rotation is relative to the parents rotation
     pub is_rotation_relative: bool,
+    
     /// Either relative rotation around the parent or absolute rotation
     pub rotation: f32,
+    
     /// The rotation of the object around its own center
     pub rotational_offset: Option<f32>,
-    /// Relative to the parent
+
+    /// Relative position offset from the parent's center
     pub position: Vec2,
-    pub shape: Shape,
-    pub draw_info: DrawInfo,
+
+    /// Shape of the object
+    pub shape: Option<Shape>,
+
+    /// Fill and stroke of the object
+    pub draw_info: Option<DrawInfo>,
+
+    /// Contains the next layer of cannons and addons in render order from lowest z to highest
     pub children: Vec<ChildObjectConfig>,
 
+    /// Stats of the object (none => will behave as addon, some => will behave as cannon)
     #[cfg(feature = "server")]
     pub cannon: Option<CannonConfig>,
 }
 
 #[derive(Clone, Debug, Default)]
 pub struct ClassConfig {
+    /// The classes name
     pub name: &'static str,
 
-    // Object properties
+    /// Visibility of the class body
     pub is_visible: bool,
-    pub rotation: f32,
-    pub shape: Shape,
-    pub draw_info: DrawInfo,
 
+    /// Shape of the class body
+    pub shape: Option<Shape>,
+
+    /// Fill and stroke of the class body
+    pub draw_info: Option<DrawInfo>,
+
+    /// Contains the first layer of cannons and addons in render order from lowest z to highest
+    pub children: Vec<ChildObjectConfig>,
+
+    /// Stats of the class
     #[cfg(feature = "server")]
     pub stats: ClassStatsConfig,
 }
