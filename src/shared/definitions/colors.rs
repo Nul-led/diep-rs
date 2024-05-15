@@ -10,6 +10,8 @@ pub enum Colors {
     Gray3,
     /// Fallen #C0C0C0
     Gray4,
+    /// Background #CCCCCC
+    Gray5,
     /// Team Blue & Own Tank #00B2E1
     Blue1,
     /// Pentagon #768DFC
@@ -46,6 +48,7 @@ impl From<Colors> for Paint {
             Colors::Gray2 => Paint::RGB(153, 153, 153),
             Colors::Gray3 => Paint::RGB(187, 187, 187),
             Colors::Gray4 => Paint::RGB(192, 192, 192),
+            Colors::Gray5 => Paint::RGB(204, 204, 204),
             Colors::Blue1 => Paint::RGB(0, 178, 225),
             Colors::Blue2 => Paint::RGB(118, 141, 252),
             Colors::Red1 => Paint::RGB(241, 78, 84),

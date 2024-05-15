@@ -67,7 +67,7 @@ impl OffscreenContext {
 impl Default for OffscreenContext {
     fn default() -> Self {
         let ctx = Self::new();
-        ctx.set_image_smoothing_enabled(false);
+        //ctx.set_image_smoothing_enabled(false);
         ctx
     }
 }
