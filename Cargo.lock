@@ -1828,6 +1828,8 @@ dependencies = [
  "rand",
  "serde",
  "tracing",
+ "wasm-bindgen",
+ "web-sys",
 ]
 
 [[package]]

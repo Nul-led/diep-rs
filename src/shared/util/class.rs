@@ -37,6 +37,12 @@ pub struct ChildObjectConfig {
     /// Stats of the object (none => will behave as addon, some => will behave as cannon)
     #[cfg(feature = "server")]
     pub cannon: Option<CannonConfig>,
+
+    /// Passive rotation of the object (eg. smasher addons)
+    #[cfg(feature = "server")]
+    pub passive_rotation: f32,
+
+    // TODO routine cfg
 }
 
 #[derive(Clone, Debug, Default)]

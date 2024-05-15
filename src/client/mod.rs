@@ -4,4 +4,5 @@ pub mod events;
 pub mod plugins;
 pub mod resources;
 pub mod systems;
+pub mod utils;
 pub mod web;
