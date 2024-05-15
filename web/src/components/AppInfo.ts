@@ -1,6 +1,6 @@
 import { Component } from "../core/Component";
 import Renderable from "../core/Renderable";
-import Viewport, { ScreenAnchorX, ScreenAnchorY } from "../core/Viewport";
+import { ScreenAnchorX, ScreenAnchorY } from "../core/Viewport";
 import Text from "../widgets/Text";
 import TextArea from "../widgets/TextArea";
 
