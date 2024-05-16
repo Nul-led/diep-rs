@@ -12,7 +12,10 @@ use crate::{
         utils::context::{Context, OffscreenContext},
     },
     shared::{
-        components::camera::{Camera, CameraMode},
+        components::{
+            camera::{Camera, CameraMode},
+            game::GameMapInfo,
+        },
         definitions::colors::Colors,
         util::paint::Paint,
     },
@@ -51,16 +54,24 @@ pub fn render_grid(
                 }
             };
 
-             // TODO make grid size configurable
+            // TODO make grid size configurable
 
             let offset =
                 (((r_viewport.size / 2.0 / r_viewport.zoom - cam_pos) % 50.0) + 50.0) % 50.0;
 
             r_viewport.grid_pattern_ctx.reset();
-            r_viewport.grid_pattern_ctx.set_fill_style(&Paint::from(Colors::Gray5).into());
-            r_viewport.grid_pattern_ctx.set_stroke_style(&Paint::from(Colors::Black).into());
-            r_viewport.grid_pattern_ctx.set_global_alpha(0.1 * r_viewport.zoom as f64); // TODO grid base alpha cfg
-            r_viewport.grid_pattern_ctx.set_line_width(1.0 / r_viewport.zoom as f64);
+            r_viewport
+                .grid_pattern_ctx
+                .set_fill_style(&Paint::from(Colors::Gray5).into());
+            r_viewport
+                .grid_pattern_ctx
+                .set_stroke_style(&Paint::from(Colors::Black).into());
+            r_viewport
+                .grid_pattern_ctx
+                .set_global_alpha(0.1 * r_viewport.zoom as f64); // TODO grid base alpha cfg
+            r_viewport
+                .grid_pattern_ctx
+                .set_line_width(1.0 / r_viewport.zoom as f64);
             r_viewport.grid_pattern_ctx.fill_rect(0.0, 0.0, 50.0, 50.0);
             r_viewport.grid_pattern_ctx.begin_path();
             r_viewport.grid_pattern_ctx.move_to(0.5, 0.5);
@@ -69,12 +80,26 @@ pub fn render_grid(
             r_viewport.grid_pattern_ctx.line_to(50.5, 0.5);
             r_viewport.grid_pattern_ctx.stroke();
 
-            if let Ok(pattern) = r_viewport.ctx.create_pattern_with_offscreen_canvas(&r_viewport.grid_pattern_ctx.canvas(), "repeat") {
+            if let Ok(pattern) = r_viewport.ctx.create_pattern_with_offscreen_canvas(
+                &r_viewport.grid_pattern_ctx.canvas(),
+                "repeat",
+            ) {
                 if let Some(pattern) = pattern {
-                    r_viewport.ctx.scale(r_viewport.zoom as f64, r_viewport.zoom as f64).unwrap();
-                    r_viewport.ctx.translate(offset.x as f64 - 50.0, offset.y as f64 - 50.0).unwrap();
+                    r_viewport
+                        .ctx
+                        .scale(r_viewport.zoom as f64, r_viewport.zoom as f64)
+                        .unwrap();
+                    r_viewport
+                        .ctx
+                        .translate(offset.x as f64 - 50.0, offset.y as f64 - 50.0)
+                        .unwrap();
                     r_viewport.ctx.set_fill_style(&pattern);
-                    r_viewport.ctx.fill_rect(0.0, 0.0, (r_viewport.size.x / r_viewport.zoom) as f64 + 50.0, (r_viewport.size.y / r_viewport.zoom) as f64 + 50.0);
+                    r_viewport.ctx.fill_rect(
+                        0.0,
+                        0.0,
+                        (r_viewport.size.x / r_viewport.zoom) as f64 + 50.0,
+                        (r_viewport.size.y / r_viewport.zoom) as f64 + 50.0,
+                    );
                 }
             }
         }
@@ -83,41 +108,44 @@ pub fn render_grid(
     r_viewport.ctx.restore();
 }
 
-pub fn render_borders(
-    q_game: Query<(&Game)
-    r_viewport: ResMut<Viewport>,
-) {
-    r_viewport.borders.min =
+pub fn render_borders(q_game: Query<(&GameMapInfo)>, mut r_viewport: ResMut<Viewport>) {
+    if let Ok(map_info) = q_game.get_single() {
+        r_viewport.borders.min = (r_viewport.borders.min * 4.0 - map_info.size / 2.0) / 5.0;
+        r_viewport.borders.max = (r_viewport.borders.max * 4.0 + map_info.size / 2.0) / 5.0;
 
-}
+        let screen_min = Vec2::ZERO.max(r_viewport.to_screen_pos(r_viewport.borders.min));
+        let screen_max = Vec2::ZERO.min(r_viewport.to_screen_pos(r_viewport.borders.max));
 
+        r_viewport.ctx.save();
+        r_viewport.ctx.set_global_alpha(0.1); // TODO make configurable
+        r_viewport
+            .ctx
+            .set_fill_style(&Paint::from(Colors::Black).into());
 
-/*
-    public static renderBorders(ctx: Context) {
-        borderCoordinateMapping.minX = ((borderCoordinateMapping.minX * 4.0) + Arena.minX) / 5.0;
-        borderCoordinateMapping.minY = (borderCoordinateMapping.minY * 4.0 + Arena.minY) / 5.0;
-        borderCoordinateMapping.maxX = (borderCoordinateMapping.maxX * 4.0 + Arena.maxX) / 5.0;
-        borderCoordinateMapping.maxY = (borderCoordinateMapping.maxY * 4.0 + Arena.maxY) / 5.0;
+        r_viewport.ctx.fill_rect(
+            0.0,
+            screen_min.y as f64,
+            screen_min.x as f64,
+            (r_viewport.size.y - screen_min.y) as f64,
+        );
+        r_viewport
+            .ctx
+            .fill_rect(0.0, 0.0, screen_max.x as f64, screen_min.y as f64);
+        r_viewport.ctx.fill_rect(
+            screen_min.x as f64,
+            0.0,
+            (r_viewport.size.x - screen_max.x) as f64,
+            screen_max.y as f64,
+        );
+        r_viewport.ctx.fill_rect(
+            screen_min.x as f64,
+            screen_max.y as f64,
+            (r_viewport.size.x - screen_min.x) as f64,
+            (r_viewport.size.y - screen_max.y) as f64,
+        );
 
-        const borderMinX = Math.max(0, this.screenX(borderCoordinateMapping.minX));
-        const borderMinY = Math.max(0, this.screenY(borderCoordinateMapping.minY));
-        const borderMaxX = Math.min(this.screenWidth, this.screenX(borderCoordinateMapping.maxX));
-        const borderMaxY = Math.min(this.screenHeight, this.screenY(borderCoordinateMapping.maxY));
-
-        ctx.save();
-
-        ctx.globalAlpha = 0.1; // TODO border alpha convar
-        ctx.fillStyle = Color.BLACK; // TODO border color convar
-
-        ctx.fillRect(0, borderMinY, borderMinX, this.screenHeight - borderMinY);
-        ctx.fillRect(0, 0, borderMaxX, borderMinY);
-        ctx.fillRect(borderMaxX, 0, this.screenWidth - borderMaxX, borderMaxY);
-        ctx.fillRect(borderMinX, borderMaxY, this.screenWidth - borderMinX, this.screenHeight - borderMaxY);
-
-        ctx.restore();
+        r_viewport.ctx.restore();
     }
-
-
-*/
+}
 
 pub fn render_indicators() {}

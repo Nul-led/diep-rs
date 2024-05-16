@@ -29,13 +29,14 @@ pub struct Camera {
 }
 
 #[derive(Clone, Component, Serialize, Deserialize, PartialEq)]
-pub struct Status {
+pub struct PlayerStatus {
     pub level: u32,
     pub levelbar: f32,
     pub score: u32,
     pub scorebar: f32,
     pub classname: String,
 }
+
 #[derive(Clone, Serialize, Deserialize, PartialEq)]
 struct Stat {
     pub name: String,
@@ -43,7 +44,7 @@ struct Stat {
 }
 
 #[derive(Clone, Component, Serialize, Deserialize, PartialEq)]
-pub struct Stats(Vec<Stat>); // Death Stats
+pub struct PlayerStats(Vec<Stat>); // Death Stats
 
 #[derive(Clone, Component, Serialize, Deserialize, PartialEq)]
 pub struct AvailableClasses(Vec<u16>); // TODO Available Tank Upgrades

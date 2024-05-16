@@ -5,7 +5,7 @@ use crate::server::util::class::{CannonConfig, ClassStatsConfig};
 
 use super::{drawinfo::DrawInfo, shape::Shape};
 
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Default)]
 pub struct ChildObjectConfig {
     /// Visibility of the object
     pub is_visible: bool,
@@ -45,7 +45,7 @@ pub struct ChildObjectConfig {
     // TODO routine cfg
 }
 
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Default)]
 pub struct ClassConfig {
     /// The classes name
     pub name: &'static str,
