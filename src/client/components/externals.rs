@@ -11,3 +11,7 @@ pub struct ScoreTextRef {
 pub struct HealthbarBarRef {
     // TODO
 }
+
+pub struct IndicatorTextRef {
+    // TODO
+}

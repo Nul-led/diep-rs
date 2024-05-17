@@ -1,8 +1,8 @@
 use bevy::{
-    ecs::system::{Query, Res, ResMut},
-    math::Vec2,
+    ecs::{entity::Entity, system::{Query, Res, ResMut}},
+    math::Vec2, ui::ZIndex,
 };
-use bevy_xpbd_2d::components::Position;
+use bevy_xpbd_2d::components::{Position, Rotation};
 use wasm_bindgen::JsValue;
 use web_sys::OffscreenCanvas;
 
@@ -13,8 +13,10 @@ use crate::{
     },
     shared::{
         components::{
-            camera::{Camera, CameraMode},
-            game::GameMapInfo,
+            camera::{Camera, CameraMode}, game::GameMapInfo, indicator::{IndicatorConfig, IndicatorPosition}, object::{
+                ObjectDamageMarker, ObjectDrawInfo, ObjectInvincibilityMarker, ObjectName,
+                ObjectOpacity, ObjectScore, ObjectShape, ObjectZIndex,
+            }
         },
         definitions::colors::Colors,
         util::paint::Paint,
@@ -22,7 +24,30 @@ use crate::{
 };
 
 /// Renders entities, names, scores and healthbar
-pub fn render_objects(q_shapes: Query<()>, r_viewport: Res<Viewport>) {}
+pub fn render_objects(
+    q_object_z_index: Query<(Entity, &ObjectZIndex)>,
+    q_objects: Query<(
+        &Position,
+        &Rotation,
+        &ObjectName,
+        &ObjectScore,
+        &ObjectOpacity,
+        &ObjectShape,
+        &ObjectDrawInfo,
+        &ObjectDamageMarker,
+        &ObjectInvincibilityMarker,
+        // TODO cannon
+    )>,
+    r_viewport: Res<Viewport>,
+) {
+
+    let object_entities: Vec<(Entity, &ObjectZIndex)> = q_object_z_index.iter().collect();
+
+    object_entities.map()
+}
+
+
+pub fn render_object
 
 pub fn render_grid(
     q_camera: Query<&Camera>,
@@ -40,7 +65,6 @@ pub fn render_grid(
         r_viewport
             .ctx
             .fill_rect(0.0, 0.0, r_viewport.size.x as f64, r_viewport.size.y as f64);
-        // TODO screenW, screenH as args
     }
 
     if true
@@ -148,4 +172,6 @@ pub fn render_borders(q_game: Query<(&GameMapInfo)>, mut r_viewport: ResMut<View
     }
 }
 
-pub fn render_indicators() {}
+pub fn render_indicators(q_game: Query<(&IndicatorConfig, &IndicatorPosition)>, mut r_viewport: ResMut<Viewport>) {
+    
+}
