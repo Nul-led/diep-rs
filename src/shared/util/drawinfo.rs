@@ -5,7 +5,7 @@ use super::paint::Paint;
 #[derive(Clone, Copy, Serialize, Deserialize, Default, PartialEq)]
 pub struct Stroke {
     pub width: f32,
-    pub paint: Paint,
+    pub paint: Option<Paint>,
 }
 
 #[derive(Clone, Copy, Serialize, Deserialize, Default, PartialEq)]

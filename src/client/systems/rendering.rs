@@ -1,10 +1,12 @@
 use bevy::{
-    ecs::{entity::Entity, system::{Query, Res, ResMut}},
-    math::Vec2, ui::ZIndex,
+    ecs::{
+        entity::Entity,
+        system::{Query, Res, ResMut},
+    }, math::Vec2, transform::components::GlobalTransform, ui::ZIndex
 };
 use bevy_xpbd_2d::components::{Position, Rotation};
 use wasm_bindgen::JsValue;
-use web_sys::OffscreenCanvas;
+use web_sys::{OffscreenCanvas, Path2d};
 
 use crate::{
     client::{
@@ -13,13 +15,16 @@ use crate::{
     },
     shared::{
         components::{
-            camera::{Camera, CameraMode}, game::GameMapInfo, indicator::{IndicatorConfig, IndicatorPosition}, object::{
+            camera::{Camera, CameraMode},
+            game::GameMapInfo,
+            indicator::{IndicatorConfig, IndicatorPosition},
+            object::{
                 ObjectDamageMarker, ObjectDrawInfo, ObjectInvincibilityMarker, ObjectName,
                 ObjectOpacity, ObjectScore, ObjectShape, ObjectZIndex,
-            }
+            },
         },
         definitions::colors::Colors,
-        util::paint::Paint,
+        util::{drawinfo::Stroke, paint::Paint},
     },
 };
 
@@ -27,27 +32,76 @@ use crate::{
 pub fn render_objects(
     q_object_z_index: Query<(Entity, &ObjectZIndex)>,
     q_objects: Query<(
-        &Position,
-        &Rotation,
-        &ObjectName,
-        &ObjectScore,
-        &ObjectOpacity,
-        &ObjectShape,
-        &ObjectDrawInfo,
-        &ObjectDamageMarker,
-        &ObjectInvincibilityMarker,
+        &GlobalTransform,
+        Option<&ObjectName>,
+        Option<&ObjectScore>,
+        Option<&ObjectOpacity>,
+        Option<&ObjectShape>,
+        Option<&ObjectDrawInfo>,
+        Option<&ObjectDamageMarker>,
+        Option<&ObjectInvincibilityMarker>,
         // TODO cannon
     )>,
     r_viewport: Res<Viewport>,
 ) {
+    let mut object_entities: Vec<(Entity, &ObjectZIndex)> = q_object_z_index.iter().collect();
+    object_entities.sort_by(|a, b| a.1 .0.cmp(&b.1 .0));
 
-    let object_entities: Vec<(Entity, &ObjectZIndex)> = q_object_z_index.iter().collect();
+    for (entity, _) in object_entities {
+        if let Ok((
+            transform,
+            name,
+            score,
+            opacity,
+            shape,
+            draw_info,
+            damage_marker,
+            invincibility_marker,
+        )) = q_objects.get(entity)
+        {
+            let pos = Position::from(transform);
+            let rot = Rotation::from(transform);
 
-    object_entities.map()
+            r_viewport.ctx.save();
+
+            r_viewport.ctx.translate(pos.x as f64, pos.y as f64).unwrap();
+            r_viewport.ctx.rotate(rot.as_radians() as f64).unwrap();
+            
+            if let Some(opacity) = opacity {
+                r_viewport.ctx.set_global_alpha(opacity.0 as f64);
+            }
+
+            let (fill_paint, stroke_paint, stroke_width) = if let Some(draw_info) = draw_info {
+                let fill_paint = draw_info.0.fill.unwrap_or(Paint::RGB(0, 0, 0));
+                let (stroke_paint, stroke_width) = match draw_info.0.stroke {
+                    Some(stroke) => (
+                        stroke.paint.unwrap_or(fill_paint.blend_with(Paint::RGB(0, 0, 0), 0.4)), // TODO make configurable
+                        stroke.width,
+                    ),
+                    None => (Paint::RGB(0, 0, 0), 0.0),
+                };
+                (fill_paint, stroke_paint, stroke_width)
+            } else {
+                (Paint::RGB(0, 0, 0), Paint::RGB(0, 0, 0), 0.0)
+            };
+
+            r_viewport.ctx.set_fill_style(&fill_paint.into());
+            r_viewport.ctx.set_stroke_style(&stroke_paint.into());
+            r_viewport.ctx.set_line_width(stroke_width as f64);
+            r_viewport.ctx.set_line_join("round");
+
+            if let Some(shape) = shape {
+                let path = Path2d::from(&shape.0);
+                r_viewport.ctx.fill_with_path_2d(&path);
+                r_viewport.ctx.stroke_with_path(&path);
+            }
+            
+            r_viewport.ctx.restore();
+        }
+    }
 }
 
-
-pub fn render_object
+//pub fn render_object
 
 pub fn render_grid(
     q_camera: Query<&Camera>,
@@ -172,6 +226,8 @@ pub fn render_borders(q_game: Query<(&GameMapInfo)>, mut r_viewport: ResMut<View
     }
 }
 
-pub fn render_indicators(q_game: Query<(&IndicatorConfig, &IndicatorPosition)>, mut r_viewport: ResMut<Viewport>) {
-    
+pub fn render_indicators(
+    q_game: Query<(&IndicatorConfig, &IndicatorPosition)>,
+    mut r_viewport: ResMut<Viewport>,
+) {
 }
