@@ -1,17 +1,20 @@
+use std::thread::Scope;
+
 use bevy::{
     ecs::{
         entity::Entity,
         system::{Query, Res, ResMut},
     }, math::Vec2, transform::components::GlobalTransform, ui::ZIndex
 };
-use bevy_xpbd_2d::components::{Position, Rotation};
+use bevy_xpbd_2d::{components::{Position, Rotation}, plugins::collision::{AnyCollider, Collider}};
+use lightyear::packet::header;
 use wasm_bindgen::JsValue;
 use web_sys::{OffscreenCanvas, Path2d};
 
 use crate::{
     client::{
         resources::viewport::Viewport,
-        utils::context::{Context, OffscreenContext},
+        utils::{context::{Context, OffscreenContext}, prettify::prettify_number},
     },
     shared::{
         components::{
@@ -19,8 +22,7 @@ use crate::{
             game::GameMapInfo,
             indicator::{IndicatorConfig, IndicatorPosition},
             object::{
-                ObjectDamageMarker, ObjectDrawInfo, ObjectInvincibilityMarker, ObjectName,
-                ObjectOpacity, ObjectScore, ObjectShape, ObjectZIndex,
+                ObjectDamageMarker, ObjectDrawInfo, ObjectHealth, ObjectInvincibilityMarker, ObjectName, ObjectOpacity, ObjectScore, ObjectShape, ObjectZIndex
             },
         },
         definitions::colors::Colors,
@@ -38,6 +40,7 @@ pub fn render_objects(
         Option<&ObjectOpacity>,
         Option<&ObjectShape>,
         Option<&ObjectDrawInfo>,
+        Option<&ObjectHealth>,
         Option<&ObjectDamageMarker>,
         Option<&ObjectInvincibilityMarker>,
         // TODO cannon
@@ -55,6 +58,7 @@ pub fn render_objects(
             opacity,
             shape,
             draw_info,
+            health,
             damage_marker,
             invincibility_marker,
         )) = q_objects.get(entity)
@@ -65,11 +69,14 @@ pub fn render_objects(
             r_viewport.ctx.save();
 
             r_viewport.ctx.translate(pos.x as f64, pos.y as f64).unwrap();
-            r_viewport.ctx.rotate(rot.as_radians() as f64).unwrap();
-            
+
             if let Some(opacity) = opacity {
                 r_viewport.ctx.set_global_alpha(opacity.0 as f64);
             }
+
+            r_viewport.ctx.save();
+
+            r_viewport.ctx.rotate(rot.as_radians() as f64).unwrap();
 
             let (fill_paint, stroke_paint, stroke_width) = if let Some(draw_info) = draw_info {
                 let fill_paint = draw_info.0.fill.unwrap_or(Paint::RGB(0, 0, 0));
@@ -94,14 +101,83 @@ pub fn render_objects(
                 let path = Path2d::from(&shape.0);
                 r_viewport.ctx.fill_with_path_2d(&path);
                 r_viewport.ctx.stroke_with_path(&path);
+
+                r_viewport.ctx.restore();
+
+                let collider = Collider::from(&shape.0);
+                // don't use real rot as input here or it might produce larger aabb than we want
+                let size = collider.aabb(pos.0, 0.0).size();
+
+                r_viewport.ctx.set_text_align("center");
+                r_viewport.ctx.set_text_baseline("middle");
+
+                let offset = if let Some(score) = score {
+                    let font_size = size.max_element() / 50.0 * 25.0;
+                    r_viewport.ctx.set_font(&format!("{}px Ubuntu", font_size));
+                    let txt = prettify_number(score.score, 1);
+ 
+                    if let Some(draw_info) = score.draw_info {
+                        if let Some(stroke) = draw_info.stroke {
+                            r_viewport.ctx.set_stroke_style(&stroke.paint.unwrap_or(Paint::RGB(0, 0, 0)).into());
+                            r_viewport.ctx.set_line_width((font_size * stroke.width) as f64);
+                            r_viewport.ctx.stroke_text(&txt, 0.0, (size.y / 2.0 * -1.5) as f64);
+                        }
+
+                        if let Some(fill) = draw_info.fill {
+                            r_viewport.ctx.set_fill_style(&fill.into());
+                            r_viewport.ctx.fill_text(&txt, 0.0, (size.y / 2.0 * -1.5) as f64);
+                        }
+                    }
+                    (font_size * 1.4).max(0.0)
+                } else { 0.0 };
+
+                if let Some(name) = name {
+                    let font_size = size.max_element() / 50.0 * 40.0;
+                    r_viewport.ctx.set_font(&format!("{}px Ubuntu", font_size));
+                    
+                    if let Some(draw_info) = name.draw_info {
+                        if let Some(stroke) = draw_info.stroke {
+                            r_viewport.ctx.set_stroke_style(&stroke.paint.unwrap_or(Paint::RGB(0, 0, 0)).into());
+                            r_viewport.ctx.set_line_width((font_size * stroke.width) as f64);
+                            r_viewport.ctx.stroke_text(&name.name, 0.0, (size.y / 2.0 * -1.5 - offset) as f64);
+                        }
+
+                        if let Some(fill) = draw_info.fill {
+                            r_viewport.ctx.set_fill_style(&fill.into());
+                            r_viewport.ctx.fill_text(&name.name, 0.0, (size.y / 2.0 * -1.5 - offset) as f64);
+                        }
+                    }
+                }
+
+                if let Some(health) = health {
+                    if health.max_health != health.health {
+                        let perc = (health.health / health.max_health).clamp(0.0, 1.0);
+
+                        r_viewport.ctx.translate((-size.x / 2.0) as f64, 35.0);
+
+                        r_viewport.ctx.set_line_cap("round");
+                        r_viewport.ctx.set_line_width(16.0);
+                        r_viewport.ctx.begin_path();
+                        r_viewport.ctx.move_to(8.0, 8.0);
+                        r_viewport.ctx.line_to(size.x as f64, 8.0); // TODO check if i need to size.x - 8.0
+                        r_viewport.ctx.set_stroke_style(&Paint::RGB(204, 204, 204).into()); // TODO configurable
+                        r_viewport.ctx.stroke();
+                        r_viewport.ctx.set_line_width(16.0 * 0.75);
+                        r_viewport.ctx.begin_path();
+                        r_viewport.ctx.move_to(8.0, 8.0);
+                        r_viewport.ctx.line_to(8.0_f32.max(size.x * perc) as f64, 8.0);
+                        r_viewport.ctx.set_stroke_style(&health.custom_healthbar_color.unwrap_or(Paint::RGB(0, 0, 0)).into());
+                        r_viewport.ctx.stroke();
+
+                        // TODO health text
+                    }
+                }
             }
             
             r_viewport.ctx.restore();
         }
     }
 }
-
-//pub fn render_object
 
 pub fn render_grid(
     q_camera: Query<&Camera>,

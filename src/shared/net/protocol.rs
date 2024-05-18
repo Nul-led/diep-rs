@@ -27,7 +27,7 @@ Channels:
 use bevy::app::{App, Plugin};
 use lightyear::{channel::builder::ChannelDirection, client::components::ComponentSyncMode, prelude::{AppComponentExt, AppMessageExt}};
 
-use crate::shared::components::{camera::{AvailableClasses, Camera, ConsoleCommands, PlayerId, PlayerStats, PlayerStatus, RenderToggles}, game::{GameLobbyInfo, GameMapInfo, GameServerInfo}, indicator::{IndicatorConfig, IndicatorPosition}, object::{ObjectDamageMarker, ObjectDrawInfo, ObjectInvincibilityMarker, ObjectName, ObjectOpacity, ObjectScore, ObjectShape}};
+use crate::shared::components::{camera::{AvailableClasses, Camera, ConsoleCommands, PlayerId, PlayerStats, PlayerStatus, RenderToggles}, game::{GameLobbyInfo, GameMapInfo, GameServerInfo}, indicator::{IndicatorConfig, IndicatorPosition}, object::{ObjectDamageMarker, ObjectDrawInfo, ObjectHealth, ObjectInvincibilityMarker, ObjectName, ObjectOpacity, ObjectScore, ObjectShape}};
 
 pub struct ProtocolPlugin;
 
@@ -90,6 +90,10 @@ impl Plugin for ProtocolPlugin {
             .add_prediction(ComponentSyncMode::Full);
 
         app.register_component::<ObjectDrawInfo>(ChannelDirection::ServerToClient);
+
+        app.register_component::<ObjectHealth>(ChannelDirection::ServerToClient)
+            .add_interpolation(ComponentSyncMode::Full)
+            .add_prediction(ComponentSyncMode::Full);
 
         app.register_component::<ObjectDamageMarker>(ChannelDirection::ServerToClient);
 
