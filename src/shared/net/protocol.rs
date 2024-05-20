@@ -25,6 +25,7 @@ Channels:
 */
 
 use bevy::app::{App, Plugin};
+use bevy_xpbd_2d::components::{Position, Rotation};
 use lightyear::{channel::builder::ChannelDirection, client::components::ComponentSyncMode, prelude::{AppComponentExt, AppMessageExt}};
 
 use crate::shared::components::{camera::{AvailableClasses, Camera, ConsoleCommands, PlayerId, PlayerStats, PlayerStatus, RenderToggles}, game::{GameLobbyInfo, GameMapInfo, GameServerInfo}, indicator::{IndicatorConfig, IndicatorPosition}, object::{ObjectDamageMarker, ObjectDrawInfo, ObjectHealth, ObjectInvincibilityMarker, ObjectName, ObjectOpacity, ObjectScore, ObjectShape}};
@@ -99,7 +100,13 @@ impl Plugin for ProtocolPlugin {
 
         app.register_component::<ObjectInvincibilityMarker>(ChannelDirection::ServerToClient);
 
-        // cannon
+        app.register_component::<Position>(ChannelDirection::ServerToClient)
+            .add_interpolation(ComponentSyncMode::Full)
+            .add_prediction(ComponentSyncMode::Full);
+
+        app.register_component::<Rotation>(ChannelDirection::ServerToClient)
+            .add_interpolation(ComponentSyncMode::Full)
+            .add_prediction(ComponentSyncMode::Full);
 
 
     

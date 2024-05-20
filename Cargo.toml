@@ -4,19 +4,22 @@ version = "0.1.0"
 edition = "2021"
 
 [features]
-client = []
+default = ["client"]
+client = ["web-sys", "wasm-bindgen"]
 server = []
 
 [dependencies]
 anyhow = "1.0.83"
 bevy = "0.13.2"
-bevy_xpbd_2d = "0.4.2"
+bevy_xpbd_2d = { version = "0.4.2", features = ["2d", "f32", "parry-f32", "parallel", "serialize"] }
 cfg-if = "1.0.0"
 lightyear = { version = "0.15.1", features = ["webtransport", "websocket", "xpbd_2d"] }
 rand = "0.8.5"
 serde = { version = "1.0.201", features = ["derive"] }
 tracing = "0.1.40"
-wasm-bindgen = "0.2.92"
+
+# client
+wasm-bindgen = { version = "0.2.92", optional = true }
 web-sys = { version = "0.3.69", features = [
     "Document", 
     "Element",
@@ -27,4 +30,4 @@ web-sys = { version = "0.3.69", features = [
     "OffscreenCanvasRenderingContext2d",
     "CanvasPattern",
     "Path2d",
-]}
+], optional = true }
