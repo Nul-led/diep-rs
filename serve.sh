@@ -1,0 +1,1 @@
+npm run watch --prefix web & trunk serve && kill $!

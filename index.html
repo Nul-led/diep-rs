@@ -51,16 +51,20 @@
             border: 0;
             outline: none;
           }*/
-        </style>
 
+          #_app {
+            display: none;
+          }
+        </style>
     </head>
 
     <body>
         <!--span id="loading">Loading...</span-->
-        <canvas id="canvas" width="800" height="800"></canvas>
         <span id="fontLoader">fontLoader</span>
+        <canvas id="_app" width="0" height="0""></canvas>
+        <canvas id="canvas" width="800" height="800"></canvas>
         <!--div id="textInputContainer"><input id="textInput"></div-->
         
-        <script src="./main.bundle.js"></script>
+        <script data-trunk data-no-minify src="res/main.bundle.js"></script>
     </body>
 </html>

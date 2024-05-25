@@ -5,5 +5,5 @@ mod server;
 mod shared;
 
 fn main() {
-
+    client::app::run();
 }

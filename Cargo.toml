@@ -30,4 +30,8 @@ web-sys = { version = "0.3.69", features = [
     "OffscreenCanvasRenderingContext2d",
     "CanvasPattern",
     "Path2d",
+    "VisibilityState",
+    "Worker",
+    "Blob",
+    "Url"
 ], optional = true }

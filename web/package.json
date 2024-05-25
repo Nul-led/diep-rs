@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "build": "esbuild src/index.ts --bundle --outfile=../public/main.bundle.js",
-    "watch": "esbuild src/index.ts --bundle --outfile=../public/main.bundle.js --watch"
+    "build": "esbuild src/index.ts --bundle --outfile=../res/main.bundle.js",
+    "watch": "esbuild src/index.ts --bundle --outfile=../res/main.bundle.js --watch=forever"
   },
   "keywords": [],
   "author": "Nulled",

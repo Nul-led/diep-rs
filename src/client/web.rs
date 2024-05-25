@@ -26,3 +26,24 @@ extern "C" {
     //#[wasm_bindgen(structural , method , setter , js_class = "Text" , js_name = height)]
 
 }
+
+
+#[repr(u8)]
+enum Component {
+    AppInfo,
+    Attributes,
+    Changelog,
+    Classes,
+    ClassTree,
+    Console,
+    Fadeout,
+    GameModes,
+    InfoHeader,
+    Invite,
+    Minimap,
+    Notifications,
+    PlayerStats,
+    PlayerStatus,
+    Scoreboard,
+    SpawnMenu,
+}
