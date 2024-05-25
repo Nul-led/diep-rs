@@ -17,10 +17,15 @@ export default class AppInfo extends Component {
     }
 
     public render(ctx: Renderable): void {
+        ctx.canvas.save();
+        ctx.canvas.globalAlpha = 0.7;
+
         const x = this.x.anchoredScreenSpace(this.anchorX);
         const y = this.y.anchoredScreenSpace(this.anchorY);
 
         this.lines.render(ctx, x - this.lines.calculateWidth(), y - this.lines.calculateHeight());
         this.header.render(ctx, x - this.header.calculateWidth(), y - this.header.calculateHeight() - this.lines.canvasHeight);
+    
+        ctx.canvas.restore();
     }
 }

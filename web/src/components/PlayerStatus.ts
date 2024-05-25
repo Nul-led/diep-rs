@@ -20,6 +20,9 @@ export default class PlayerStatus extends Component {
     }
 
     public render(ctx: Renderable): void {
+        ctx.canvas.save();
+        ctx.canvas.globalAlpha = 0.7;
+
         const x = this.x.anchoredScreenSpace(this.anchorX);
         const y = this.y.anchoredScreenSpace(this.anchorY);
         const levelbarHeight = this.lebelbar.outerHeight.screenSpace();
@@ -27,6 +30,8 @@ export default class PlayerStatus extends Component {
 
         this.lebelbar.renderCentered(ctx, x, y);
         if (this.renderScorebar) this.scorebar.renderCentered(ctx, x, y - levelbarHeight);
-        this.playerNameText.renderCentered(ctx, x, y - levelbarHeight + (this.renderScorebar ? (scorebarHeight + levelbarHeight / 2) : (levelbarHeight / 2)));
+        this.playerNameText.renderCentered(ctx, x, y - levelbarHeight - (this.renderScorebar ? (scorebarHeight + levelbarHeight / 2) : (levelbarHeight / 2)));
+        
+        ctx.canvas.restore();
     }
 }

@@ -1,8 +1,9 @@
 "use strict";
 (() => {
   // src/core/Component.ts
-  var Component = class {
+  var Component = class extends EventTarget {
     constructor(x = 0, y = 0, anchorX = 0 /* Min */, anchorY = 3 /* Min */) {
+      super();
       this.x = x;
       this.y = y;
       this.anchorX = anchorX;
@@ -316,10 +317,13 @@
       this.anchorY = anchorY;
     }
     render(ctx) {
+      ctx.canvas.save();
+      ctx.canvas.globalAlpha = 0.7;
       const x = this.x.anchoredScreenSpace(this.anchorX);
       const y = this.y.anchoredScreenSpace(this.anchorY);
       this.lines.render(ctx, x - this.lines.calculateWidth(), y - this.lines.calculateHeight());
       this.header.render(ctx, x - this.header.calculateWidth(), y - this.header.calculateHeight() - this.lines.canvasHeight);
+      ctx.canvas.restore();
     }
   };
 
@@ -573,8 +577,12 @@
       const animation = this.isDown ? this.slideDownAnimation : this.slideUpAnimation;
       animation.step(this.isDown);
       const y = this.y.anchoredScreenSpace(this.anchorY) * animation.latest;
-      if (animation.timer === 0)
+      if (animation.timer === 0) {
+        this.dispatchEvent(new Event("animation::timer::min" /* AnimationTimerMin */));
         return;
+      } else if (animation.timer === 1) {
+        this.dispatchEvent(new Event("animation::timer::max" /* AnimationTimerMax */));
+      }
       this.header.renderCentered(ctx, x, y);
     }
   };
@@ -798,20 +806,61 @@
 
   // src/components/Invite.ts
   var Invite = class extends Component {
-    constructor(button = new TextButton(new Text("Invite", 0.56 * 24), -135, 12, 2 /* Max */, 3 /* Min */, 120, 24, Color.fromRGB(119, 119, 119), Color.fromRGB(51, 51, 51)), x = -135, y = 12, anchorX = 2 /* Max */, anchorY = 3 /* Min */) {
+    constructor(button = new TextButton(new Text("Invite", 0.56 * 24), -135, 12, 2 /* Max */, 3 /* Min */, 120, 24, Color.fromRGB(119, 119, 119), Color.fromRGB(51, 51, 51)), x = -135, y = 12, anchorX = 2 /* Max */, anchorY = 3 /* Min */, inviteLink = "") {
       super();
       this.button = button;
       this.x = x;
       this.y = y;
       this.anchorX = anchorX;
       this.anchorY = anchorY;
+      this.inviteLink = inviteLink;
     }
     render(ctx) {
       const x = this.x.anchoredScreenSpace(this.anchorX);
       const y = this.y.anchoredScreenSpace(this.anchorY);
       this.button.render(ctx, x, y);
-      this.button.onClick = () => {
-      };
+      this.button.onClick = () => navigator.clipboard.writeText(this.inviteLink);
+    }
+  };
+
+  // src/components/Minimap.ts
+  var Minimap = class extends Component {
+    constructor(x = -20, y = -20, anchorX = 2 /* Max */, anchorY = 5 /* Max */, sizeX = 175, sizeY = 175, backgroundColor = Color.fromRGB(205, 205, 205), strokeColor = Color.fromRGB(121, 121, 121)) {
+      super();
+      this.x = x;
+      this.y = y;
+      this.anchorX = anchorX;
+      this.anchorY = anchorY;
+      this.sizeX = sizeX;
+      this.sizeY = sizeY;
+      this.backgroundColor = backgroundColor;
+      this.strokeColor = strokeColor;
+      this.buffer = new Renderable();
+    }
+    render(ctx) {
+      ctx.canvas.save();
+      ctx.canvas.globalAlpha = 0.7;
+      const x = (this.x - this.sizeX).anchoredScreenSpace(this.anchorX);
+      const y = (this.y - this.sizeY).anchoredScreenSpace(this.anchorY);
+      const sizeX = this.sizeX.screenSpace();
+      const sizeY = this.sizeY.screenSpace();
+      ctx.canvas.save();
+      ctx.canvas.translate(x, y);
+      ctx.canvas.scale(this.sizeX.screenSpace(), this.sizeY.screenSpace());
+      ctx.canvas.save();
+      ctx.canvas.beginPath();
+      ctx.canvas.rect(0, 0, 1, 1);
+      ctx.canvas.clip();
+      ctx.canvas.fillStyle = this.backgroundColor.toCSS();
+      ctx.canvas.fillRect(0, 0, 1, 1);
+      ctx.canvas.drawImage(this.buffer.canvas.canvas, 0, 0, 1, 1);
+      ctx.canvas.restore();
+      ctx.canvas.strokeStyle = this.strokeColor.toCSS();
+      ctx.canvas.lineWidth = 0.03;
+      ctx.canvas.lineJoin = "round";
+      ctx.canvas.strokeRect(0, 0, 1, 1);
+      ctx.canvas.restore();
+      ctx.canvas.restore();
     }
   };
 
@@ -963,6 +1012,8 @@
       this.renderScorebar = renderScorebar;
     }
     render(ctx) {
+      ctx.canvas.save();
+      ctx.canvas.globalAlpha = 0.7;
       const x = this.x.anchoredScreenSpace(this.anchorX);
       const y = this.y.anchoredScreenSpace(this.anchorY);
       const levelbarHeight = this.lebelbar.outerHeight.screenSpace();
@@ -970,7 +1021,8 @@
       this.lebelbar.renderCentered(ctx, x, y);
       if (this.renderScorebar)
         this.scorebar.renderCentered(ctx, x, y - levelbarHeight);
-      this.playerNameText.renderCentered(ctx, x, y - levelbarHeight + (this.renderScorebar ? scorebarHeight + levelbarHeight / 2 : levelbarHeight / 2));
+      this.playerNameText.renderCentered(ctx, x, y - levelbarHeight - (this.renderScorebar ? scorebarHeight + levelbarHeight / 2 : levelbarHeight / 2));
+      ctx.canvas.restore();
     }
   };
 
@@ -1009,19 +1061,52 @@
       this.ctx.canvasSize = { width: this.width, height: this.height };
     }
     static {
-      this.a = new AppInfo();
+      this.appInfo = new AppInfo();
     }
     static {
-      this.b = new Changelog();
+      this.attributes = null;
     }
     static {
-      this.c = new InfoHeader();
+      this.changelog = new Changelog();
     }
     static {
-      this.d = new PlayerStatus();
+      this.classes = null;
     }
     static {
-      this.e = new Invite();
+      this.classTree = null;
+    }
+    static {
+      this.console = null;
+    }
+    static {
+      this.fadeout = null;
+    }
+    static {
+      this.gameModes = null;
+    }
+    static {
+      this.infoHeader = new InfoHeader();
+    }
+    static {
+      this.invite = new Invite();
+    }
+    static {
+      this.minimap = new Minimap();
+    }
+    static {
+      this.notifications = null;
+    }
+    static {
+      this.playerStats = null;
+    }
+    static {
+      this.playerStatus = new PlayerStatus();
+    }
+    static {
+      this.scoreboard = null;
+    }
+    static {
+      this.spawnMenu = null;
     }
     /*
         this.canvas.save();
@@ -1030,14 +1115,21 @@
         this.canvas.strokeRect(0, 0, this.canvasWidth, this.canvasHeight);
         this.canvas.restore();
     */
-    static render() {
+    static startFrame() {
       this.resize();
       this.ctx.canvas.reset();
-      this.a.render(this.ctx);
-      this.b.render(this.ctx);
-      this.c.render(this.ctx);
-      this.d.render(this.ctx);
-      this.e.render(this.ctx);
+    }
+    static renderComponents() {
+      if (this.appInfo)
+        this.appInfo.render(this.ctx);
+      if (this.infoHeader)
+        this.infoHeader.render(this.ctx);
+      if (this.invite)
+        this.invite.render(this.ctx);
+      if (this.minimap)
+        this.minimap.render(this.ctx);
+      if (this.playerStatus)
+        this.playerStatus.render(this.ctx);
     }
   };
   Number.prototype.screenSpace = function() {
@@ -1172,7 +1264,8 @@
   // src/index.ts
   var render = () => {
     Input.startFrame();
-    Viewport.render();
+    Viewport.startFrame();
+    Viewport.renderComponents();
     Input.endFrame();
     requestAnimationFrame(render);
   };

@@ -2,6 +2,7 @@ import AppInfo from "../components/AppInfo";
 import Changelog from "../components/Changelog";
 import InfoHeader from "../components/InfoHeader";
 import Invite from "../components/Invite";
+import Minimap from "../components/Minimap";
 import PlayerStatus from "../components/PlayerStatus";
 import Renderable from "./Renderable";
 
@@ -37,11 +38,22 @@ export default class Viewport {
         this.ctx.canvasSize = { width: this.width, height: this.height };
     }
 
-    public static a = new AppInfo();
-    public static b = new Changelog();
-    public static c = new InfoHeader();
-    public static d = new PlayerStatus();
-    public static e = new Invite();
+    public static appInfo: AppInfo | null = new AppInfo;
+    public static attributes: null = null;
+    public static changelog: Changelog | null = new Changelog;
+    public static classes: null = null;
+    public static classTree: null = null;
+    public static console: null = null;
+    public static fadeout: null = null;
+    public static gameModes: null = null;
+    public static infoHeader: InfoHeader | null = new InfoHeader;
+    public static invite: Invite | null = new Invite;
+    public static minimap: Minimap | null = new Minimap;
+    public static notifications: null = null;
+    public static playerStats: null = null;
+    public static playerStatus: PlayerStatus | null = new PlayerStatus;
+    public static scoreboard: null = null;
+    public static spawnMenu: null = null;
 
     /*
         this.canvas.save();
@@ -51,14 +63,28 @@ export default class Viewport {
         this.canvas.restore();
     */
 
-    public static render() {
+    public static startFrame() {
         this.resize();
         this.ctx.canvas.reset();
-        this.a.render(this.ctx);
-        this.b.render(this.ctx);
-        this.c.render(this.ctx);
-        this.d.render(this.ctx);
-        this.e.render(this.ctx);
+    }
+
+    public static renderComponents() {
+        if (this.appInfo) this.appInfo.render(this.ctx);
+        //if(this.attributes) this.attributes.render(this.ctx);
+        //if(this.changelog) this.changelog.render(this.ctx);
+        //if(this.classes) this.classes.render(this.ctx);
+        //if(this.classTree) this.classTree.render(this.ctx);
+        //if(this.console) this.console.render(this.ctx);
+        //if(this.fadeout) this.fadeout.render(this.ctx);
+        //if(this.gameModes) this.gameModes.render(this.ctx);
+        if (this.infoHeader) this.infoHeader.render(this.ctx);
+        if (this.invite) this.invite.render(this.ctx);
+        if (this.minimap) this.minimap.render(this.ctx);
+        //if(this.notifications) this.notifications.render(this.ctx);
+        //if(this.playerStats) this.playerStats.render(this.ctx);
+        if (this.playerStatus) this.playerStatus.render(this.ctx);
+        //if(this.scoreboard) this.scoreboard.render(this.ctx);
+        //if(this.spawnMenu) this.spawnMenu.render(this.ctx);
     }
 }
 

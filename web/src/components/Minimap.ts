@@ -7,11 +7,12 @@ export default class Minimap extends Component {
     public readonly buffer: Renderable = new Renderable();
 
     public constructor(
-        public x: number = -195,
-        public y: number = -195,
+        public x: number = -20,
+        public y: number = -20,
         public anchorX: ScreenAnchorX = ScreenAnchorX.Max,
         public anchorY: ScreenAnchorY = ScreenAnchorY.Max,
-        public size: number = 175,
+        public sizeX: number = 175,
+        public sizeY: number = 175,
         public backgroundColor = Color.fromRGB(205, 205, 205),
         public strokeColor = Color.fromRGB(121, 121, 121),
     ) {
@@ -19,13 +20,17 @@ export default class Minimap extends Component {
     }
 
     public render(ctx: Renderable): void {
-        const x = this.x.anchoredScreenSpace(this.anchorX);
-        const y = this.y.anchoredScreenSpace(this.anchorY);
-        const size = this.size.screenSpace();
+        ctx.canvas.save();
+        ctx.canvas.globalAlpha = 0.7;
+
+        const x = (this.x - this.sizeX).anchoredScreenSpace(this.anchorX);
+        const y = (this.y - this.sizeY).anchoredScreenSpace(this.anchorY);
+        const sizeX = this.sizeX.screenSpace();
+        const sizeY = this.sizeY.screenSpace();
 
         ctx.canvas.save();
         ctx.canvas.translate(x, y);
-        ctx.canvas.scale(size, size);
+        ctx.canvas.scale(this.sizeX.screenSpace(), this.sizeY.screenSpace());
         ctx.canvas.save();
         ctx.canvas.beginPath();
         ctx.canvas.rect(0, 0, 1, 1);
@@ -40,6 +45,8 @@ export default class Minimap extends Component {
         ctx.canvas.lineWidth = 0.03;
         ctx.canvas.lineJoin = "round";
         ctx.canvas.strokeRect(0, 0, 1, 1);
+        ctx.canvas.restore();
+
         ctx.canvas.restore();
     }
 }

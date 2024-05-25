@@ -12,6 +12,7 @@ export default class Invite extends Component {
         public y: number = 12,
         public anchorX: ScreenAnchorX = ScreenAnchorX.Max,
         public anchorY: ScreenAnchorY = ScreenAnchorY.Min,
+        public inviteLink: string = "",
     ) {
         super();
     }
@@ -21,6 +22,6 @@ export default class Invite extends Component {
         const y = this.y.anchoredScreenSpace(this.anchorY);
 
         this.button.render(ctx, x, y);
-        this.button.onClick = () => {}; // TODO invite
+        this.button.onClick = () => navigator.clipboard.writeText(this.inviteLink); // TODO invite
     }
 }
