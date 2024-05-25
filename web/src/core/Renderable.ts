@@ -1,7 +1,7 @@
 export default class Renderable {
     public canvas: CanvasRenderingContext2D;
 
-    public constructor(canvas?: HTMLCanvasElement) {
+    public constructor(canvas?: HTMLCanvasElement | OffscreenCanvas) {
         const ctx = (canvas || new OffscreenCanvas(1, 1)).getContext("2d");
         if (!ctx) throw "Unable to create a new canvas context";
         this.canvas = ctx as CanvasRenderingContext2D; // Quick hack since these types are pretty much overlapping
