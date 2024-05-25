@@ -22,9 +22,11 @@ export default class PlayerStatus extends Component {
     public render(ctx: Renderable): void {
         const x = this.x.anchoredScreenSpace(this.anchorX);
         const y = this.y.anchoredScreenSpace(this.anchorY);
+        const levelbarHeight = this.lebelbar.outerHeight.screenSpace();
+        const scorebarHeight = this.scorebar.outerHeight.screenSpace();
 
         this.lebelbar.renderCentered(ctx, x, y);
-        if (this.renderScorebar) this.scorebar.renderCentered(ctx, x, y - (24).screenSpace());
-        this.playerNameText.renderCentered(ctx, x, y - (24 + (this.renderScorebar ? 32 : 12)).screenSpace());
+        if (this.renderScorebar) this.scorebar.renderCentered(ctx, x, y - levelbarHeight);
+        this.playerNameText.renderCentered(ctx, x, y - levelbarHeight + (this.renderScorebar ? (scorebarHeight + levelbarHeight / 2) : (levelbarHeight / 2)));
     }
 }
