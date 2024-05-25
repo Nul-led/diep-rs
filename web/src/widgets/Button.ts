@@ -1,5 +1,5 @@
 import Renderable from "../core/Renderable";
-import Viewport from "../core/Viewport";
+import Viewport, { ScreenAnchorX, ScreenAnchorY } from "../core/Viewport";
 import { InteractableWidget } from "../core/Widget";
 import Color from "../util/Color";
 
@@ -10,6 +10,8 @@ export default class Button extends InteractableWidget {
     public constructor(
         protected _x: number = 0,
         protected _y: number = 0,
+        public anchorX: ScreenAnchorX = ScreenAnchorX.Min,
+        public anchorY: ScreenAnchorY = ScreenAnchorY.Min,
         protected _width: number = 1,
         protected _height: number = 1,
         protected _fillColor: Color | null = Color.WHITE,
@@ -27,7 +29,7 @@ export default class Button extends InteractableWidget {
 
     protected getInteractablePath(): Path2D {
         const path = new Path2D();
-        path.rect(this._x.screenSpace(), this._y.screenSpace(), this._width.screenSpace(), this._height.screenSpace());
+        path.rect(this._x.anchoredScreenSpace(this.anchorX), this._y.anchoredScreenSpace(this.anchorY), this._width.screenSpace(), this._height.screenSpace());
         return path;
     }
 

@@ -1,19 +1,8 @@
 import AppInfo from "../components/AppInfo";
 import Changelog from "../components/Changelog";
 import InfoHeader from "../components/InfoHeader";
+import Invite from "../components/Invite";
 import PlayerStatus from "../components/PlayerStatus";
-import Animation, { AnimationType } from "../util/Animation";
-import Color from "../util/Color";
-import Bar from "../widgets/Bar";
-import Button from "../widgets/Button";
-import Image from "../widgets/Image";
-import ProgressBar from "../widgets/ProgressBar";
-import Slider from "../widgets/Slider";
-import Text from "../widgets/Text";
-import TextArea from "../widgets/TextArea";
-import Checkbox from "../widgets/buttons/Checkbox";
-import ImageButton from "../widgets/buttons/ImageButton";
-import { TextButton } from "../widgets/buttons/TextButton";
 import Renderable from "./Renderable";
 
 export enum ScreenAnchorX {
@@ -52,6 +41,7 @@ export default class Viewport {
     public static b = new Changelog();
     public static c = new InfoHeader();
     public static d = new PlayerStatus();
+    public static e = new Invite();
 
     /*
         this.canvas.save();
@@ -68,6 +58,7 @@ export default class Viewport {
         this.b.render(this.ctx);
         this.c.render(this.ctx);
         this.d.render(this.ctx);
+        this.e.render(this.ctx);
     }
 }
 

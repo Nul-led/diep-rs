@@ -4,6 +4,11 @@ import { ScreenAnchorX, ScreenAnchorY } from "../core/Viewport";
 import Animation, { AnimationType } from "../util/Animation";
 import Text from "../widgets/Text";
 
+export enum InfoHeaderEvents {
+    AnimationTimerMin = "animation::timer::min",
+    AnimationTimerMax = "animation::timer::max",
+}
+
 export default class InfoHeader extends Component {
     public constructor(
         public readonly header: Text = new Text("Connecting...", 70),
@@ -24,8 +29,14 @@ export default class InfoHeader extends Component {
         animation.step(this.isDown);
         const y = this.y.anchoredScreenSpace(this.anchorY) * animation.latest;
 
+
         // dont actually render if not needed
-        if(animation.timer === 0) return;
+        if (animation.timer === 0) {
+            this.dispatchEvent(new Event(InfoHeaderEvents.AnimationTimerMin));
+            return;
+        } else if (animation.timer === 1) {
+            this.dispatchEvent(new Event(InfoHeaderEvents.AnimationTimerMax))
+        }
 
         this.header.renderCentered(ctx, x, y);
     }

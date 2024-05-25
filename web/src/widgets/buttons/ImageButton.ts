@@ -1,4 +1,4 @@
-import Viewport from "../../core/Viewport";
+import Viewport, { ScreenAnchorX, ScreenAnchorY } from "../../core/Viewport";
 import Color from "../../util/Color";
 import Button from "../Button";
 import Image from "../Image";
@@ -8,6 +8,8 @@ export default class ImageButton extends Button {
         public readonly imageWidget: Image = new Image(),
         protected _x: number = 0,
         protected _y: number = 0,
+        public anchorX: ScreenAnchorX = ScreenAnchorX.Min,
+        public anchorY: ScreenAnchorY = ScreenAnchorY.Min,
         protected _width: number = 1,
         protected _height: number = 1,
         protected _strokeColor: Color | null = Color.BLACK,

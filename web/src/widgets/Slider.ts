@@ -1,5 +1,5 @@
 import Input from "../core/Input";
-import Viewport from "../core/Viewport";
+import Viewport, { ScreenAnchorX, ScreenAnchorY } from "../core/Viewport";
 import { InteractableWidget } from "../core/Widget";
 import { clamp } from "../util/Clamp";
 import Color from "../util/Color";
@@ -12,6 +12,8 @@ export default class Slider extends InteractableWidget {
     constructor(
         protected _x: number = 0,
         protected _y: number = 0,
+        public anchorX: ScreenAnchorX = ScreenAnchorX.Min,
+        public anchorY: ScreenAnchorY = ScreenAnchorY.Min,
         protected _width: number = 100.0,
         protected _height: number = 20.0,
         public step: number = 0.01,
@@ -31,8 +33,8 @@ export default class Slider extends InteractableWidget {
 
     protected getInteractablePath(): Path2D {
         const path = new Path2D();
-        const x = this._x.screenSpace();
-        const y = this._y.screenSpace();
+        const x = this._x.anchoredScreenSpace(this.anchorX);
+        const y = this._y.anchoredScreenSpace(this.anchorY);
         const w = this._width.screenSpace();
         const h = this._height.screenSpace();
         path.rect(x, y + h * 0.25, w, h);
@@ -45,7 +47,7 @@ export default class Slider extends InteractableWidget {
 
         if (this.isSliding) {
             if (!Input.mouse.leftDown) this.isSliding = false;
-            this.value = clamp((Input.mouse.x - this._x.screenSpace()) / this._width.screenSpace(), 0, 1);
+            this.value = clamp((Input.mouse.x - this._x.anchoredScreenSpace(this.anchorX)) / this._width.screenSpace(), 0, 1);
             Input.mouse.cursor = "pointer";
         }
 

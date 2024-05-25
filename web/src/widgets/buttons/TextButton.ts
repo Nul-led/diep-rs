@@ -1,4 +1,4 @@
-import Viewport from "../../core/Viewport";
+import Viewport, { ScreenAnchorX, ScreenAnchorY } from "../../core/Viewport";
 import Color from "../../util/Color";
 import Button from "../Button";
 import Text from "../Text";
@@ -8,6 +8,8 @@ export class TextButton extends Button {
         public readonly textWidget: Text = new Text(),
         protected _x: number = 0,
         protected _y: number = 0,
+        public anchorX: ScreenAnchorX = ScreenAnchorX.Min,
+        public anchorY: ScreenAnchorY = ScreenAnchorY.Min,
         protected _width: number = 1,
         protected _height: number = 1,
         protected _fillColor: Color | null = Color.WHITE,
