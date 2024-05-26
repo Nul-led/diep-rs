@@ -346,247 +346,6 @@
     }
   };
 
-  // src/util/Clamp.ts
-  var clamp = (val, min, max) => Math.min(Math.max(val, min), max);
-
-  // src/util/Animation.ts
-  var Animation = class {
-    constructor(animationType = "easeInOutSine" /* EaseInOutSine */, timeStep = 0.05, timer = 0, latest = 0, isClamped = true) {
-      this.animationType = animationType;
-      this.timeStep = timeStep;
-      this.timer = timer;
-      this.latest = latest;
-      this.isClamped = isClamped;
-    }
-    stepForward() {
-      if (this.isClamped) {
-        if (this.timer === 1)
-          return false;
-        this.timer = clamp(this.timer + this.timeStep, 0, 1);
-      } else
-        this.timer += this.timeStep;
-      this.latest = this.timer[this.animationType]();
-      return true;
-    }
-    stepBackward() {
-      if (this.isClamped) {
-        if (this.timer === 0)
-          return false;
-        this.timer = clamp(this.timer - this.timeStep, 0, 1);
-      } else
-        this.timer -= this.timeStep;
-      this.latest = this.timer[this.animationType]();
-      return true;
-    }
-    step(isForward) {
-      return isForward ? this.stepForward() : this.stepBackward();
-    }
-  };
-  Number.prototype.blendWith = function(wanted) {
-    return (this * 9 + wanted) / 10;
-  };
-  Number.prototype.smoothStep = function() {
-    return this ** 2 * (3 - 2 * this);
-  };
-  Number.prototype.exponentialSmoothing = function(wanted, rate) {
-    return this * (1 - clamp(rate, 0, 1)) + wanted * clamp(rate, 0, 1);
-  };
-  Number.prototype.biExponentialSmoothing = function(wanted, primaryRate, secondaryRate) {
-    if (this < wanted)
-      return this.exponentialSmoothing(wanted, primaryRate);
-    else
-      return this.exponentialSmoothing(wanted, secondaryRate);
-  };
-  Number.prototype.easeInSine = function() {
-    return -1 * Math.cos(this * (Math.PI / 2)) + 1;
-  };
-  Number.prototype.easeOutSine = function() {
-    return Math.sin(this * (Math.PI / 2));
-  };
-  Number.prototype.easeInOutSine = function() {
-    return -0.5 * (Math.cos(Math.PI * this) - 1);
-  };
-  Number.prototype.easeInQuad = function() {
-    return this * this;
-  };
-  Number.prototype.easeOutQuad = function() {
-    return this * (2 - this);
-  };
-  Number.prototype.easeInOutQuad = function() {
-    return this < 0.5 ? 2 * this * this : -1 + (4 - 2 * this) * this;
-  };
-  Number.prototype.easeInCubic = function() {
-    return this * this * this;
-  };
-  Number.prototype.easeOutCubic = function() {
-    const t1 = this - 1;
-    return t1 * t1 * t1 + 1;
-  };
-  Number.prototype.easeInOutCubic = function() {
-    return this < 0.5 ? 4 * this * this * this : (this - 1) * (2 * this - 2) * (2 * this - 2) + 1;
-  };
-  Number.prototype.easeInQuart = function() {
-    return this * this * this * this;
-  };
-  Number.prototype.easeOutQuart = function() {
-    const t1 = this - 1;
-    return 1 - t1 * t1 * t1 * t1;
-  };
-  Number.prototype.easeInOutQuart = function() {
-    const t1 = this - 1;
-    return this < 0.5 ? 8 * this * this * this * this : 1 - 8 * t1 * t1 * t1 * t1;
-  };
-  Number.prototype.easeInQuint = function() {
-    return this * this * this * this * this;
-  };
-  Number.prototype.easeOutQuint = function() {
-    const t1 = this - 1;
-    return 1 + t1 * t1 * t1 * t1 * t1;
-  };
-  Number.prototype.easeInOutQuint = function() {
-    const t1 = this - 1;
-    return this < 0.5 ? 16 * this * this * this * this * this : 1 + 16 * t1 * t1 * t1 * t1 * t1;
-  };
-  Number.prototype.easeInExpo = function() {
-    if (this === 0) {
-      return 0;
-    }
-    return Math.pow(2, 10 * (this - 1));
-  };
-  Number.prototype.easeOutExpo = function() {
-    if (this === 1) {
-      return 1;
-    }
-    return -Math.pow(2, -10 * this) + 1;
-  };
-  Number.prototype.easeInOutExpo = function() {
-    if (this === 0 || this === 1) {
-      return this;
-    }
-    const scaledTime = this * 2;
-    const scaledTime1 = scaledTime - 1;
-    if (scaledTime < 1) {
-      return 0.5 * Math.pow(2, 10 * scaledTime1);
-    }
-    return 0.5 * (-Math.pow(2, -10 * scaledTime1) + 2);
-  };
-  Number.prototype.easeInCirc = function() {
-    const scaledTime = this / 1;
-    return -1 * (Math.sqrt(1 - scaledTime * this) - 1);
-  };
-  Number.prototype.easeOutCirc = function() {
-    const t1 = this - 1;
-    return Math.sqrt(1 - t1 * t1);
-  };
-  Number.prototype.easeInOutCirc = function() {
-    const scaledTime = this * 2;
-    const scaledTime1 = scaledTime - 2;
-    if (scaledTime < 1) {
-      return -0.5 * (Math.sqrt(1 - scaledTime * scaledTime) - 1);
-    }
-    return 0.5 * (Math.sqrt(1 - scaledTime1 * scaledTime1) + 1);
-  };
-  Number.prototype.easeInBack = function(magnitude = 1.70158) {
-    return this * this * ((magnitude + 1) * this - magnitude);
-  };
-  Number.prototype.easeOutBack = function(magnitude = 1.70158) {
-    const scaledTime = this / 1 - 1;
-    return scaledTime * scaledTime * ((magnitude + 1) * scaledTime + magnitude) + 1;
-  };
-  Number.prototype.easeInOutBack = function(magnitude = 1.70158) {
-    const scaledTime = this * 2;
-    const scaledTime2 = scaledTime - 2;
-    const s = magnitude * 1.525;
-    if (scaledTime < 1) {
-      return 0.5 * scaledTime * scaledTime * ((s + 1) * scaledTime - s);
-    }
-    return 0.5 * (scaledTime2 * scaledTime2 * ((s + 1) * scaledTime2 + s) + 2);
-  };
-  Number.prototype.easeInElastic = function(magnitude = 0.7) {
-    if (this === 0 || this === 1) {
-      return this;
-    }
-    const scaledTime = this / 1;
-    const scaledTime1 = scaledTime - 1;
-    const p = 1 - magnitude;
-    const s = p / (2 * Math.PI) * Math.asin(1);
-    return -(Math.pow(2, 10 * scaledTime1) * Math.sin((scaledTime1 - s) * (2 * Math.PI) / p));
-  };
-  Number.prototype.easeOutElastic = function(magnitude = 0.7) {
-    if (this === 0 || this === 1) {
-      return this;
-    }
-    const p = 1 - magnitude;
-    const scaledTime = this * 2;
-    const s = p / (2 * Math.PI) * Math.asin(1);
-    return Math.pow(2, -10 * scaledTime) * Math.sin((scaledTime - s) * (2 * Math.PI) / p) + 1;
-  };
-  Number.prototype.easeInOutElastic = function(magnitude = 0.65) {
-    if (this === 0 || this === 1) {
-      return this;
-    }
-    const p = 1 - magnitude;
-    const scaledTime = this * 2;
-    const scaledTime1 = scaledTime - 1;
-    const s = p / (2 * Math.PI) * Math.asin(1);
-    if (scaledTime < 1) {
-      return -0.5 * (Math.pow(2, 10 * scaledTime1) * Math.sin((scaledTime1 - s) * (2 * Math.PI) / p));
-    }
-    return Math.pow(2, -10 * scaledTime1) * Math.sin((scaledTime1 - s) * (2 * Math.PI) / p) * 0.5 + 1;
-  };
-  Number.prototype.easeOutBounce = function() {
-    const scaledTime = this / 1;
-    if (scaledTime < 1 / 2.75) {
-      return 7.5625 * scaledTime * scaledTime;
-    } else if (scaledTime < 2 / 2.75) {
-      const scaledTime2 = scaledTime - 1.5 / 2.75;
-      return 7.5625 * scaledTime2 * scaledTime2 + 0.75;
-    } else if (scaledTime < 2.5 / 2.75) {
-      const scaledTime2 = scaledTime - 2.25 / 2.75;
-      return 7.5625 * scaledTime2 * scaledTime2 + 0.9375;
-    } else {
-      const scaledTime2 = scaledTime - 2.625 / 2.75;
-      return 7.5625 * scaledTime2 * scaledTime2 + 0.984375;
-    }
-  };
-  Number.prototype.easeInBounce = function() {
-    return 1 - (1 - this).easeOutBounce();
-  };
-  Number.prototype.easeInOutBounce = function() {
-    if (this < 0.5) {
-      return (this * 2).easeInBounce() * 0.5;
-    }
-    return (this * 2 - 1).easeOutBounce() * 0.5 + 0.5;
-  };
-
-  // src/components/InfoHeader.ts
-  var InfoHeader = class extends Component {
-    constructor(header = new Text("Connecting...", 70), x = 0, y = 0, anchorX = 1 /* Half */, anchorY = 4 /* Half */, slideDownAnimation = new Animation("easeOutExpo" /* EaseOutExpo */, 75e-4), slideUpAnimation = new Animation("easeInSine" /* EaseInSine */, 0.05, 1), isDown = true) {
-      super();
-      this.header = header;
-      this.x = x;
-      this.y = y;
-      this.anchorX = anchorX;
-      this.anchorY = anchorY;
-      this.slideDownAnimation = slideDownAnimation;
-      this.slideUpAnimation = slideUpAnimation;
-      this.isDown = isDown;
-    }
-    render(ctx) {
-      const x = this.x.anchoredScreenSpace(this.anchorX);
-      const animation = this.isDown ? this.slideDownAnimation : this.slideUpAnimation;
-      animation.step(this.isDown);
-      const y = this.y.anchoredScreenSpace(this.anchorY) * animation.latest;
-      if (animation.timer === 0) {
-        this.dispatchEvent(new Event("animation::timer::min" /* AnimationTimerMin */));
-        return;
-      } else if (animation.timer === 1) {
-        this.dispatchEvent(new Event("animation::timer::max" /* AnimationTimerMax */));
-      }
-      this.header.renderCentered(ctx, x, y);
-    }
-  };
-
   // src/widgets/Button.ts
   var Button = class extends InteractableWidget {
     constructor(_x = 0, _y = 0, anchorX = 0 /* Min */, anchorY = 3 /* Min */, _width = 1, _height = 1, _fillColor = Color.WHITE, _strokeColor = Color.BLACK, _strokeWidth = 10, _mockHover = false, _mockPress = false) {
@@ -837,6 +596,9 @@
       this.strokeColor = strokeColor;
       this.buffer = new Renderable();
     }
+    getBufferCtx() {
+      return this.buffer.canvas;
+    }
     render(ctx) {
       ctx.canvas.save();
       ctx.canvas.globalAlpha = 0.7;
@@ -1000,9 +762,9 @@
 
   // src/components/PlayerStatus.ts
   var PlayerStatus = class extends Component {
-    constructor(lebelbar = new ProgressBar(new Text("Lvl 1 Tank", 16), 424, 24, new Color(16768579)), scorebar = new ProgressBar(new Text("Score: 0", 15), 320, 20, new Color(4456337)), playerNameText = new Text("Unnamed", 40), x = 0, y = -34, anchorX = 1 /* Half */, anchorY = 5 /* Max */, renderScorebar = true) {
+    constructor(levelbar = new ProgressBar(new Text("Lvl 1 Tank", 16), 424, 24, new Color(16768579)), scorebar = new ProgressBar(new Text("Score: 0", 15), 320, 20, new Color(4456337)), playerNameText = new Text("Unnamed", 40), x = 0, y = -34, anchorX = 1 /* Half */, anchorY = 5 /* Max */, renderScorebar = true) {
       super();
-      this.lebelbar = lebelbar;
+      this.levelbar = levelbar;
       this.scorebar = scorebar;
       this.playerNameText = playerNameText;
       this.x = x;
@@ -1016,9 +778,9 @@
       ctx.canvas.globalAlpha = 0.7;
       const x = this.x.anchoredScreenSpace(this.anchorX);
       const y = this.y.anchoredScreenSpace(this.anchorY);
-      const levelbarHeight = this.lebelbar.outerHeight.screenSpace();
+      const levelbarHeight = this.levelbar.outerHeight.screenSpace();
       const scorebarHeight = this.scorebar.outerHeight.screenSpace();
-      this.lebelbar.renderCentered(ctx, x, y);
+      this.levelbar.renderCentered(ctx, x, y);
       if (this.renderScorebar)
         this.scorebar.renderCentered(ctx, x, y - levelbarHeight);
       this.playerNameText.renderCentered(ctx, x, y - levelbarHeight - (this.renderScorebar ? scorebarHeight + levelbarHeight / 2 : levelbarHeight / 2));
@@ -1027,7 +789,7 @@
   };
 
   // src/core/Viewport.ts
-  var Viewport = class {
+  var Viewport = class _Viewport {
     static {
       this.maxWidth = 1920;
     }
@@ -1051,14 +813,6 @@
     }
     static {
       this.ctx = new Renderable(document.getElementById("canvas"));
-    }
-    static resize() {
-      this.width = window.innerWidth * window.devicePixelRatio;
-      this.height = window.innerHeight * window.devicePixelRatio;
-      const guiZoomFactor = Math.max(this.width / this.maxWidth, this.height / this.maxHeight) * this.guiScale;
-      this.guiZoomChanged = this.guiZoomFactor !== guiZoomFactor;
-      this.guiZoomFactor = guiZoomFactor;
-      this.ctx.canvasSize = { width: this.width, height: this.height };
     }
     static {
       this.appInfo = new AppInfo();
@@ -1085,7 +839,7 @@
       this.gameModes = null;
     }
     static {
-      this.infoHeader = new InfoHeader();
+      this.infoHeader = null;
     }
     static {
       this.invite = new Invite();
@@ -1108,28 +862,43 @@
     static {
       this.spawnMenu = null;
     }
+    static resize() {
+      _Viewport.width = window.innerWidth * window.devicePixelRatio;
+      _Viewport.height = window.innerHeight * window.devicePixelRatio;
+      const guiZoomFactor = Math.max(_Viewport.width / _Viewport.maxWidth, _Viewport.height / _Viewport.maxHeight) * _Viewport.guiScale;
+      _Viewport.guiZoomChanged = _Viewport.guiZoomFactor !== guiZoomFactor;
+      _Viewport.guiZoomFactor = guiZoomFactor;
+      _Viewport.ctx.canvasSize = { width: _Viewport.width, height: _Viewport.height };
+    }
     /*
         this.canvas.save();
         this.canvas.strokeStyle = Color.fromRGB(255, 0, 0).toCSS();
         this.canvas.lineWidth = 1;
-        this.canvas.strokeRect(0, 0, this.canvasWidth, this.canvasHeight);
+        this.canvas.strokeRect(0, 0, Viewport.canvasWidth, Viewport.canvasHeight);
         this.canvas.restore();
     */
+    static getCtx() {
+      return _Viewport.ctx.canvas;
+    }
     static startFrame() {
-      this.resize();
-      this.ctx.canvas.reset();
+      _Viewport.resize();
+      _Viewport.ctx.canvas.reset();
+      Input.startFrame();
     }
     static renderComponents() {
-      if (this.appInfo)
-        this.appInfo.render(this.ctx);
-      if (this.infoHeader)
-        this.infoHeader.render(this.ctx);
-      if (this.invite)
-        this.invite.render(this.ctx);
-      if (this.minimap)
-        this.minimap.render(this.ctx);
-      if (this.playerStatus)
-        this.playerStatus.render(this.ctx);
+      if (_Viewport.appInfo)
+        _Viewport.appInfo.render(_Viewport.ctx);
+      if (_Viewport.infoHeader)
+        _Viewport.infoHeader.render(_Viewport.ctx);
+      if (_Viewport.invite)
+        _Viewport.invite.render(_Viewport.ctx);
+      if (_Viewport.minimap)
+        _Viewport.minimap.render(_Viewport.ctx);
+      if (_Viewport.playerStatus)
+        _Viewport.playerStatus.render(_Viewport.ctx);
+    }
+    static endFrame() {
+      Input.endFrame();
     }
   };
   Number.prototype.screenSpace = function() {
@@ -1261,16 +1030,393 @@
     }
   };
 
-  // src/index.ts
-  var render = () => {
-    Input.startFrame();
-    Viewport.startFrame();
-    Viewport.renderComponents();
-    Input.endFrame();
-    requestAnimationFrame(render);
+  // src/util/Clamp.ts
+  var clamp = (val, min, max) => Math.min(Math.max(val, min), max);
+
+  // src/util/Animation.ts
+  var Animation = class {
+    constructor(animationType = "easeInOutSine" /* EaseInOutSine */, timeStep = 0.05, timer = 0, latest = 0, isClamped = true) {
+      this.animationType = animationType;
+      this.timeStep = timeStep;
+      this.timer = timer;
+      this.latest = latest;
+      this.isClamped = isClamped;
+    }
+    stepForward() {
+      if (this.isClamped) {
+        if (this.timer === 1)
+          return false;
+        this.timer = clamp(this.timer + this.timeStep, 0, 1);
+      } else
+        this.timer += this.timeStep;
+      this.latest = this.timer[this.animationType]();
+      return true;
+    }
+    stepBackward() {
+      if (this.isClamped) {
+        if (this.timer === 0)
+          return false;
+        this.timer = clamp(this.timer - this.timeStep, 0, 1);
+      } else
+        this.timer -= this.timeStep;
+      this.latest = this.timer[this.animationType]();
+      return true;
+    }
+    step(isForward) {
+      return isForward ? this.stepForward() : this.stepBackward();
+    }
   };
+  Number.prototype.blendWith = function(wanted) {
+    return (this * 9 + wanted) / 10;
+  };
+  Number.prototype.smoothStep = function() {
+    return this ** 2 * (3 - 2 * this);
+  };
+  Number.prototype.exponentialSmoothing = function(wanted, rate) {
+    return this * (1 - clamp(rate, 0, 1)) + wanted * clamp(rate, 0, 1);
+  };
+  Number.prototype.biExponentialSmoothing = function(wanted, primaryRate, secondaryRate) {
+    if (this < wanted)
+      return this.exponentialSmoothing(wanted, primaryRate);
+    else
+      return this.exponentialSmoothing(wanted, secondaryRate);
+  };
+  Number.prototype.easeInSine = function() {
+    return -1 * Math.cos(this * (Math.PI / 2)) + 1;
+  };
+  Number.prototype.easeOutSine = function() {
+    return Math.sin(this * (Math.PI / 2));
+  };
+  Number.prototype.easeInOutSine = function() {
+    return -0.5 * (Math.cos(Math.PI * this) - 1);
+  };
+  Number.prototype.easeInQuad = function() {
+    return this * this;
+  };
+  Number.prototype.easeOutQuad = function() {
+    return this * (2 - this);
+  };
+  Number.prototype.easeInOutQuad = function() {
+    return this < 0.5 ? 2 * this * this : -1 + (4 - 2 * this) * this;
+  };
+  Number.prototype.easeInCubic = function() {
+    return this * this * this;
+  };
+  Number.prototype.easeOutCubic = function() {
+    const t1 = this - 1;
+    return t1 * t1 * t1 + 1;
+  };
+  Number.prototype.easeInOutCubic = function() {
+    return this < 0.5 ? 4 * this * this * this : (this - 1) * (2 * this - 2) * (2 * this - 2) + 1;
+  };
+  Number.prototype.easeInQuart = function() {
+    return this * this * this * this;
+  };
+  Number.prototype.easeOutQuart = function() {
+    const t1 = this - 1;
+    return 1 - t1 * t1 * t1 * t1;
+  };
+  Number.prototype.easeInOutQuart = function() {
+    const t1 = this - 1;
+    return this < 0.5 ? 8 * this * this * this * this : 1 - 8 * t1 * t1 * t1 * t1;
+  };
+  Number.prototype.easeInQuint = function() {
+    return this * this * this * this * this;
+  };
+  Number.prototype.easeOutQuint = function() {
+    const t1 = this - 1;
+    return 1 + t1 * t1 * t1 * t1 * t1;
+  };
+  Number.prototype.easeInOutQuint = function() {
+    const t1 = this - 1;
+    return this < 0.5 ? 16 * this * this * this * this * this : 1 + 16 * t1 * t1 * t1 * t1 * t1;
+  };
+  Number.prototype.easeInExpo = function() {
+    if (this === 0) {
+      return 0;
+    }
+    return Math.pow(2, 10 * (this - 1));
+  };
+  Number.prototype.easeOutExpo = function() {
+    if (this === 1) {
+      return 1;
+    }
+    return -Math.pow(2, -10 * this) + 1;
+  };
+  Number.prototype.easeInOutExpo = function() {
+    if (this === 0 || this === 1) {
+      return this;
+    }
+    const scaledTime = this * 2;
+    const scaledTime1 = scaledTime - 1;
+    if (scaledTime < 1) {
+      return 0.5 * Math.pow(2, 10 * scaledTime1);
+    }
+    return 0.5 * (-Math.pow(2, -10 * scaledTime1) + 2);
+  };
+  Number.prototype.easeInCirc = function() {
+    const scaledTime = this / 1;
+    return -1 * (Math.sqrt(1 - scaledTime * this) - 1);
+  };
+  Number.prototype.easeOutCirc = function() {
+    const t1 = this - 1;
+    return Math.sqrt(1 - t1 * t1);
+  };
+  Number.prototype.easeInOutCirc = function() {
+    const scaledTime = this * 2;
+    const scaledTime1 = scaledTime - 2;
+    if (scaledTime < 1) {
+      return -0.5 * (Math.sqrt(1 - scaledTime * scaledTime) - 1);
+    }
+    return 0.5 * (Math.sqrt(1 - scaledTime1 * scaledTime1) + 1);
+  };
+  Number.prototype.easeInBack = function(magnitude = 1.70158) {
+    return this * this * ((magnitude + 1) * this - magnitude);
+  };
+  Number.prototype.easeOutBack = function(magnitude = 1.70158) {
+    const scaledTime = this / 1 - 1;
+    return scaledTime * scaledTime * ((magnitude + 1) * scaledTime + magnitude) + 1;
+  };
+  Number.prototype.easeInOutBack = function(magnitude = 1.70158) {
+    const scaledTime = this * 2;
+    const scaledTime2 = scaledTime - 2;
+    const s = magnitude * 1.525;
+    if (scaledTime < 1) {
+      return 0.5 * scaledTime * scaledTime * ((s + 1) * scaledTime - s);
+    }
+    return 0.5 * (scaledTime2 * scaledTime2 * ((s + 1) * scaledTime2 + s) + 2);
+  };
+  Number.prototype.easeInElastic = function(magnitude = 0.7) {
+    if (this === 0 || this === 1) {
+      return this;
+    }
+    const scaledTime = this / 1;
+    const scaledTime1 = scaledTime - 1;
+    const p = 1 - magnitude;
+    const s = p / (2 * Math.PI) * Math.asin(1);
+    return -(Math.pow(2, 10 * scaledTime1) * Math.sin((scaledTime1 - s) * (2 * Math.PI) / p));
+  };
+  Number.prototype.easeOutElastic = function(magnitude = 0.7) {
+    if (this === 0 || this === 1) {
+      return this;
+    }
+    const p = 1 - magnitude;
+    const scaledTime = this * 2;
+    const s = p / (2 * Math.PI) * Math.asin(1);
+    return Math.pow(2, -10 * scaledTime) * Math.sin((scaledTime - s) * (2 * Math.PI) / p) + 1;
+  };
+  Number.prototype.easeInOutElastic = function(magnitude = 0.65) {
+    if (this === 0 || this === 1) {
+      return this;
+    }
+    const p = 1 - magnitude;
+    const scaledTime = this * 2;
+    const scaledTime1 = scaledTime - 1;
+    const s = p / (2 * Math.PI) * Math.asin(1);
+    if (scaledTime < 1) {
+      return -0.5 * (Math.pow(2, 10 * scaledTime1) * Math.sin((scaledTime1 - s) * (2 * Math.PI) / p));
+    }
+    return Math.pow(2, -10 * scaledTime1) * Math.sin((scaledTime1 - s) * (2 * Math.PI) / p) * 0.5 + 1;
+  };
+  Number.prototype.easeOutBounce = function() {
+    const scaledTime = this / 1;
+    if (scaledTime < 1 / 2.75) {
+      return 7.5625 * scaledTime * scaledTime;
+    } else if (scaledTime < 2 / 2.75) {
+      const scaledTime2 = scaledTime - 1.5 / 2.75;
+      return 7.5625 * scaledTime2 * scaledTime2 + 0.75;
+    } else if (scaledTime < 2.5 / 2.75) {
+      const scaledTime2 = scaledTime - 2.25 / 2.75;
+      return 7.5625 * scaledTime2 * scaledTime2 + 0.9375;
+    } else {
+      const scaledTime2 = scaledTime - 2.625 / 2.75;
+      return 7.5625 * scaledTime2 * scaledTime2 + 0.984375;
+    }
+  };
+  Number.prototype.easeInBounce = function() {
+    return 1 - (1 - this).easeOutBounce();
+  };
+  Number.prototype.easeInOutBounce = function() {
+    if (this < 0.5) {
+      return (this * 2).easeInBounce() * 0.5;
+    }
+    return (this * 2 - 1).easeOutBounce() * 0.5 + 0.5;
+  };
+
+  // src/components/InfoHeader.ts
+  var InfoHeader = class extends Component {
+    constructor(header = new Text("Connecting...", 70), x = 0, y = 0, anchorX = 1 /* Half */, anchorY = 4 /* Half */, slideDownAnimation = new Animation("easeOutExpo" /* EaseOutExpo */, 75e-4), slideUpAnimation = new Animation("easeInSine" /* EaseInSine */, 0.05, 1), isDown = true) {
+      super();
+      this.header = header;
+      this.x = x;
+      this.y = y;
+      this.anchorX = anchorX;
+      this.anchorY = anchorY;
+      this.slideDownAnimation = slideDownAnimation;
+      this.slideUpAnimation = slideUpAnimation;
+      this.isDown = isDown;
+    }
+    render(ctx) {
+      const x = this.x.anchoredScreenSpace(this.anchorX);
+      const animation = this.isDown ? this.slideDownAnimation : this.slideUpAnimation;
+      animation.step(this.isDown);
+      const y = this.y.anchoredScreenSpace(this.anchorY) * animation.latest;
+      if (animation.timer === 0) {
+        this.dispatchEvent(new Event("animation::timer::min" /* AnimationTimerMin */));
+        return;
+      } else if (animation.timer === 1) {
+        this.dispatchEvent(new Event("animation::timer::max" /* AnimationTimerMax */));
+      }
+      this.header.renderCentered(ctx, x, y);
+    }
+  };
+
+  // src/core/ABI.ts
+  window.enableComponents = (components) => {
+    for (const component of components) {
+      switch (component) {
+        case 0 /* AppInfo */:
+          Viewport.appInfo ||= new AppInfo();
+          break;
+        case 1 /* Attributes */:
+          break;
+        case 2 /* Changelog */:
+          Viewport.changelog ||= new Changelog();
+          break;
+        case 4 /* ClassTree */:
+          break;
+        case 2 /* Changelog */:
+          Viewport.changelog ||= new Changelog();
+          break;
+        case 3 /* Classes */:
+          break;
+        case 5 /* Console */:
+          break;
+        case 6 /* Fadeout */:
+          break;
+        case 7 /* GameModes */:
+          break;
+        case 8 /* InfoHeader */:
+          Viewport.infoHeader ||= new InfoHeader();
+          break;
+        case 9 /* Invite */:
+          Viewport.invite ||= new Invite();
+          break;
+        case 10 /* Minimap */:
+          Viewport.minimap ||= new Minimap();
+          break;
+        case 11 /* Notifications */:
+          break;
+        case 12 /* PlayerStats */:
+          break;
+        case 13 /* PlayerStatus */:
+          Viewport.playerStatus ||= new PlayerStatus();
+          break;
+        case 14 /* Scoreboard */:
+          break;
+        case 15 /* SpawnMenu */:
+          break;
+      }
+    }
+  };
+  window.disableComponents = (components) => {
+    for (const component of components) {
+      switch (component) {
+        case 0 /* AppInfo */:
+          Viewport.appInfo = null;
+          break;
+        case 1 /* Attributes */:
+          Viewport.attributes = null;
+          break;
+        case 2 /* Changelog */:
+          Viewport.changelog = null;
+          break;
+        case 4 /* ClassTree */:
+          Viewport.classTree = null;
+          break;
+        case 2 /* Changelog */:
+          Viewport.changelog = null;
+          break;
+        case 3 /* Classes */:
+          Viewport.classes = null;
+          break;
+        case 5 /* Console */:
+          Viewport.console = null;
+          break;
+        case 6 /* Fadeout */:
+          Viewport.fadeout = null;
+          break;
+        case 7 /* GameModes */:
+          Viewport.gameModes = null;
+          break;
+        case 8 /* InfoHeader */:
+          Viewport.infoHeader = null;
+          break;
+        case 9 /* Invite */:
+          Viewport.invite = null;
+          break;
+        case 10 /* Minimap */:
+          Viewport.minimap = null;
+          break;
+        case 11 /* Notifications */:
+          Viewport.notifications = null;
+          break;
+        case 12 /* PlayerStats */:
+          Viewport.playerStats = null;
+          break;
+        case 13 /* PlayerStatus */:
+          Viewport.playerStatus = null;
+          break;
+        case 14 /* Scoreboard */:
+          Viewport.scoreboard = null;
+          break;
+        case 15 /* SpawnMenu */:
+          Viewport.spawnMenu = null;
+          break;
+      }
+    }
+  };
+  window.setAppInfoBody = (text) => {
+    if (Viewport.appInfo)
+      Viewport.appInfo.lines.text = text;
+  };
+  window.setAppInfoHeader = (text) => {
+    if (Viewport.appInfo)
+      Viewport.appInfo.header.text = text;
+  };
+  window.setChangelog = (text) => {
+    if (Viewport.changelog)
+      Viewport.changelog.lines.text = text;
+  };
+  window.setInfoHeader = (text) => {
+    if (Viewport.infoHeader)
+      Viewport.infoHeader.header.text = text;
+  };
+  window.setInvite = (link) => {
+    if (Viewport.invite)
+      Viewport.invite.inviteLink = link;
+  };
+  window.setPlayerStatusLevelbarText = (text) => {
+    if (Viewport.playerStatus)
+      Viewport.playerStatus.levelbar.textWidget.text = text;
+  };
+  window.setPlayerStatusPlayerName = (name) => {
+    if (Viewport.playerStatus)
+      Viewport.playerStatus.playerNameText.text = name;
+  };
+  window.setPlayerStatusRenderScorebar = (renderScorebar) => {
+    if (Viewport.playerStatus)
+      Viewport.playerStatus.renderScorebar = renderScorebar;
+  };
+  window.setPlayerStatusScorebarText = (text) => {
+    if (Viewport.playerStatus)
+      Viewport.playerStatus.scorebar.textWidget.text = text;
+  };
+  window.Input = Input;
+  window.Viewport = Viewport;
+
+  // src/index.ts
   document.fonts.onloadingdone = () => {
     Input.init();
-    requestAnimationFrame(render);
   };
 })();

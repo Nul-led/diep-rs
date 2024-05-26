@@ -4,6 +4,7 @@ import InfoHeader from "../components/InfoHeader";
 import Invite from "../components/Invite";
 import Minimap from "../components/Minimap";
 import PlayerStatus from "../components/PlayerStatus";
+import Input from "./Input";
 import Renderable from "./Renderable";
 
 export enum ScreenAnchorX {
@@ -29,15 +30,6 @@ export default class Viewport {
 
     public static ctx: Renderable = new Renderable(document.getElementById("canvas") as HTMLCanvasElement);
 
-    protected static resize() {
-        this.width = window.innerWidth * window.devicePixelRatio;
-        this.height = window.innerHeight * window.devicePixelRatio;
-        const guiZoomFactor = Math.max(this.width / this.maxWidth, this.height / this.maxHeight) * this.guiScale;
-        this.guiZoomChanged = this.guiZoomFactor !== guiZoomFactor;
-        this.guiZoomFactor = guiZoomFactor;
-        this.ctx.canvasSize = { width: this.width, height: this.height };
-    }
-
     public static appInfo: AppInfo | null = new AppInfo;
     public static attributes: null = null;
     public static changelog: Changelog | null = new Changelog;
@@ -46,7 +38,7 @@ export default class Viewport {
     public static console: null = null;
     public static fadeout: null = null;
     public static gameModes: null = null;
-    public static infoHeader: InfoHeader | null = new InfoHeader;
+    public static infoHeader: InfoHeader | null = null;
     public static invite: Invite | null = new Invite;
     public static minimap: Minimap | null = new Minimap;
     public static notifications: null = null;
@@ -55,36 +47,54 @@ export default class Viewport {
     public static scoreboard: null = null;
     public static spawnMenu: null = null;
 
+    protected static resize() {
+        Viewport.width = window.innerWidth * window.devicePixelRatio;
+        Viewport.height = window.innerHeight * window.devicePixelRatio;
+        const guiZoomFactor = Math.max(Viewport.width / Viewport.maxWidth, Viewport.height / Viewport.maxHeight) * Viewport.guiScale;
+        Viewport.guiZoomChanged = Viewport.guiZoomFactor !== guiZoomFactor;
+        Viewport.guiZoomFactor = guiZoomFactor;
+        Viewport.ctx.canvasSize = { width: Viewport.width, height: Viewport.height };
+    }
+
     /*
         this.canvas.save();
         this.canvas.strokeStyle = Color.fromRGB(255, 0, 0).toCSS();
         this.canvas.lineWidth = 1;
-        this.canvas.strokeRect(0, 0, this.canvasWidth, this.canvasHeight);
+        this.canvas.strokeRect(0, 0, Viewport.canvasWidth, Viewport.canvasHeight);
         this.canvas.restore();
     */
 
+    public static getCtx(): CanvasRenderingContext2D {
+        return Viewport.ctx.canvas;
+    }
+    
     public static startFrame() {
-        this.resize();
-        this.ctx.canvas.reset();
+        Viewport.resize();
+        Viewport.ctx.canvas.reset();
+        Input.startFrame();
     }
 
     public static renderComponents() {
-        if (this.appInfo) this.appInfo.render(this.ctx);
-        //if(this.attributes) this.attributes.render(this.ctx);
-        //if(this.changelog) this.changelog.render(this.ctx);
-        //if(this.classes) this.classes.render(this.ctx);
-        //if(this.classTree) this.classTree.render(this.ctx);
-        //if(this.console) this.console.render(this.ctx);
-        //if(this.fadeout) this.fadeout.render(this.ctx);
-        //if(this.gameModes) this.gameModes.render(this.ctx);
-        if (this.infoHeader) this.infoHeader.render(this.ctx);
-        if (this.invite) this.invite.render(this.ctx);
-        if (this.minimap) this.minimap.render(this.ctx);
-        //if(this.notifications) this.notifications.render(this.ctx);
-        //if(this.playerStats) this.playerStats.render(this.ctx);
-        if (this.playerStatus) this.playerStatus.render(this.ctx);
-        //if(this.scoreboard) this.scoreboard.render(this.ctx);
-        //if(this.spawnMenu) this.spawnMenu.render(this.ctx);
+        if (Viewport.appInfo) Viewport.appInfo.render(Viewport.ctx);
+        //if(Viewport.attributes) Viewport.attributes.render(Viewport.ctx);
+        //if(Viewport.changelog) Viewport.changelog.render(Viewport.ctx);
+        //if(Viewport.classes) Viewport.classes.render(Viewport.ctx);
+        //if(Viewport.classTree) Viewport.classTree.render(Viewport.ctx);
+        //if(Viewport.console) Viewport.console.render(Viewport.ctx);
+        //if(Viewport.fadeout) Viewport.fadeout.render(Viewport.ctx);
+        //if(Viewport.gameModes) Viewport.gameModes.render(Viewport.ctx);
+        if (Viewport.infoHeader) Viewport.infoHeader.render(Viewport.ctx);
+        if (Viewport.invite) Viewport.invite.render(Viewport.ctx);
+        if (Viewport.minimap) Viewport.minimap.render(Viewport.ctx);
+        //if(Viewport.notifications) Viewport.notifications.render(Viewport.ctx);
+        //if(Viewport.playerStats) Viewport.playerStats.render(Viewport.ctx);
+        if (Viewport.playerStatus) Viewport.playerStatus.render(Viewport.ctx);
+        //if(Viewport.scoreboard) Viewport.scoreboard.render(Viewport.ctx);
+        //if(Viewport.spawnMenu) Viewport.spawnMenu.render(Viewport.ctx);
+    }
+
+    public static endFrame() {
+        Input.endFrame();
     }
 }
 

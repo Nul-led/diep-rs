@@ -19,6 +19,10 @@ export default class Minimap extends Component {
         super();
     }
 
+    public getBufferCtx(): CanvasRenderingContext2D {
+        return this.buffer.canvas;
+    }
+
     public render(ctx: Renderable): void {
         ctx.canvas.save();
         ctx.canvas.globalAlpha = 0.7;

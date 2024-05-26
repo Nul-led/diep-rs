@@ -8,17 +8,17 @@ use web_sys::{
 /* Disclaimer: While there are a few conversions marked as unsafe, they are safe as long as you treat the converted context as the conversion target (ie not accessing unsupported methods and properties) */
 
 #[derive(Clone, Debug)]
-pub struct Context(CanvasRenderingContext2d);
+pub struct Context(pub CanvasRenderingContext2d);
 
 impl Context {
     pub fn new(canvas: HtmlCanvasElement) -> Self {
-        Self(unsafe {
+        Self(
             canvas
                 .get_context("2d")
                 .unwrap()
                 .unwrap()
-                .unchecked_into::<CanvasRenderingContext2d>()
-        })
+                .unchecked_into::<CanvasRenderingContext2d>(),
+        )
     }
 }
 
@@ -46,7 +46,7 @@ unsafe impl Send for Context {}
 unsafe impl Sync for Context {}
 
 #[derive(Clone, Debug)]
-pub struct OffscreenContext(OffscreenCanvasRenderingContext2d);
+pub struct OffscreenContext(pub OffscreenCanvasRenderingContext2d);
 
 impl OffscreenContext {
     pub fn new() -> Self {
@@ -54,13 +54,13 @@ impl OffscreenContext {
     }
 
     pub fn new_with_canvas(canvas: OffscreenCanvas) -> Self {
-        Self(unsafe {
+        Self(
             canvas
                 .get_context("2d")
                 .unwrap()
                 .unwrap()
-                .unchecked_into::<OffscreenCanvasRenderingContext2d>()
-        })
+                .unchecked_into::<OffscreenCanvasRenderingContext2d>(),
+        )
     }
 }
 
@@ -99,16 +99,16 @@ unsafe impl Sync for OffscreenContext {}
 
 impl From<OffscreenContext> for Context {
     fn from(value: OffscreenContext) -> Self {
-        Self(unsafe { value.0.unchecked_into::<CanvasRenderingContext2d>() })
+        Self(value.0.unchecked_into::<CanvasRenderingContext2d>())
     }
 }
 
 impl From<Context> for OffscreenContext {
     fn from(value: Context) -> Self {
-        Self(unsafe {
+        Self(
             value
                 .0
-                .unchecked_into::<OffscreenCanvasRenderingContext2d>()
-        })
+                .unchecked_into::<OffscreenCanvasRenderingContext2d>(),
+        )
     }
 }

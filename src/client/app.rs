@@ -1,11 +1,14 @@
 use std::{mem, sync::{Arc, RwLock}, time::Instant};
 
 use bevy::{a11y::AccessibilityPlugin, app::{App, Main, Plugin, ScheduleRunnerPlugin, Startup, Update}, diagnostic::{Diagnostic, DiagnosticsPlugin, FrameTimeDiagnosticsPlugin, RegisterDiagnostic}, ecs::{system::{Query, Resource, RunSystemOnce}, world::World}, gilrs::GilrsPlugin, hierarchy::HierarchyPlugin, input::InputPlugin, log::LogPlugin, text::{Text, Text2dBundle}, transform::TransformPlugin, window::{Window, WindowPlugin}, winit::WinitPlugin, MinimalPlugins};
+use bevy_xpbd_2d::plugins::PhysicsPlugins;
 use tracing::{info, Level};
 use wasm_bindgen::{closure::Closure, JsCast, JsValue};
 use web_sys::{js_sys::Array, window, Blob, Url, VisibilityState, Worker};
 
 use crate::shared::net::protocol::ProtocolPlugin;
+
+use super::plugins::rendering::RenderingPlugin;
 
 pub fn run() {
     let mut app = App::new();
@@ -31,7 +34,9 @@ pub fn run() {
         WinitPlugin::default(),
         GilrsPlugin,
         FrameTimeDiagnosticsPlugin,
+        PhysicsPlugins::default(),
 
+        RenderingPlugin,
 
         //ProtocolPlugin,
     ));

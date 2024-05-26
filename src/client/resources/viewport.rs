@@ -1,8 +1,9 @@
 use bevy::{ecs::system::Resource, math::Vec2};
-use web_sys::OffscreenCanvas;
 
-use crate::client::utils::context::{Context, OffscreenContext};
+use crate::client::{utils::context::{Context, OffscreenContext}, web};
 
+
+#[derive(Clone, Copy, Default, PartialEq)]
 pub struct MapBorders {
     pub min: Vec2,
     pub max: Vec2,
@@ -23,12 +24,15 @@ pub struct Viewport {
 }
 
 impl Viewport {
-    pub fn new() {
-        /* 
+    pub fn new() -> Viewport {
         Viewport {
-            OffscreenContext::new_with_canvas(OffscreenCanvas::new(50, 50).unwrap()),
+            ctx: Context(web::Viewport::get_ctx()),
+            size: Vec2::new(web::Viewport::viewport_width(), web::Viewport::viewport_height()),
+            zoom: 0.55 * web::Viewport::gui_zoom_factor(),
+            offset: Vec2::default(),
+            borders: MapBorders::default(),
+            grid_pattern_ctx: OffscreenContext::new(),
         }
-        */
     }
 
     pub fn to_screen_x(&self, v: f32) -> f32 {

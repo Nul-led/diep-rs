@@ -1,15 +1,9 @@
 import Input from "./core/Input";
 import Viewport from "./core/Viewport";
+import * as ABI from "./core/ABI";
 
-const render = () => {
-    Input.startFrame();
-    Viewport.startFrame();
-    Viewport.renderComponents();
-    Input.endFrame();
-    requestAnimationFrame(render);
-}
+ABI.Component;
 
 document.fonts.onloadingdone = () => {
     Input.init();
-    requestAnimationFrame(render);
 }

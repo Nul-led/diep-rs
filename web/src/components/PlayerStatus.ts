@@ -7,7 +7,7 @@ import Text from "../widgets/Text";
 
 export default class PlayerStatus extends Component {
     public constructor(
-        public readonly lebelbar: ProgressBar = new ProgressBar(new Text("Lvl 1 Tank", 16), 424, 24, new Color(16768579)),
+        public readonly levelbar: ProgressBar = new ProgressBar(new Text("Lvl 1 Tank", 16), 424, 24, new Color(16768579)),
         public readonly scorebar: ProgressBar = new ProgressBar(new Text("Score: 0", 15), 320, 20, new Color(4456337)),
         public readonly playerNameText: Text = new Text("Unnamed", 40),
         public x: number = 0,
@@ -25,10 +25,10 @@ export default class PlayerStatus extends Component {
 
         const x = this.x.anchoredScreenSpace(this.anchorX);
         const y = this.y.anchoredScreenSpace(this.anchorY);
-        const levelbarHeight = this.lebelbar.outerHeight.screenSpace();
+        const levelbarHeight = this.levelbar.outerHeight.screenSpace();
         const scorebarHeight = this.scorebar.outerHeight.screenSpace();
 
-        this.lebelbar.renderCentered(ctx, x, y);
+        this.levelbar.renderCentered(ctx, x, y);
         if (this.renderScorebar) this.scorebar.renderCentered(ctx, x, y - levelbarHeight);
         this.playerNameText.renderCentered(ctx, x, y - levelbarHeight - (this.renderScorebar ? (scorebarHeight + levelbarHeight / 2) : (levelbarHeight / 2)));
         

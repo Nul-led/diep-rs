@@ -1,20 +1,17 @@
-use std::thread::Scope;
 
 use bevy::{
     ecs::{
         entity::Entity,
         system::{Query, Res, ResMut},
-    }, math::Vec2, transform::components::GlobalTransform, ui::ZIndex
+    }, math::Vec2, transform::components::GlobalTransform
 };
 use bevy_xpbd_2d::{components::{Position, Rotation}, plugins::collision::{AnyCollider, Collider}};
-use lightyear::packet::header;
-use wasm_bindgen::JsValue;
-use web_sys::{OffscreenCanvas, Path2d};
+use web_sys::Path2d;
 
 use crate::{
     client::{
         resources::viewport::Viewport,
-        utils::{context::{Context, OffscreenContext}, prettify::prettify_number},
+        utils::prettify::prettify_number,
     },
     shared::{
         components::{
@@ -26,12 +23,12 @@ use crate::{
             },
         },
         definitions::colors::Colors,
-        util::{drawinfo::Stroke, paint::Paint},
+        util::paint::Paint,
     },
 };
 
 /// Renders entities, names, scores and healthbar
-pub fn render_objects(
+pub fn system_render_objects(
     q_object_z_index: Query<(Entity, &ObjectZIndex)>,
     q_objects: Query<(
         &GlobalTransform,
@@ -120,12 +117,12 @@ pub fn render_objects(
                         if let Some(stroke) = draw_info.stroke {
                             r_viewport.ctx.set_stroke_style(&stroke.paint.unwrap_or(Paint::RGB(0, 0, 0)).into());
                             r_viewport.ctx.set_line_width((font_size * stroke.width) as f64);
-                            r_viewport.ctx.stroke_text(&txt, 0.0, (size.y / 2.0 * -1.5) as f64);
+                            r_viewport.ctx.stroke_text(&txt, 0.0, (size.y / 2.0 * -1.5) as f64).unwrap();
                         }
 
                         if let Some(fill) = draw_info.fill {
                             r_viewport.ctx.set_fill_style(&fill.into());
-                            r_viewport.ctx.fill_text(&txt, 0.0, (size.y / 2.0 * -1.5) as f64);
+                            r_viewport.ctx.fill_text(&txt, 0.0, (size.y / 2.0 * -1.5) as f64).unwrap();
                         }
                     }
                     (font_size * 1.4).max(0.0)
@@ -139,12 +136,12 @@ pub fn render_objects(
                         if let Some(stroke) = draw_info.stroke {
                             r_viewport.ctx.set_stroke_style(&stroke.paint.unwrap_or(Paint::RGB(0, 0, 0)).into());
                             r_viewport.ctx.set_line_width((font_size * stroke.width) as f64);
-                            r_viewport.ctx.stroke_text(&name.name, 0.0, (size.y / 2.0 * -1.5 - offset) as f64);
+                            r_viewport.ctx.stroke_text(&name.name, 0.0, (size.y / 2.0 * -1.5 - offset) as f64).unwrap();
                         }
 
                         if let Some(fill) = draw_info.fill {
                             r_viewport.ctx.set_fill_style(&fill.into());
-                            r_viewport.ctx.fill_text(&name.name, 0.0, (size.y / 2.0 * -1.5 - offset) as f64);
+                            r_viewport.ctx.fill_text(&name.name, 0.0, (size.y / 2.0 * -1.5 - offset) as f64).unwrap();
                         }
                     }
                 }
@@ -153,20 +150,20 @@ pub fn render_objects(
                     if health.max_health != health.health {
                         let perc = (health.health / health.max_health).clamp(0.0, 1.0);
 
-                        r_viewport.ctx.translate((-size.x / 2.0) as f64, 35.0);
+                        r_viewport.ctx.translate((-size.x / 2.0) as f64, (size.y / 2.0 + 35.0) as f64).unwrap();
 
                         r_viewport.ctx.set_line_cap("round");
                         r_viewport.ctx.set_line_width(16.0);
                         r_viewport.ctx.begin_path();
                         r_viewport.ctx.move_to(8.0, 8.0);
                         r_viewport.ctx.line_to(size.x as f64, 8.0); // TODO check if i need to size.x - 8.0
-                        r_viewport.ctx.set_stroke_style(&Paint::RGB(204, 204, 204).into()); // TODO configurable
+                        r_viewport.ctx.set_stroke_style(&Paint::RGB(0, 0, 0).into()); // TODO configurable
                         r_viewport.ctx.stroke();
                         r_viewport.ctx.set_line_width(16.0 * 0.75);
                         r_viewport.ctx.begin_path();
                         r_viewport.ctx.move_to(8.0, 8.0);
                         r_viewport.ctx.line_to(8.0_f32.max(size.x * perc) as f64, 8.0);
-                        r_viewport.ctx.set_stroke_style(&health.custom_healthbar_color.unwrap_or(Paint::RGB(0, 0, 0)).into());
+                        r_viewport.ctx.set_stroke_style(&health.custom_healthbar_color.unwrap_or(Paint::RGB(133, 227, 125)).into());
                         r_viewport.ctx.stroke();
 
                         // TODO health text
@@ -179,7 +176,7 @@ pub fn render_objects(
     }
 }
 
-pub fn render_grid(
+pub fn system_render_grid(
     q_camera: Query<&Camera>,
     q_position: Query<&Position>,
     r_viewport: Res<Viewport>,
@@ -262,7 +259,7 @@ pub fn render_grid(
     r_viewport.ctx.restore();
 }
 
-pub fn render_borders(q_game: Query<(&GameMapInfo)>, mut r_viewport: ResMut<Viewport>) {
+pub fn system_render_borders(q_game: Query<(&GameMapInfo)>, mut r_viewport: ResMut<Viewport>) {
     if let Ok(map_info) = q_game.get_single() {
         r_viewport.borders.min = (r_viewport.borders.min * 4.0 - map_info.size / 2.0) / 5.0;
         r_viewport.borders.max = (r_viewport.borders.max * 4.0 + map_info.size / 2.0) / 5.0;
@@ -302,7 +299,7 @@ pub fn render_borders(q_game: Query<(&GameMapInfo)>, mut r_viewport: ResMut<View
     }
 }
 
-pub fn render_indicators(
+pub fn system_render_indicators(
     q_game: Query<(&IndicatorConfig, &IndicatorPosition)>,
     mut r_viewport: ResMut<Viewport>,
 ) {

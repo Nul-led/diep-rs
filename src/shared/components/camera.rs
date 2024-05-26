@@ -11,7 +11,7 @@ pub enum CameraMode {
         target: Vec2,
     },
     Relative {
-        target: Entity, // Requires: Transform
+        target: Entity, // Requires: GlobalTransform
         movement_speed: f32,
     },
 }
