@@ -276,6 +276,7 @@ pub fn system_render_grid(
     r_viewport.ctx.restore();
 }
 
+// TODO this is broken
 pub fn system_render_borders(q_game: Query<(&GameMapInfo)>, mut r_viewport: ResMut<Viewport>) {
     if let Ok(map_info) = q_game.get_single() {
         r_viewport.borders.min = (r_viewport.borders.min * 4.0 - map_info.size / 2.0) / 5.0;
