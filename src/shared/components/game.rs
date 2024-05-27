@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 pub struct GameMapInfo {
     pub size: Vec2,
     pub padding: f32,
-    pub grid_size: f32,
+    pub grid_size: u32,
 }
 #[derive(Clone, Copy, Serialize, Deserialize, Default, Component, PartialEq)]
 pub struct GameServerInfo {

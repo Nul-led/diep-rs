@@ -1,4 +1,5 @@
 use bevy::{ecs::system::Resource, math::Vec2};
+use web_sys::OffscreenCanvas;
 
 use crate::client::{utils::context::{Context, OffscreenContext}, web};
 
@@ -31,7 +32,7 @@ impl Viewport {
             zoom: 0.55 * web::Viewport::gui_zoom_factor(),
             offset: Vec2::default(),
             borders: MapBorders::default(),
-            grid_pattern_ctx: OffscreenContext::new(),
+            grid_pattern_ctx: OffscreenContext::new_with_canvas(OffscreenCanvas::new(50, 50).unwrap()),
         }
     }
 

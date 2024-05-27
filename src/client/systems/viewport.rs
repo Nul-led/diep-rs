@@ -19,13 +19,11 @@ pub fn system_sync_viewport(mut r_viewport: ResMut<Viewport>, q_camera: Query<&C
                 }
             }
         };
-        
     } else {
         r_viewport.zoom = 0.55 * web::Viewport::gui_zoom_factor();
         r_viewport.offset = Vec2::ZERO;
     }
 }
-
 
 pub fn system_apply_camera(r_viewport: Res<Viewport>) {
     r_viewport.ctx.save();

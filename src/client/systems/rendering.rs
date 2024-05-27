@@ -6,6 +6,7 @@ use bevy::{
     }, math::Vec2, transform::components::GlobalTransform
 };
 use bevy_xpbd_2d::{components::{Position, Rotation}, plugins::collision::{AnyCollider, Collider}};
+use tracing::info;
 use web_sys::Path2d;
 
 use crate::{
@@ -32,6 +33,7 @@ pub fn system_render_objects(
     q_object_z_index: Query<(Entity, &ObjectZIndex)>,
     q_objects: Query<(
         &GlobalTransform,
+        Option<&Collider>,
         Option<&ObjectName>,
         Option<&ObjectScore>,
         Option<&ObjectOpacity>,
@@ -50,6 +52,7 @@ pub fn system_render_objects(
     for (entity, _) in object_entities {
         if let Ok((
             transform,
+            collider,
             name,
             score,
             opacity,
@@ -95,21 +98,29 @@ pub fn system_render_objects(
             r_viewport.ctx.set_line_join("round");
 
             if let Some(shape) = shape {
+                let size = if let Some(collider) = collider {
+                    let scale = collider.scale();
+                    r_viewport.ctx.scale(scale.x as f64, scale.y as f64).unwrap();
+                    collider.aabb(pos.0, 0.0).size()
+                } else {
+                    let collider = Collider::from(&shape.0);
+                    collider.aabb(pos.0, 0.0).size()
+                };
+
                 let path = Path2d::from(&shape.0);
                 r_viewport.ctx.fill_with_path_2d(&path);
                 r_viewport.ctx.stroke_with_path(&path);
 
                 r_viewport.ctx.restore();
 
-                let collider = Collider::from(&shape.0);
-                // don't use real rot as input here or it might produce larger aabb than we want
-                let size = collider.aabb(pos.0, 0.0).size();
+                r_viewport.ctx.set_stroke_style(&Paint::RGB(0, 0, 0).into());
+                r_viewport.ctx.stroke_rect((-size.x / 2.0) as f64, (-size.y / 2.0) as f64, size.x as f64, size.y as f64);
 
                 r_viewport.ctx.set_text_align("center");
                 r_viewport.ctx.set_text_baseline("middle");
 
                 let offset = if let Some(score) = score {
-                    let font_size = size.max_element() / 50.0 * 25.0;
+                    let font_size = size.max_element() / 2.0 / 50.0 * 25.0;
                     r_viewport.ctx.set_font(&format!("{}px Ubuntu", font_size));
                     let txt = prettify_number(score.score, 1);
  
@@ -129,7 +140,7 @@ pub fn system_render_objects(
                 } else { 0.0 };
 
                 if let Some(name) = name {
-                    let font_size = size.max_element() / 50.0 * 40.0;
+                    let font_size = size.max_element() / 2.0 / 50.0 * 40.0;
                     r_viewport.ctx.set_font(&format!("{}px Ubuntu", font_size));
                     
                     if let Some(draw_info) = name.draw_info {
@@ -179,6 +190,7 @@ pub fn system_render_objects(
 pub fn system_render_grid(
     q_camera: Query<&Camera>,
     q_position: Query<&Position>,
+    q_game: Query<&GameMapInfo>,
     r_viewport: Res<Viewport>,
 ) {
     r_viewport.ctx.save();
@@ -197,6 +209,8 @@ pub fn system_render_grid(
     if true
     /* TODO toggles.grid */
     {
+        let grid_size = q_game.get_single().and_then(|m| Ok(m.grid_size)).unwrap_or(50);
+        
         if let Ok(camera) = q_camera.get_single() {
             let cam_pos = match camera.mode {
                 CameraMode::Absolute { target } => target,
@@ -208,12 +222,16 @@ pub fn system_render_grid(
             // TODO make grid size configurable
 
             let offset =
-                (((r_viewport.size / 2.0 / r_viewport.zoom - cam_pos) % 50.0) + 50.0) % 50.0;
+                (((r_viewport.size / 2.0 / r_viewport.zoom - cam_pos) % grid_size as f32) + grid_size as f32) % grid_size as f32;
 
             r_viewport.grid_pattern_ctx.reset();
+            let canvas = r_viewport.grid_pattern_ctx.canvas();
+            canvas.set_width(grid_size);
+            canvas.set_height(grid_size);
             r_viewport
                 .grid_pattern_ctx
                 .set_fill_style(&Paint::from(Colors::Gray5).into());
+            r_viewport.grid_pattern_ctx.fill_rect(0.0, 0.0, grid_size as f64, grid_size as f64);
             r_viewport
                 .grid_pattern_ctx
                 .set_stroke_style(&Paint::from(Colors::Black).into());
@@ -223,12 +241,11 @@ pub fn system_render_grid(
             r_viewport
                 .grid_pattern_ctx
                 .set_line_width(1.0 / r_viewport.zoom as f64);
-            r_viewport.grid_pattern_ctx.fill_rect(0.0, 0.0, 50.0, 50.0);
             r_viewport.grid_pattern_ctx.begin_path();
             r_viewport.grid_pattern_ctx.move_to(0.5, 0.5);
-            r_viewport.grid_pattern_ctx.line_to(0.5, 50.5);
+            r_viewport.grid_pattern_ctx.line_to(0.5, grid_size as f64 + 0.5);
             r_viewport.grid_pattern_ctx.move_to(0.5, 0.5);
-            r_viewport.grid_pattern_ctx.line_to(50.5, 0.5);
+            r_viewport.grid_pattern_ctx.line_to(grid_size as f64 + 0.5, 0.5);
             r_viewport.grid_pattern_ctx.stroke();
 
             if let Ok(pattern) = r_viewport.ctx.create_pattern_with_offscreen_canvas(
@@ -242,14 +259,14 @@ pub fn system_render_grid(
                         .unwrap();
                     r_viewport
                         .ctx
-                        .translate(offset.x as f64 - 50.0, offset.y as f64 - 50.0)
+                        .translate((offset.x - grid_size as f32) as f64, (offset.y - grid_size as f32) as f64)
                         .unwrap();
                     r_viewport.ctx.set_fill_style(&pattern);
                     r_viewport.ctx.fill_rect(
                         0.0,
                         0.0,
-                        (r_viewport.size.x / r_viewport.zoom) as f64 + 50.0,
-                        (r_viewport.size.y / r_viewport.zoom) as f64 + 50.0,
+                        (r_viewport.size.x / r_viewport.zoom + grid_size as f32) as f64,
+                        (r_viewport.size.y / r_viewport.zoom + grid_size as f32) as f64,
                     );
                 }
             }

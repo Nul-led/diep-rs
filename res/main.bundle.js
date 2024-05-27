@@ -1416,7 +1416,5 @@
   window.Viewport = Viewport;
 
   // src/index.ts
-  document.fonts.onloadingdone = () => {
-    Input.init();
-  };
+  Input.init();
 })();

@@ -107,8 +107,5 @@ impl Plugin for ProtocolPlugin {
         app.register_component::<Rotation>(ChannelDirection::ServerToClient)
             .add_interpolation(ComponentSyncMode::Full)
             .add_prediction(ComponentSyncMode::Full);
-
-
-    
     }
 }

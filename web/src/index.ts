@@ -4,6 +4,4 @@ import * as ABI from "./core/ABI";
 
 ABI.Component;
 
-document.fonts.onloadingdone = () => {
-    Input.init();
-}
+Input.init();
