@@ -6,4 +6,3 @@ pub mod resources;
 pub mod systems;
 pub mod utils;
 pub mod web;
-pub mod app;

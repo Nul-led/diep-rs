@@ -15,7 +15,6 @@ export enum Component {
     ClassTree,
     Console,
     Fadeout,
-    GameModes,
     InfoHeader,
     Invite,
     Minimap,
@@ -39,7 +38,6 @@ declare global {
         // class tree
         // console
         // fadeout
-        // game modes
         setInfoHeader(text: string): void;
         setInvite(link: string): void;
         // notifications
@@ -76,8 +74,6 @@ window.enableComponents = (components) => {
             case Component.Console:
                 break;
             case Component.Fadeout:
-                break;
-            case Component.GameModes:
                 break;
             case Component.InfoHeader:
                 Viewport.infoHeader ||= new InfoHeader;
@@ -129,9 +125,6 @@ window.disableComponents = (components) => {
                 break;
             case Component.Fadeout:
                 Viewport.fadeout = null;
-                break;
-            case Component.GameModes:
-                Viewport.gameModes = null;
                 break;
             case Component.InfoHeader:
                 Viewport.infoHeader = null;

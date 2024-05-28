@@ -836,9 +836,6 @@
       this.fadeout = null;
     }
     static {
-      this.gameModes = null;
-    }
-    static {
       this.infoHeader = null;
     }
     static {
@@ -1294,27 +1291,25 @@
           break;
         case 6 /* Fadeout */:
           break;
-        case 7 /* GameModes */:
-          break;
-        case 8 /* InfoHeader */:
+        case 7 /* InfoHeader */:
           Viewport.infoHeader ||= new InfoHeader();
           break;
-        case 9 /* Invite */:
+        case 8 /* Invite */:
           Viewport.invite ||= new Invite();
           break;
-        case 10 /* Minimap */:
+        case 9 /* Minimap */:
           Viewport.minimap ||= new Minimap();
           break;
-        case 11 /* Notifications */:
+        case 10 /* Notifications */:
           break;
-        case 12 /* PlayerStats */:
+        case 11 /* PlayerStats */:
           break;
-        case 13 /* PlayerStatus */:
+        case 12 /* PlayerStatus */:
           Viewport.playerStatus ||= new PlayerStatus();
           break;
-        case 14 /* Scoreboard */:
+        case 13 /* Scoreboard */:
           break;
-        case 15 /* SpawnMenu */:
+        case 14 /* SpawnMenu */:
           break;
       }
     }
@@ -1346,31 +1341,28 @@
         case 6 /* Fadeout */:
           Viewport.fadeout = null;
           break;
-        case 7 /* GameModes */:
-          Viewport.gameModes = null;
-          break;
-        case 8 /* InfoHeader */:
+        case 7 /* InfoHeader */:
           Viewport.infoHeader = null;
           break;
-        case 9 /* Invite */:
+        case 8 /* Invite */:
           Viewport.invite = null;
           break;
-        case 10 /* Minimap */:
+        case 9 /* Minimap */:
           Viewport.minimap = null;
           break;
-        case 11 /* Notifications */:
+        case 10 /* Notifications */:
           Viewport.notifications = null;
           break;
-        case 12 /* PlayerStats */:
+        case 11 /* PlayerStats */:
           Viewport.playerStats = null;
           break;
-        case 13 /* PlayerStatus */:
+        case 12 /* PlayerStatus */:
           Viewport.playerStatus = null;
           break;
-        case 14 /* Scoreboard */:
+        case 13 /* Scoreboard */:
           Viewport.scoreboard = null;
           break;
-        case 15 /* SpawnMenu */:
+        case 14 /* SpawnMenu */:
           Viewport.spawnMenu = null;
           break;
       }

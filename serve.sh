@@ -1,1 +1,1 @@
-npm run watch --prefix web & trunk serve && kill $!
+npm run watch --prefix web & trunk serve --no-default-features --features client & cargo watch -x 'run --no-default-features --features server' && kill $! 

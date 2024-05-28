@@ -92,8 +92,6 @@ extern "C" {
 
     // fadeout
 
-    // game modes
-
     #[wasm_bindgen(js_name = setInfoHeader)]
     pub fn set_info_header(text: &str);
 
@@ -160,7 +158,6 @@ pub enum Component {
     ClassTree,
     Console,
     Fadeout,
-    GameModes,
     InfoHeader,
     Invite,
     Minimap,

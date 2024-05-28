@@ -1,0 +1,43 @@
+
+
+Client
+
+- Components
+    - Attributes
+    - Classes
+    - Classtree (needs research)
+    - console (needs research)
+    - fadeout (needs research)
+    - minimap (entities + viewport + player arrow)
+    - notifications
+    - player stats
+    - scoreboard
+    - spawn menu (needs research)
+
+- Widgets
+    - attribute button
+    - class button
+    - radio button (needs design)
+    - color selector (needs design)
+    - text box (needs research)
+    - tooltip (needs design)
+
+- Rendering
+    - Indicator Rendering
+    - link tank rendering to widgets
+
+- Networking
+
+- Inputs
+
+
+
+Server
+
+- Networking
+
+
+Shared
+
+- Networking
+

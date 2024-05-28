@@ -37,7 +37,6 @@ export default class Viewport {
     public static classTree: null = null;
     public static console: null = null;
     public static fadeout: null = null;
-    public static gameModes: null = null;
     public static infoHeader: InfoHeader | null = null;
     public static invite: Invite | null = new Invite;
     public static minimap: Minimap | null = new Minimap;
