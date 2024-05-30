@@ -1,5 +1,6 @@
 use bevy::{ecs::system::{Query, Res, ResMut}, math::Vec2, transform::components::GlobalTransform};
 use bevy_xpbd_2d::components::Position;
+use tracing::info;
 
 use crate::{client::{resources::viewport::Viewport, web}, shared::components::camera::{Camera, CameraMode}};
 
@@ -19,9 +20,13 @@ pub fn system_sync_viewport(mut r_viewport: ResMut<Viewport>, q_camera: Query<&C
                 }
             }
         };
+
+        info!("has camera")
     } else {
         r_viewport.zoom = 0.55 * web::Viewport::gui_zoom_factor();
         r_viewport.offset = Vec2::ZERO;
+
+        info!("has no camera")
     }
 }
 

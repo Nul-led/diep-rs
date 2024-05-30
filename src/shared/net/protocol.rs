@@ -25,7 +25,7 @@ Channels:
 */
 
 use bevy::app::{App, Plugin};
-use bevy_xpbd_2d::components::{Position, Rotation};
+use bevy_xpbd_2d::{components::{Position, Rotation}, plugins::collision::Collider};
 use lightyear::{channel::builder::ChannelDirection, client::components::ComponentSyncMode, prelude::{AppComponentExt, AppMessageExt}};
 
 use crate::shared::components::{camera::{AvailableClasses, Camera, ConsoleCommands, PlayerId, PlayerStats, PlayerStatus, RenderToggles}, game::{GameLobbyInfo, GameMapInfo, GameServerInfo}, indicator::{IndicatorConfig, IndicatorPosition}, object::{ObjectDamageMarker, ObjectDrawInfo, ObjectHealth, ObjectInvincibilityMarker, ObjectName, ObjectOpacity, ObjectScore, ObjectShape}};

@@ -1,27 +1,28 @@
 use bevy::app::App;
+use shared::{net::protocol::ProtocolPlugin, plugins::shared::SharedInitPlugin};
 
 #[cfg(feature = "client")]
 mod client;
 
-#[cfg(feature = "client")]
-use client::plugins::client::ClientPlugin;
-
 #[cfg(feature = "server")]
 mod server;
-
-#[cfg(feature = "server")]
-use server::plugins::server::ServerPlugin;
 
 mod shared;
 
 fn main() {
     let mut app = App::new();
 
-    #[cfg(feature = "client")]
-    app.add_plugins(ClientPlugin);
+    app.add_plugins(SharedInitPlugin);
 
-    #[cfg(feature = "server")]
-    app.add_plugins(ServerPlugin);
+    #[cfg(feature = "client")] {
+        app.add_plugins(client::plugins::client::ClientInitPlugin);
+    }
+
+    #[cfg(feature = "server")] {
+        app.add_plugins(server::plugins::server::ServerInitPlugin);
+    }
+
+    app.add_plugins(ProtocolPlugin);
 
     app.run();
 }

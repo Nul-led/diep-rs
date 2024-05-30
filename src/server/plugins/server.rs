@@ -1,26 +1,35 @@
-use bevy::{app::{App, Plugin}, diagnostic::{Diagnostic, DiagnosticsPlugin, FrameTimeDiagnosticsPlugin, RegisterDiagnostic}, hierarchy::HierarchyPlugin, log::LogPlugin, transform::TransformPlugin, MinimalPlugins};
-use bevy_xpbd_2d::plugins::PhysicsPlugins;
-use tracing::Level;
+use std::time::Duration;
 
-pub struct ServerPlugin;
+use bevy::{
+    app::{App, Plugin, RunMode, ScheduleRunnerPlugin, Startup, Update},
+    diagnostic::SystemInformationDiagnosticsPlugin, ecs::system::Commands,
+};
+use lightyear::{prelude::server::ServerCommands, server::plugin::ServerPlugins};
 
-impl Plugin for ServerPlugin {
+use crate::{server::net::config::server_config, shared::{definitions::config::TICK_DURATION, systems::test::{test_system, test_system1}}};
+
+pub struct ServerInitPlugin;
+
+impl Plugin for ServerInitPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins((
-            MinimalPlugins,
-            LogPlugin {
-                level: Level::DEBUG,
-                ..Default::default()
+            ScheduleRunnerPlugin {
+                run_mode: RunMode::Loop {
+                    wait: Some(Duration::from_secs_f64(TICK_DURATION)),
+                },
             },
-            TransformPlugin,
-            HierarchyPlugin::default(),
-            DiagnosticsPlugin,
-            FrameTimeDiagnosticsPlugin,
-            PhysicsPlugins::default(),
+            SystemInformationDiagnosticsPlugin,
+            ServerPlugins::new(server_config()),
         ));
 
-        app.register_diagnostic(Diagnostic::new(FrameTimeDiagnosticsPlugin::FPS).with_smoothing_factor(0.1));
-        app.register_diagnostic(Diagnostic::new(FrameTimeDiagnosticsPlugin::FRAME_COUNT));
-        app.register_diagnostic(Diagnostic::new(FrameTimeDiagnosticsPlugin::FRAME_TIME));
+        app.add_systems(Startup, start_server);
+
+        app.add_systems(Startup, test_system);
+        app.add_systems(Update, test_system1);
     }
+}
+
+
+fn start_server(mut commands: Commands) {
+    commands.start_server();
 }

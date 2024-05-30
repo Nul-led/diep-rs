@@ -48,7 +48,7 @@ pub fn system_render_objects(
 ) {
     let mut object_entities: Vec<(Entity, &ObjectZIndex)> = q_object_z_index.iter().collect();
     object_entities.sort_by(|a, b| a.1 .0.cmp(&b.1 .0));
-
+    info!("{}", object_entities.len());
     for (entity, _) in object_entities {
         if let Ok((
             transform,

@@ -1,16 +1,16 @@
 use std::time::Duration;
 
-use lightyear::shared::{config::{Mode, SharedConfig}, tick_manager::TickConfig};
+use lightyear::shared::{config::SharedConfig, tick_manager::TickConfig};
 
-pub const FIXED_TIMESTEP_HZ: f64 = 25.0;
+use crate::shared::definitions::config::{SERVER_MODE, TICK_DURATION};
 
-pub fn shared_config(mode: Mode) -> SharedConfig {
+pub fn shared_config() -> SharedConfig {
     SharedConfig {
         client_send_interval: Duration::default(),
-        server_send_interval: Duration::from_millis(40),
+        server_send_interval: Duration::from_secs_f64(TICK_DURATION),
         tick: TickConfig {
-            tick_duration: Duration::from_secs_f64(1.0 / FIXED_TIMESTEP_HZ)
+            tick_duration: Duration::from_secs_f64(TICK_DURATION)
         },
-        mode,
+        mode: SERVER_MODE,
     }
 }

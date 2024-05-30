@@ -1,22 +1,15 @@
-use bevy::{a11y::AccessibilityPlugin, app::{App, Plugin}, diagnostic::{Diagnostic, DiagnosticsPlugin, FrameTimeDiagnosticsPlugin, RegisterDiagnostic}, gilrs::GilrsPlugin, hierarchy::HierarchyPlugin, input::InputPlugin, log::LogPlugin, transform::TransformPlugin, window::{Window, WindowPlugin}, winit::WinitPlugin, MinimalPlugins};
-use bevy_xpbd_2d::plugins::PhysicsPlugins;
-use tracing::Level;
+use bevy::{a11y::AccessibilityPlugin, app::{App, Plugin, Startup}, ecs::system::Commands, gilrs::GilrsPlugin, input::InputPlugin, window::{Window, WindowPlugin}, winit::WinitPlugin};
+use lightyear::{client::plugin::ClientPlugins, prelude::client::ClientCommands};
+
+use crate::{client::net::config::client_config, shared::net::protocol::ProtocolPlugin};
 
 use super::rendering::RenderingPlugin;
 
-pub struct ClientPlugin;
+pub struct ClientInitPlugin;
 
-impl Plugin for ClientPlugin {
+impl Plugin for ClientInitPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins((
-            MinimalPlugins,
-            LogPlugin {
-                level: Level::DEBUG,
-                ..Default::default()
-            },
-            TransformPlugin,
-            HierarchyPlugin::default(),
-            DiagnosticsPlugin,
             InputPlugin,
             WindowPlugin {
                 primary_window: Some(Window {
@@ -28,16 +21,14 @@ impl Plugin for ClientPlugin {
             AccessibilityPlugin,
             WinitPlugin::default(),
             GilrsPlugin,
-            FrameTimeDiagnosticsPlugin,
-            PhysicsPlugins::default(),
-    
             RenderingPlugin,
-    
-            //ProtocolPlugin,
+            ClientPlugins::new(client_config()),
         ));
 
-        app.register_diagnostic(Diagnostic::new(FrameTimeDiagnosticsPlugin::FPS).with_smoothing_factor(0.1));
-        app.register_diagnostic(Diagnostic::new(FrameTimeDiagnosticsPlugin::FRAME_COUNT));
-        app.register_diagnostic(Diagnostic::new(FrameTimeDiagnosticsPlugin::FRAME_TIME));
+        app.add_systems(Startup, connect_client);
     }
+}
+
+fn connect_client(mut commands: Commands) {
+    commands.connect_client();
 }

@@ -26,8 +26,8 @@ impl Plugin for RenderingPlugin {
         ).chain());
 
 
-        app.add_systems(Startup, test_system);
-        app.add_systems(Update, test_system1);
+        //app.add_systems(Startup, test_system);
+        //app.add_systems(Update, test_system1);
         
     }
 }
