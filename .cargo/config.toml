@@ -2,6 +2,10 @@
 #target = "wasm32-unknown-unknown"
 rustflags = ["--cfg", "web_sys_unstable_apis"]
 
+[alias]
+watch_server = "watch -x 'run --no-default-features --features server'"
+server = "run --no-default-features --features server"
+
 # Enable max optimizations for dependencies, but not for our code
 [profile.dev.package."*"]
 opt-level = 3
