@@ -26,7 +26,3 @@ use crate::shared::{
         shape::Shape,
     },
 };
-
-pub fn test_system1(mut q_obj: Query<(Entity)>) {
-    info!("{}", q_obj.iter().len());
-}

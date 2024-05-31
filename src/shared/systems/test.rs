@@ -7,10 +7,14 @@ use bevy::{
     transform::{components::Transform, TransformBundle},
 };
 use bevy_xpbd_2d::{
-    components::{Position, RigidBody, Rotation},
+    components::{
+        AngularVelocity, ColliderDensity, Friction, LinearVelocity, MassPropertiesBundle, Position,
+        RigidBody, Rotation,
+    },
     plugins::collision::Collider,
 };
 use lightyear::prelude::server::Replicate;
+use rand::random;
 
 use crate::shared::{
     components::{
@@ -38,7 +42,7 @@ pub fn test_system1(mut q_obj: Query<(&mut Rotation)>) {
 pub fn test_system(world: &mut World) {
     world.spawn((
         Camera {
-            fov: 0.7,
+            fov: 0.3,
             mode: CameraMode::Absolute {
                 target: Vec2::new(0.0, 0.0),
             },
@@ -46,23 +50,58 @@ pub fn test_system(world: &mut World) {
         Replicate::default(),
     ));
 
-    world.spawn((
-        GameMapInfo {
-            grid_size: 50,
-            size: Vec2::new(500.0, 500.0),
-            padding: 200.0,
-        },
-        Replicate::default(),
-    ));
-
-    let shape = Shape::Rect {
-        width: 50.0,
-        height: 50.0,
+    let map = GameMapInfo {
+        grid_size: 50,
+        size: Vec2::new(3000.0, 3000.0),
+        padding: 200.0,
     };
 
-    world
-        .spawn((
-            RigidBody::Static,
+    world.spawn((map, Replicate::default()));
+
+    world.spawn((
+        RigidBody::Static,
+        Collider::segment(
+            -map.size / 2.0,
+            Vec2::new(map.size.x / 2.0, -map.size.y / 2.0),
+        ),
+        ColliderDensity(1.0),
+    )); // top
+
+    world.spawn((
+        Collider::segment(
+            Vec2::new(map.size.x / 2.0, -map.size.y / 2.0),
+            map.size / 2.0,
+        ),
+        RigidBody::Static,
+        ColliderDensity(1.0),
+    )); // right
+
+    world.spawn((
+        Collider::segment(
+            map.size / 2.0,
+            Vec2::new(-map.size.x / 2.0, map.size.y / 2.0),
+        ),
+        RigidBody::Static,
+        ColliderDensity(1.0),
+    )); // bottom
+
+    world.spawn((
+        Collider::segment(
+            Vec2::new(-map.size.x / 2.0, map.size.y / 2.0),
+            -map.size / 2.0,
+        ),
+        RigidBody::Static,
+        ColliderDensity(1.0),
+    )); // left
+
+    for i in 0..50 {
+        let shape = Shape::Rect {
+            width: 50.0,
+            height: 50.0,
+        };
+
+        world.spawn((
+            RigidBody::Dynamic,
             Collider::from(&shape),
             ObjectShape(shape),
             ObjectZIndex(0),
@@ -73,56 +112,16 @@ pub fn test_system(world: &mut World) {
                     paint: None,
                 }),
             }),
-            TransformBundle::from(
-                Transform::from_xyz(-100.0, 0.0, 0.0)
-                    .with_rotation(Rotation::from_radians(0.0).into()),
-            ),
-            ObjectName {
-                name: "networked entity".to_string(),
-                draw_info: Some(DrawInfo {
-                    fill: Some(Paint::ColorId(Colors::White)),
-                    stroke: Some(Stroke {
-                        width: 0.2,
-                        paint: Some(Paint::ColorId(Colors::Black)),
-                    }),
-                }),
-            },
+            Position::from_xy(random::<f32>() * 500.0, random::<f32>() * 500.0),
             Replicate::default(),
-        ))
-        .with_children(|builder| {
-            let shape = Shape::Rect {
-                width: 50.0,
-                height: 50.0,
-            };
+            Friction::new(0.9),
+        ));
+    }
+}
 
-            builder.spawn((
-                RigidBody::Static,
-                Collider::from(&shape),
-                ObjectShape(shape),
-                ObjectZIndex(1),
-                ObjectDrawInfo(DrawInfo {
-                    fill: Some(Paint::ColorId(Colors::Magenta)),
-                    stroke: Some(Stroke {
-                        width: 7.5,
-                        paint: None,
-                    }),
-                }),
-                TransformBundle::from(
-                    Transform::from_xyz(-100.0, 0.0, 0.0)
-                        .with_rotation(Rotation::from_radians(0.0).into())
-                        .with_scale(Vec3::new(2.0, 2.0, 1.0)),
-                ),
-                ObjectName {
-                    name: "networked child entity".to_string(),
-                    draw_info: Some(DrawInfo {
-                        fill: Some(Paint::ColorId(Colors::White)),
-                        stroke: Some(Stroke {
-                            width: 0.2,
-                            paint: Some(Paint::ColorId(Colors::Black)),
-                        }),
-                    }),
-                },
-                Replicate::default(),
-            ));
-        });
+pub fn accelerate_bodies(mut query: Query<(&mut LinearVelocity, &mut AngularVelocity)>) {
+    for (mut linear_velocity, mut angular_velocity) in query.iter_mut() {
+        linear_velocity.x += 0.05;
+        angular_velocity.0 += 0.05;
+    }
 }

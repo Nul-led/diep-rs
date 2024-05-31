@@ -7,7 +7,7 @@ pub fn client_config() -> ClientConfig {
     ClientConfig {
         net: NetConfig::Netcode {
             auth: Authentication::Manual {
-                client_id: (random() * f64::MAX).floor() as u64,
+                client_id: (unsafe { random() } * f64::MAX).floor() as u64,
                 server_addr: SERVER_ADDR,
                 private_key: Key::default(),
                 protocol_id: 0,

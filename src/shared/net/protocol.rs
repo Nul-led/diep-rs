@@ -25,8 +25,8 @@ Channels:
 */
 
 use bevy::{app::{App, Plugin}, transform::components::GlobalTransform};
-use bevy_xpbd_2d::{components::{Position, Rotation}, plugins::collision::Collider};
-use lightyear::{channel::builder::ChannelDirection, client::components::ComponentSyncMode, prelude::{AppComponentExt, AppMessageExt}};
+use bevy_xpbd_2d::{components::{AngularVelocity, LinearVelocity, Position, RigidBody, Rotation}, plugins::collision::Collider};
+use lightyear::{channel::builder::ChannelDirection, client::components::ComponentSyncMode, prelude::{AppComponentExt, AppMessageExt}, utils::bevy_xpbd_2d::{position, rotation}};
 
 use crate::shared::components::{camera::{AvailableClasses, Camera, ConsoleCommands, PlayerId, PlayerStats, PlayerStatus, RenderToggles}, game::{GameLobbyInfo, GameMapInfo, GameServerInfo}, indicator::{IndicatorConfig, IndicatorPosition}, object::{ObjectDamageMarker, ObjectDrawInfo, ObjectHealth, ObjectInvincibilityMarker, ObjectName, ObjectOpacity, ObjectScore, ObjectShape, ObjectZIndex}};
 
@@ -102,8 +102,24 @@ impl Plugin for ProtocolPlugin {
         
         app.register_component::<ObjectZIndex>(ChannelDirection::ServerToClient);
 
-        app.register_component::<GlobalTransform>(ChannelDirection::ServerToClient)
+        app.register_component::<RigidBody>(ChannelDirection::ServerToClient);
+
+        app.register_component::<Rotation>(ChannelDirection::ServerToClient)
             .add_interpolation(ComponentSyncMode::Full)
+            .add_prediction(ComponentSyncMode::Full)
+            .add_interpolation_fn(rotation::lerp)
+            .add_correction_fn(rotation::lerp);
+
+        app.register_component::<Position>(ChannelDirection::ServerToClient)
+            .add_interpolation(ComponentSyncMode::Full)
+            .add_prediction(ComponentSyncMode::Full)
+            .add_interpolation_fn(position::lerp)
+            .add_correction_fn(position::lerp);
+
+        app.register_component::<LinearVelocity>(ChannelDirection::Bidirectional)
+            .add_prediction(ComponentSyncMode::Full);
+
+        app.register_component::<AngularVelocity>(ChannelDirection::Bidirectional)
             .add_prediction(ComponentSyncMode::Full);
     }
 }

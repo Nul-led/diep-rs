@@ -10,10 +10,26 @@ server = []
 
 [dependencies]
 anyhow = "1.0.83"
-bevy = "0.13.2"
-bevy_xpbd_2d = { version = "0.4.2", features = ["2d", "f32", "parry-f32", "parallel", "serialize"] }
+bevy = { version = "0.13.2", default-features = false, features = [
+    "bevy_gilrs",
+    "bevy_winit",
+    "multi-threaded",
+    "webgl2",
+    "x11",
+] }
+bevy_xpbd_2d = { version = "0.4.2", default-features = false, features = [
+    "2d",
+    "f32",
+    "parry-f32",
+    "parallel",
+    "serialize",
+] }
 cfg-if = "1.0.0"
-lightyear = { version = "0.15.1", features = ["webtransport", "websocket", "xpbd_2d"] }
+lightyear = { version = "0.15.1", features = [
+    "webtransport",
+    "websocket",
+    "xpbd_2d",
+] }
 rand = "0.8.5"
 serde = { version = "1.0.201", features = ["derive"] }
 tracing = "0.1.40"
@@ -21,7 +37,7 @@ tracing = "0.1.40"
 # client
 wasm-bindgen = { version = "0.2.92", optional = true }
 web-sys = { version = "0.3.69", features = [
-    "Document", 
+    "Document",
     "Element",
     "Node",
     "HtmlCanvasElement",
@@ -33,5 +49,5 @@ web-sys = { version = "0.3.69", features = [
     "VisibilityState",
     "Worker",
     "Blob",
-    "Url"
+    "Url",
 ], optional = true }

@@ -32,8 +32,8 @@ use crate::{
 pub fn system_render_objects(
     q_object_z_index: Query<(Entity, &ObjectZIndex)>,
     q_objects: Query<(
-        &GlobalTransform,
-        Option<&Collider>,
+        &Position,
+        &Rotation,
         Option<&ObjectName>,
         Option<&ObjectScore>,
         Option<&ObjectOpacity>,
@@ -48,11 +48,10 @@ pub fn system_render_objects(
 ) {
     let mut object_entities: Vec<(Entity, &ObjectZIndex)> = q_object_z_index.iter().collect();
     object_entities.sort_by(|a, b| a.1 .0.cmp(&b.1 .0));
-    info!("{}", object_entities.len());
     for (entity, _) in object_entities {
         if let Ok((
-            transform,
-            collider,
+            pos,
+            rot,
             name,
             score,
             opacity,
@@ -63,8 +62,6 @@ pub fn system_render_objects(
             invincibility_marker,
         )) = q_objects.get(entity)
         {
-            let pos = Position::from(transform);
-            let rot = Rotation::from(transform);
 
             r_viewport.ctx.save();
 
@@ -98,14 +95,8 @@ pub fn system_render_objects(
             r_viewport.ctx.set_line_join("round");
 
             if let Some(shape) = shape {
-                let size = if let Some(collider) = collider {
-                    let scale = collider.scale();
-                    r_viewport.ctx.scale(scale.x as f64, scale.y as f64).unwrap();
-                    collider.aabb(pos.0, 0.0).size()
-                } else {
-                    let collider = Collider::from(&shape.0);
-                    collider.aabb(pos.0, 0.0).size()
-                };
+                let collider = Collider::from(&shape.0);
+                let size = collider.aabb(pos.0, 0.0).size();
 
                 let path = Path2d::from(&shape.0);
                 r_viewport.ctx.fill_with_path_2d(&path);
@@ -113,8 +104,8 @@ pub fn system_render_objects(
 
                 r_viewport.ctx.restore();
 
-                r_viewport.ctx.set_stroke_style(&Paint::RGB(0, 0, 0).into());
-                r_viewport.ctx.stroke_rect((-size.x / 2.0) as f64, (-size.y / 2.0) as f64, size.x as f64, size.y as f64);
+                //r_viewport.ctx.set_stroke_style(&Paint::RGB(0, 0, 0).into());
+                //r_viewport.ctx.stroke_rect((-size.x / 2.0) as f64, (-size.y / 2.0) as f64, size.x as f64, size.y as f64);
 
                 r_viewport.ctx.set_text_align("center");
                 r_viewport.ctx.set_text_baseline("middle");
