@@ -1,6 +1,6 @@
 use bevy::{app::{App, Plugin, Startup, Update}, ecs::schedule::IntoSystemConfigs};
 
-use crate::client::{resources::viewport::Viewport, systems::{rendering::{system_render_borders, system_render_grid, system_render_indicators, system_render_objects}, test::{test_system, test_system1}, viewport::{system_apply_camera, system_revert_camera, system_sync_viewport}}, web};
+use crate::client::{resources::viewport::Viewport, systems::{rendering::{system_render_borders, system_render_grid, system_render_indicators, system_render_objects}, test::{test_system1}, viewport::{system_apply_camera, system_revert_camera, system_sync_viewport}}, web};
 
 
 
@@ -27,7 +27,7 @@ impl Plugin for RenderingPlugin {
 
 
         //app.add_systems(Startup, test_system);
-        //app.add_systems(Update, test_system1);
+        app.add_systems(Update, test_system1);
         
     }
 }

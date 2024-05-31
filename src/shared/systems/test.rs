@@ -38,7 +38,7 @@ pub fn test_system1(mut q_obj: Query<(&mut Rotation)>) {
 pub fn test_system(world: &mut World) {
     world.spawn((
         Camera {
-            fov: 0.3,
+            fov: 0.7,
             mode: CameraMode::Absolute {
                 target: Vec2::new(0.0, 0.0),
             },
@@ -46,15 +46,14 @@ pub fn test_system(world: &mut World) {
         Replicate::default(),
     ));
 
-    world.spawn(
-        (GameMapInfo {
+    world.spawn((
+        GameMapInfo {
             grid_size: 50,
             size: Vec2::new(500.0, 500.0),
             padding: 200.0,
         },
         Replicate::default(),
-    ),
-    );
+    ));
 
     let shape = Shape::Rect {
         width: 50.0,
@@ -79,7 +78,7 @@ pub fn test_system(world: &mut World) {
                     .with_rotation(Rotation::from_radians(0.0).into()),
             ),
             ObjectName {
-                name: "test".to_string(),
+                name: "networked entity".to_string(),
                 draw_info: Some(DrawInfo {
                     fill: Some(Paint::ColorId(Colors::White)),
                     stroke: Some(Stroke {
@@ -100,7 +99,7 @@ pub fn test_system(world: &mut World) {
                 RigidBody::Static,
                 Collider::from(&shape),
                 ObjectShape(shape),
-                ObjectZIndex(-1),
+                ObjectZIndex(1),
                 ObjectDrawInfo(DrawInfo {
                     fill: Some(Paint::ColorId(Colors::Magenta)),
                     stroke: Some(Stroke {
@@ -114,7 +113,7 @@ pub fn test_system(world: &mut World) {
                         .with_scale(Vec3::new(2.0, 2.0, 1.0)),
                 ),
                 ObjectName {
-                    name: "test".to_string(),
+                    name: "networked child entity".to_string(),
                     draw_info: Some(DrawInfo {
                         fill: Some(Paint::ColorId(Colors::White)),
                         stroke: Some(Stroke {

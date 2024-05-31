@@ -24,11 +24,11 @@ Channels:
 
 */
 
-use bevy::app::{App, Plugin};
+use bevy::{app::{App, Plugin}, transform::components::GlobalTransform};
 use bevy_xpbd_2d::{components::{Position, Rotation}, plugins::collision::Collider};
 use lightyear::{channel::builder::ChannelDirection, client::components::ComponentSyncMode, prelude::{AppComponentExt, AppMessageExt}};
 
-use crate::shared::components::{camera::{AvailableClasses, Camera, ConsoleCommands, PlayerId, PlayerStats, PlayerStatus, RenderToggles}, game::{GameLobbyInfo, GameMapInfo, GameServerInfo}, indicator::{IndicatorConfig, IndicatorPosition}, object::{ObjectDamageMarker, ObjectDrawInfo, ObjectHealth, ObjectInvincibilityMarker, ObjectName, ObjectOpacity, ObjectScore, ObjectShape}};
+use crate::shared::components::{camera::{AvailableClasses, Camera, ConsoleCommands, PlayerId, PlayerStats, PlayerStatus, RenderToggles}, game::{GameLobbyInfo, GameMapInfo, GameServerInfo}, indicator::{IndicatorConfig, IndicatorPosition}, object::{ObjectDamageMarker, ObjectDrawInfo, ObjectHealth, ObjectInvincibilityMarker, ObjectName, ObjectOpacity, ObjectScore, ObjectShape, ObjectZIndex}};
 
 pub struct ProtocolPlugin;
 
@@ -99,12 +99,10 @@ impl Plugin for ProtocolPlugin {
         app.register_component::<ObjectDamageMarker>(ChannelDirection::ServerToClient);
 
         app.register_component::<ObjectInvincibilityMarker>(ChannelDirection::ServerToClient);
+        
+        app.register_component::<ObjectZIndex>(ChannelDirection::ServerToClient);
 
-        app.register_component::<Position>(ChannelDirection::ServerToClient)
-            .add_interpolation(ComponentSyncMode::Full)
-            .add_prediction(ComponentSyncMode::Full);
-
-        app.register_component::<Rotation>(ChannelDirection::ServerToClient)
+        app.register_component::<GlobalTransform>(ChannelDirection::ServerToClient)
             .add_interpolation(ComponentSyncMode::Full)
             .add_prediction(ComponentSyncMode::Full);
     }

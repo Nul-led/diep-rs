@@ -14,7 +14,7 @@ impl Plugin for SharedInitPlugin {
             FrameCountPlugin,
             TimePlugin,
             LogPlugin {
-                level: Level::DEBUG,
+                level: Level::INFO,
                 ..Default::default()
             },
             TransformPlugin,
