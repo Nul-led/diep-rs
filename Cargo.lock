@@ -970,6 +970,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "bevy_web_keepalive"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4f71126dc7eeeb1823cf9ef02812e71c65b8f12aea349888bf98d01349234b82"
+dependencies = [
+ "bevy_app",
+ "bevy_ecs",
+ "bevy_time",
+ "wasm-bindgen",
+ "web-sys",
+]
+
+[[package]]
 name = "bevy_window"
 version = "0.13.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1042,6 +1055,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "bincode"
+version = "2.0.0-rc.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f11ea1a0346b94ef188834a65c068a03aec181c94896d481d7a0a40d85b0ce95"
+dependencies = [
+ "bincode_derive",
+ "serde",
+]
+
+[[package]]
+name = "bincode_derive"
+version = "2.0.0-rc.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7e30759b3b99a1b802a7a3aa21c85c3ded5c28e1c83170d82d70f08bbf7f3e4c"
+dependencies = [
+ "virtue",
+]
+
+[[package]]
 name = "bit-set"
 version = "0.5.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1071,8 +1103,7 @@ dependencies = [
 [[package]]
 name = "bitcode_lightyear_patch"
 version = "0.5.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c82d186a0148ef9a83a4c8129acf71485a273a5650fcb47cbf66d361615dc660"
+source = "git+https://github.com/cBournhonesque/lightyear?branch=main#555868345e9966cb4dc17c5313e1f84db893da99"
 dependencies = [
  "bitcode_derive",
  "bytemuck",
@@ -2486,15 +2517,15 @@ dependencies = [
 [[package]]
 name = "lightyear"
 version = "0.15.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c6d2f731276594feef4fff46d8b84fd36974ce707d268f8c2fba4ecef48f861e"
+source = "git+https://github.com/cBournhonesque/lightyear?branch=main#555868345e9966cb4dc17c5313e1f84db893da99"
 dependencies = [
- "anyhow",
  "async-channel",
  "async-compat",
  "base64 0.22.1",
  "bevy",
+ "bevy_web_keepalive",
  "bevy_xpbd_2d",
+ "bincode",
  "bitcode_lightyear_patch",
  "byteorder",
  "bytes",
@@ -2539,8 +2570,7 @@ dependencies = [
 [[package]]
 name = "lightyear_macros"
 version = "0.15.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fe1fa37db59d4effd2a1eec189261d3ddda9a8bec832f12c2f5810aa0317b4ba"
+source = "git+https://github.com/cBournhonesque/lightyear?branch=main#555868345e9966cb4dc17c5313e1f84db893da99"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -4345,6 +4375,12 @@ name = "version_check"
 version = "0.9.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "49874b5167b65d7193b8aba1567f5c7d93d001cafc34600cee003eda787e483f"
+
+[[package]]
+name = "virtue"
+version = "0.0.13"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9dcc60c0624df774c82a0ef104151231d37da4962957d691c011c852b2473314"
 
 [[package]]
 name = "walkdir"

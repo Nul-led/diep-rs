@@ -25,7 +25,7 @@ bevy_xpbd_2d = { version = "0.4.2", default-features = false, features = [
     "serialize",
 ] }
 cfg-if = "1.0.0"
-lightyear = { version = "0.15.1", features = [
+lightyear = { git = "https://github.com/cBournhonesque/lightyear", branch = "main", features = [
     "webtransport",
     "websocket",
     "xpbd_2d",

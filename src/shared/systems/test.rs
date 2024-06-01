@@ -8,8 +8,7 @@ use bevy::{
 };
 use bevy_xpbd_2d::{
     components::{
-        AngularVelocity, ColliderDensity, Friction, LinearVelocity, MassPropertiesBundle, Position,
-        RigidBody, Rotation,
+        AngularVelocity, ColliderDensity, Friction, LinearDamping, LinearVelocity, MassPropertiesBundle, Position, RigidBody, Rotation
     },
     plugins::collision::Collider,
 };
@@ -114,7 +113,7 @@ pub fn test_system(world: &mut World) {
             }),
             Position::from_xy(random::<f32>() * 500.0, random::<f32>() * 500.0),
             Replicate::default(),
-            Friction::new(0.9),
+            LinearDamping(0.1),
         ));
     }
 }
