@@ -8,11 +8,11 @@ use bevy::{
 };
 use bevy_xpbd_2d::{
     components::{
-        AngularVelocity, ColliderDensity, Friction, LinearDamping, LinearVelocity, MassPropertiesBundle, Position, RigidBody, Rotation
+        AngularDamping, AngularVelocity, ColliderDensity, Friction, LinearDamping, LinearVelocity, MassPropertiesBundle, Position, RigidBody, Rotation
     },
-    plugins::collision::Collider,
+    plugins::collision::Collider, resources::SleepingThreshold,
 };
-use lightyear::prelude::server::Replicate;
+use lightyear::{prelude::server::{Replicate, SyncTarget}, shared::replication::network_target::NetworkTarget};
 use rand::random;
 
 use crate::shared::{
@@ -112,15 +112,24 @@ pub fn test_system(world: &mut World) {
                 }),
             }),
             Position::from_xy(random::<f32>() * 500.0, random::<f32>() * 500.0),
-            Replicate::default(),
+            Replicate {
+                sync: SyncTarget {
+                    interpolation: NetworkTarget::All,
+                    //prediction: NetworkTarget::All,
+                    ..Default::default()
+                },
+                ..Default::default()
+            },
             LinearDamping(0.1),
+            AngularDamping(1.0),
         ));
     }
 }
 
-pub fn accelerate_bodies(mut query: Query<(&mut LinearVelocity, &mut AngularVelocity)>) {
-    for (mut linear_velocity, mut angular_velocity) in query.iter_mut() {
-        linear_velocity.x += 0.05;
-        angular_velocity.0 += 0.05;
+pub fn minimum_velocity_system(mut query: Query<&mut LinearVelocity>) {
+    for mut velocity in query.iter_mut() {
+        if velocity.length_squared() < 0.0001 {
+            velocity.0 = Vec2::ZERO;
+        }
     }
 }

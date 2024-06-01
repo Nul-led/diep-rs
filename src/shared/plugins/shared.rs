@@ -2,7 +2,7 @@ use bevy::{app::{App, FixedUpdate, Plugin, Startup, Update}, core::{FrameCountPl
 use bevy_xpbd_2d::{plugins::{setup::Physics, PhysicsPlugins}, resources::Gravity, PhysicsSet};
 use tracing::Level;
 
-use crate::shared::{definitions::config::TICKS_PER_SECOND, systems::test::{test_system, test_system1}};
+use crate::shared::{definitions::config::TICKS_PER_SECOND, systems::test::{minimum_velocity_system, test_system, test_system1}};
 
 #[derive(SystemSet, Debug, Hash, PartialEq, Eq, Clone, Copy)]
 pub enum FixedSet {
@@ -51,5 +51,7 @@ impl Plugin for SharedInitPlugin {
         app.insert_resource(Time::new_with(Physics::fixed_once_hz(TICKS_PER_SECOND)));
 
         app.insert_resource(Gravity(Vec2::ZERO));
+
+        app.add_systems(FixedUpdate, (minimum_velocity_system));
     }
 }

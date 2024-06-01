@@ -6,7 +6,7 @@ use bevy::{
 };
 use lightyear::{prelude::server::ServerCommands, server::plugin::ServerPlugins};
 
-use crate::{server::net::config::server_config, shared::{definitions::config::TICK_DURATION, systems::test::{accelerate_bodies, test_system, test_system1}}};
+use crate::{server::net::config::server_config, shared::{definitions::config::TICK_DURATION, systems::test::{test_system, test_system1}}};
 
 pub struct ServerInitPlugin;
 

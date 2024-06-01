@@ -1,11 +1,11 @@
 
 use bevy::{
     ecs::{
-        entity::Entity,
-        system::{Query, Res, ResMut},
+        entity::Entity, query::Without, system::{Query, Res, ResMut}
     }, math::Vec2, transform::components::GlobalTransform
 };
 use bevy_xpbd_2d::{components::{Position, Rotation}, plugins::collision::{AnyCollider, Collider}};
+use lightyear::client::components::Confirmed;
 use tracing::info;
 use web_sys::Path2d;
 
@@ -30,7 +30,7 @@ use crate::{
 
 /// Renders entities, names, scores and healthbar
 pub fn system_render_objects(
-    q_object_z_index: Query<(Entity, &ObjectZIndex)>,
+    q_object_z_index: Query<(Entity, &ObjectZIndex), Without<Confirmed>>,
     q_objects: Query<(
         &Position,
         &Rotation,
@@ -179,9 +179,9 @@ pub fn system_render_objects(
 }
 
 pub fn system_render_grid(
-    q_camera: Query<&Camera>,
-    q_position: Query<&Position>,
-    q_game: Query<&GameMapInfo>,
+    q_camera: Query<&Camera, Without<Confirmed>>,
+    q_position: Query<&Position, Without<Confirmed>>,
+    q_game: Query<&GameMapInfo, Without<Confirmed>>,
     r_viewport: Res<Viewport>,
 ) {
     r_viewport.ctx.save();
