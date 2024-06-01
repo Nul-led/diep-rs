@@ -1,3 +1,5 @@
+use std::ops::{Deref, DerefMut};
+
 use bevy::ecs::component::Component;
 use serde::{Deserialize, Serialize};
 
@@ -14,6 +16,8 @@ pub struct ObjectScore {
     pub score: i32,
     pub draw_info: Option<DrawInfo>,
 }
+
+
 
 #[derive(Copy, Clone, Serialize, Deserialize, Default, Component, PartialEq)]
 pub struct ObjectOpacity(pub f32);

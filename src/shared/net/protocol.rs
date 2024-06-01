@@ -26,7 +26,7 @@ Channels:
 
 use bevy::{app::{App, Plugin}, transform::components::GlobalTransform};
 use bevy_xpbd_2d::{components::{AngularDamping, AngularVelocity, LinearDamping, LinearVelocity, Position, RigidBody, Rotation}, plugins::collision::Collider};
-use lightyear::{channel::builder::ChannelDirection, client::components::ComponentSyncMode, prelude::{AppComponentExt, AppMessageExt}, utils::bevy_xpbd_2d::{position, rotation}};
+use lightyear::{channel::builder::ChannelDirection, client::components::ComponentSyncMode, prelude::{AppComponentExt, AppMessageExt}, utils::bevy_xpbd_2d::{angular_velocity, linear_velocity, position, rotation}};
 
 use crate::shared::components::{camera::{AvailableClasses, Camera, ConsoleCommands, PlayerId, PlayerStats, PlayerStatus, RenderToggles}, game::{GameLobbyInfo, GameMapInfo, GameServerInfo}, indicator::{IndicatorConfig, IndicatorPosition}, object::{ObjectDamageMarker, ObjectDrawInfo, ObjectHealth, ObjectInvincibilityMarker, ObjectName, ObjectOpacity, ObjectScore, ObjectShape, ObjectZIndex}};
 
@@ -117,10 +117,12 @@ impl Plugin for ProtocolPlugin {
             .add_correction_fn(position::lerp);
 
         app.register_component::<LinearVelocity>(ChannelDirection::ServerToClient)
-            .add_prediction(ComponentSyncMode::Full);
+            .add_prediction(ComponentSyncMode::Full)
+            .add_correction_fn(linear_velocity::lerp);
 
         app.register_component::<AngularVelocity>(ChannelDirection::ServerToClient)
-            .add_prediction(ComponentSyncMode::Full);
+            .add_prediction(ComponentSyncMode::Full)
+            .add_correction_fn(angular_velocity::lerp);
 
         app.register_component::<LinearDamping>(ChannelDirection::ServerToClient);
 

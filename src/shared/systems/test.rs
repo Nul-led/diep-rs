@@ -12,7 +12,7 @@ use bevy_xpbd_2d::{
     },
     plugins::collision::Collider, resources::SleepingThreshold,
 };
-use lightyear::{prelude::server::{Replicate, SyncTarget}, shared::replication::network_target::NetworkTarget};
+use lightyear::{prelude::server::{Replicate, SyncTarget}, shared::replication::{components::ReplicationGroup, network_target::NetworkTarget}};
 use rand::random;
 
 use crate::shared::{
@@ -113,9 +113,10 @@ pub fn test_system(world: &mut World) {
             }),
             Position::from_xy(random::<f32>() * 500.0, random::<f32>() * 500.0),
             Replicate {
+                group: ReplicationGroup::default(),
                 sync: SyncTarget {
-                    interpolation: NetworkTarget::All,
                     //prediction: NetworkTarget::All,
+                    interpolation: NetworkTarget::All,
                     ..Default::default()
                 },
                 ..Default::default()

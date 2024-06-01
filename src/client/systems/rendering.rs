@@ -5,7 +5,7 @@ use bevy::{
     }, math::Vec2, transform::components::GlobalTransform
 };
 use bevy_xpbd_2d::{components::{Position, Rotation}, plugins::collision::{AnyCollider, Collider}};
-use lightyear::client::components::Confirmed;
+use lightyear::client::{components::Confirmed, interpolation::Interpolated};
 use tracing::info;
 use web_sys::Path2d;
 
@@ -30,7 +30,7 @@ use crate::{
 
 /// Renders entities, names, scores and healthbar
 pub fn system_render_objects(
-    q_object_z_index: Query<(Entity, &ObjectZIndex), Without<Confirmed>>,
+    q_object_z_index: Query<(Entity, &ObjectZIndex)>,
     q_objects: Query<(
         &Position,
         &Rotation,
