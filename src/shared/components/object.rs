@@ -17,8 +17,6 @@ pub struct ObjectScore {
     pub draw_info: Option<DrawInfo>,
 }
 
-
-
 #[derive(Copy, Clone, Serialize, Deserialize, Default, Component, PartialEq)]
 pub struct ObjectOpacity(pub f32);
 

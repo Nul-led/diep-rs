@@ -1,8 +1,26 @@
-use bevy::{app::{App, FixedUpdate, Plugin, Startup, Update}, core::{FrameCountPlugin, TaskPoolPlugin, TypeRegistrationPlugin}, diagnostic::{DiagnosticsPlugin, EntityCountDiagnosticsPlugin, FrameTimeDiagnosticsPlugin}, ecs::schedule::{IntoSystemSetConfigs, SystemSet}, hierarchy::HierarchyPlugin, log::LogPlugin, math::Vec2, time::{Time, TimePlugin}, transform::TransformPlugin};
-use bevy_xpbd_2d::{plugins::{setup::Physics, PhysicsPlugins}, resources::Gravity, PhysicsSet};
+use bevy::{
+    app::{App, FixedUpdate, Plugin},
+    core::{FrameCountPlugin, TaskPoolPlugin, TypeRegistrationPlugin},
+    diagnostic::{DiagnosticsPlugin, EntityCountDiagnosticsPlugin, FrameTimeDiagnosticsPlugin},
+    ecs::{
+        change_detection::DetectChanges, entity::Entity, query::{Has, QueryData, Without}, schedule::{IntoSystemConfigs, IntoSystemSetConfigs, SystemSet}, system::{Commands, Query, Res, ResMut}
+    },
+    hierarchy::HierarchyPlugin,
+    log::LogPlugin,
+    math::Vec2,
+    time::{Time, TimePlugin},
+    transform::TransformPlugin,
+};
+use bevy_xpbd_2d::{
+    components::{AngularVelocity, Friction, Restitution, RigidBodyQuery, Sleeping}, constraints::{PenetrationConstraint, XpbdConstraint}, math::Scalar, plugins::{
+        collision::{Collider, ColliderParent, ColliderTransform, Collisions, ContactData, Sensor}, setup::Physics, solver::PenetrationConstraints, BroadPhasePlugin, ColliderBackendPlugin, ContactReportingPlugin, IntegratorPlugin, NarrowPhasePlugin, PhysicsPlugins, PhysicsSetupPlugin, PreparePlugin, SleepingPlugin, SolverPlugin, SpatialQueryPlugin, SyncPlugin
+    }, resources::Gravity, PhysicsSet, SubstepSchedule, SubstepSet
+};
 use tracing::Level;
 
-use crate::shared::{definitions::config::TICKS_PER_SECOND, systems::test::{minimum_velocity_system, test_system, test_system1}};
+use crate::shared::{
+    definitions::config::TICKS_PER_SECOND, systems::test::minimum_velocity_system,
+};
 
 #[derive(SystemSet, Debug, Hash, PartialEq, Eq, Clone, Copy)]
 pub enum FixedSet {
@@ -32,7 +50,7 @@ impl Plugin for SharedInitPlugin {
             EntityCountDiagnosticsPlugin,
             PhysicsPlugins::new(FixedUpdate),
         ));
-
+        
         app.configure_sets(
             FixedUpdate,
             (
@@ -52,6 +70,6 @@ impl Plugin for SharedInitPlugin {
 
         app.insert_resource(Gravity(Vec2::ZERO));
 
-        app.add_systems(FixedUpdate, (minimum_velocity_system));
+        app.add_systems(FixedUpdate, minimum_velocity_system);
     }
 }

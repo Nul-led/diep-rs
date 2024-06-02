@@ -1,4 +1,4 @@
-use std::f32::consts::PI;
+use std::{f32::consts::PI, ops::Range};
 
 use bevy::{
     ecs::{system::Query, world::World},
@@ -8,14 +8,18 @@ use bevy::{
 };
 use bevy_xpbd_2d::{
     components::{
-        AngularDamping, AngularVelocity, ColliderDensity, Friction, LinearDamping, LinearVelocity, MassPropertiesBundle, Position, RigidBody, Rotation
+        AngularDamping, AngularVelocity, CoefficientCombine, ColliderDensity, ExternalImpulse, Friction, LinearDamping, LinearVelocity, LockedAxes, MassPropertiesBundle, Position, Restitution, RigidBody, Rotation
     },
-    plugins::collision::Collider, resources::SleepingThreshold,
+    plugins::collision::Collider,
+    resources::SleepingThreshold,
 };
-use lightyear::{prelude::server::{Replicate, SyncTarget}, shared::replication::{components::ReplicationGroup, network_target::NetworkTarget}};
-use rand::random;
+use lightyear::{
+    prelude::server::{Replicate, SyncTarget},
+    shared::replication::{components::ReplicationGroup, network_target::NetworkTarget},
+};
+use rand::{distributions::Distribution, random, thread_rng, Rng};
 
-use crate::shared::{
+use crate::{server::components::{orbit::OrbitRoutine, rotation::RotationRoutine}, shared::{
     components::{
         camera::{Camera, CameraMode},
         game::GameMapInfo,
@@ -30,7 +34,7 @@ use crate::shared::{
         paint::Paint,
         shape::Shape,
     },
-};
+}};
 
 pub fn test_system1(mut q_obj: Query<(&mut Rotation)>) {
     for (mut rot) in q_obj.iter_mut() {
@@ -41,7 +45,7 @@ pub fn test_system1(mut q_obj: Query<(&mut Rotation)>) {
 pub fn test_system(world: &mut World) {
     world.spawn((
         Camera {
-            fov: 0.3,
+            fov: 0.55,
             mode: CameraMode::Absolute {
                 target: Vec2::new(0.0, 0.0),
             },
@@ -58,12 +62,11 @@ pub fn test_system(world: &mut World) {
     world.spawn((map, Replicate::default()));
 
     world.spawn((
-        RigidBody::Static,
         Collider::segment(
             -map.size / 2.0,
             Vec2::new(map.size.x / 2.0, -map.size.y / 2.0),
         ),
-        ColliderDensity(1.0),
+        RigidBody::Static,
     )); // top
 
     world.spawn((
@@ -72,7 +75,6 @@ pub fn test_system(world: &mut World) {
             map.size / 2.0,
         ),
         RigidBody::Static,
-        ColliderDensity(1.0),
     )); // right
 
     world.spawn((
@@ -81,7 +83,6 @@ pub fn test_system(world: &mut World) {
             Vec2::new(-map.size.x / 2.0, map.size.y / 2.0),
         ),
         RigidBody::Static,
-        ColliderDensity(1.0),
     )); // bottom
 
     world.spawn((
@@ -90,10 +91,9 @@ pub fn test_system(world: &mut World) {
             -map.size / 2.0,
         ),
         RigidBody::Static,
-        ColliderDensity(1.0),
     )); // left
 
-    for i in 0..50 {
+    for i in 0..30 {
         let shape = Shape::Rect {
             width: 50.0,
             height: 50.0,
@@ -111,7 +111,6 @@ pub fn test_system(world: &mut World) {
                     paint: None,
                 }),
             }),
-            Position::from_xy(random::<f32>() * 500.0, random::<f32>() * 500.0),
             Replicate {
                 group: ReplicationGroup::default(),
                 sync: SyncTarget {
@@ -122,9 +121,20 @@ pub fn test_system(world: &mut World) {
                 ..Default::default()
             },
             LinearDamping(0.1),
-            AngularDamping(1.0),
+            AngularDamping(0.1),
+            Restitution::new(0.0).with_combine_rule(CoefficientCombine::Multiply),
+            ColliderDensity(0.1),
+            Position::new(random_pos(map.size / -2.0, map.size / 2.0)),
+            OrbitRoutine::default(),
+            RotationRoutine::default(),
         ));
     }
+}
+
+
+pub fn random_pos(min: Vec2, max: Vec2) -> Vec2 {
+    let mut rng = thread_rng();
+    Vec2::new(rng.gen_range(min.x .. max.x), rng.gen_range(min.y .. max.y))
 }
 
 pub fn minimum_velocity_system(mut query: Query<&mut LinearVelocity>) {

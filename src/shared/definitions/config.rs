@@ -2,7 +2,7 @@ use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 
 use lightyear::shared::config::Mode;
 
-pub const TICKS_PER_SECOND: f64 = 50.0;
+pub const TICKS_PER_SECOND: f64 = 25.0;
 
 pub const TICK_DURATION: f64 = 1.0 / TICKS_PER_SECOND;
 

@@ -14,12 +14,13 @@ fn main() {
 
     app.add_plugins(SharedInitPlugin);
 
-    #[cfg(feature = "client")] {
-        app.add_plugins(client::plugins::client::ClientInitPlugin);
-    }
 
     #[cfg(feature = "server")] {
         app.add_plugins(server::plugins::server::ServerInitPlugin);
+    }
+
+    #[cfg(feature = "client")] {
+        app.add_plugins(client::plugins::client::ClientInitPlugin);
     }
 
     app.add_plugins(ProtocolPlugin);
