@@ -1,66 +1,52 @@
-use bevy::{
-    ecs::{component::Component, entity::Entity},
-    math::Vec2,
-};
+use bevy::ecs::component::Component;
 use lightyear::connection::netcode::ClientId;
 use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Serialize, Deserialize, PartialEq)]
-pub enum CameraMode {
-    Absolute {
-        target: Vec2,
-    },
-    Relative {
-        target: Entity, // Requires: GlobalTransform
-        movement_speed: f32,
-    },
-}
+use crate::shared::definitions::{classes::ClassId, commands::ConsoleCommand};
 
-impl Default for CameraMode {
+#[derive(Clone, Component, Serialize, Deserialize, PartialEq)]
+pub struct ViewRange(pub f32);
+
+impl Default for ViewRange {
     fn default() -> Self {
-        Self::Absolute { target: Vec2::ZERO }
+        Self(0.55)
     }
 }
 
-#[derive(Clone, Component, Serialize, Deserialize, PartialEq)]
-pub struct Camera {
-    pub mode: CameraMode,
-    pub fov: f32,
+#[derive(Clone, Component, Default, Serialize, Deserialize, PartialEq)]
+pub struct PlayerName(pub String);
+
+#[derive(Clone, Component, Default, Serialize, Deserialize, PartialEq)]
+pub struct PlayerClassName(pub String);
+
+#[derive(Clone, Copy, Component, Serialize, Deserialize, PartialEq)]
+pub struct PlayerLevel(pub u32);
+
+impl Default for PlayerLevel {
+    fn default() -> Self {
+        Self(1)
+    }
 }
 
-#[derive(Clone, Component, Serialize, Deserialize, PartialEq)]
-pub struct PlayerStatus {
-    pub level: u32,
-    pub levelbar: f32,
-    pub score: u32,
-    pub scorebar: f32,
-    pub classname: String,
-}
+#[derive(Clone, Copy, Component, Default, Serialize, Deserialize, PartialEq)]
+pub struct LevelbarProgress(pub f32);
 
-#[derive(Clone, Serialize, Deserialize, PartialEq)]
-struct Stat {
-    pub name: String,
-    pub value: String,
-}
+#[derive(Clone, Copy, Component, Default, Serialize, Deserialize, PartialEq)]
+pub struct PlayerScore(pub i32);
 
-#[derive(Clone, Component, Serialize, Deserialize, PartialEq)]
-pub struct PlayerStats(Vec<Stat>); // Death Stats
+#[derive(Clone, Copy, Component, Default, Serialize, Deserialize, PartialEq)]
+pub struct ScorebarProgress(pub f32);
 
-#[derive(Clone, Component, Serialize, Deserialize, PartialEq)]
-pub struct AvailableClasses(Vec<u16>); // TODO Available Tank Upgrades
+#[derive(Clone, Component, Serialize, Default, Deserialize, PartialEq)]
+pub struct PlayerStats(pub Vec<(String, String)>);
 
-#[derive(Clone, Serialize, Deserialize, PartialEq)]
-pub struct ConsoleCommand {
-    //pub id: Commands, TODO
-    pub name: String,
-    pub description: String,
-    pub usage: String,
-}
+#[derive(Clone, Component, Default, Serialize, Deserialize, PartialEq)]
+pub struct AvailableClasses(pub Vec<ClassId>);
 
-#[derive(Clone, Component, Serialize, Deserialize, PartialEq)]
-pub struct ConsoleCommands(Vec<ConsoleCommand>);
+#[derive(Clone, Component, Default, Serialize, Deserialize, PartialEq)]
+pub struct ConsoleCommands(pub Vec<ConsoleCommand>);
 
-#[derive(Clone, Component, Serialize, Deserialize, PartialEq)]
+#[derive(Clone, Component, Default, Serialize, Deserialize, PartialEq)]
 pub struct RenderToggles {
     pub enable_app_info: bool,
     pub enable_attributes: bool,
@@ -77,5 +63,5 @@ pub struct RenderToggles {
     pub enable_names: bool,
 }
 
-#[derive(Clone, Component, Serialize, Deserialize, PartialEq)]
-pub struct PlayerId(ClientId);
+#[derive(Clone, Component, Default, Serialize, Deserialize, PartialEq)]
+pub struct PlayerId(pub ClientId);

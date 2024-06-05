@@ -19,14 +19,12 @@ use lightyear::{
 };
 use rand::{distributions::Distribution, random, thread_rng, Rng};
 
-use crate::{server::components::{orbit::OrbitRoutine, rotation::RotationRoutine}, shared::{
+use crate::{server::{bundles::{camera::CameraBundle, game::GameBundle}, components::{orbit::OrbitRoutine, rotation::RotationRoutine}}, shared::{
     components::{
-        camera::{Camera, CameraMode},
-        game::GameMapInfo,
-        object::{
+        camera::ViewRange, game::GameMapInfo, object::{
             ObjectDrawInfo, ObjectHealth, ObjectName, ObjectOpacity, ObjectScore, ObjectShape,
             ObjectZIndex,
-        },
+        }
     },
     definitions::colors::Colors,
     util::{
@@ -36,19 +34,11 @@ use crate::{server::components::{orbit::OrbitRoutine, rotation::RotationRoutine}
     },
 }};
 
-pub fn test_system1(mut q_obj: Query<(&mut Rotation)>) {
-    for (mut rot) in q_obj.iter_mut() {
-        *rot += Rotation::from_radians(0.01);
-    }
-}
-
 pub fn test_system(world: &mut World) {
     world.spawn((
-        Camera {
-            fov: 0.55,
-            mode: CameraMode::Absolute {
-                target: Vec2::new(0.0, 0.0),
-            },
+        CameraBundle {
+            view: ViewRange(0.3),
+            ..Default::default()
         },
         Replicate::default(),
     ));
@@ -59,7 +49,13 @@ pub fn test_system(world: &mut World) {
         padding: 200.0,
     };
 
-    world.spawn((map, Replicate::default()));
+    world.spawn((
+        GameBundle {
+            map,
+            ..Default::default()
+        },
+        Replicate::default()
+    ));
 
     world.spawn((
         Collider::segment(
@@ -93,7 +89,7 @@ pub fn test_system(world: &mut World) {
         RigidBody::Static,
     )); // left
 
-    for i in 0..30 {
+    for _ in 0..500 {
         let shape = Shape::Rect {
             width: 50.0,
             height: 50.0,
@@ -111,15 +107,7 @@ pub fn test_system(world: &mut World) {
                     paint: None,
                 }),
             }),
-            Replicate {
-                group: ReplicationGroup::default(),
-                sync: SyncTarget {
-                    //prediction: NetworkTarget::All,
-                    interpolation: NetworkTarget::All,
-                    ..Default::default()
-                },
-                ..Default::default()
-            },
+            Replicate::default(),
             LinearDamping(0.1),
             AngularDamping(0.1),
             Restitution::new(0.0).with_combine_rule(CoefficientCombine::Multiply),

@@ -9,7 +9,6 @@ export default class Attributes extends Component {
     public constructor(
         public readonly unAllocatedText: Text = new Text("", 24),
         public readonly animation: Animation = new Animation(AnimationType.EaseInOutExpo, 0.1),
-        public readonly
         public x: number = -20,
         public y: number = -198,
         public anchorX: ScreenAnchorX = ScreenAnchorX.Max,

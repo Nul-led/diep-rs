@@ -1,6 +1,3 @@
 
 
-
-pub enum Classes {
-
-}
+pub type ClassId = u16;

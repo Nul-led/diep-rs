@@ -1,32 +1,17 @@
-use bevy::{ecs::system::{Query, Res, ResMut}, math::Vec2, transform::components::GlobalTransform};
+use bevy::{ecs::{query::With, system::{Query, Res, ResMut}}, math::Vec2};
 use bevy_xpbd_2d::components::Position;
-use tracing::info;
 
-use crate::{client::{resources::viewport::Viewport, web}, shared::components::camera::{Camera, CameraMode}};
+use crate::{client::{resources::viewport::Viewport, web}, shared::components::{camera::ViewRange, markers::CameraMarker}};
 
-pub fn system_sync_viewport(mut r_viewport: ResMut<Viewport>, q_camera: Query<&Camera>, q_transform: Query<&GlobalTransform>) {
+pub fn system_sync_viewport(mut r_viewport: ResMut<Viewport>, q_camera: Query<(&Position, &ViewRange), With<CameraMarker>>) {
     r_viewport.size = Vec2::new(web::Viewport::viewport_width(), web::Viewport::viewport_height());
-    if let Ok(camera) = q_camera.get_single() {
-        let wanted = camera.fov * web::Viewport::gui_zoom_factor();
+    if let Ok((position, view_range)) = q_camera.get_single() {
+        let wanted = view_range.0 * web::Viewport::gui_zoom_factor();
         r_viewport.zoom = (r_viewport.zoom * 9.0 + wanted) / 10.0;
-        r_viewport.offset = match camera.mode {
-            CameraMode::Absolute { target } => target,
-            CameraMode::Relative { target, movement_speed } => {
-                if let Ok(transform) = q_transform.get(target) {
-                    // TODO extrapolation + interpolation
-                    Position::from(transform).0
-                } else {
-                    Vec2::ZERO
-                }
-            }
-        };
-
-        info!("has camera")
+        r_viewport.offset = position.0;
     } else {
         r_viewport.zoom = 0.55 * web::Viewport::gui_zoom_factor();
         r_viewport.offset = Vec2::ZERO;
-
-        info!("has no camera")
     }
 }
 

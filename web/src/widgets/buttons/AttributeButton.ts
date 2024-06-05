@@ -3,9 +3,6 @@ import Color from "../../util/Color";
 import Button from "../Button";
 import Text from "../Text";
 
-
-
-
 export class AttributeButton extends Button {
     public constructor(
         public readonly nameTextWidget: Text = new Text(),

@@ -26,18 +26,4 @@ Client
     - Indicator Rendering
     - link tank rendering to widgets
 
-- Networking
-
 - Inputs
-
-
-
-Server
-
-- Networking
-
-
-Shared
-
-- Networking
-

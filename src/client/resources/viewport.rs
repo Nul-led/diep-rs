@@ -4,14 +4,10 @@ use web_sys::OffscreenCanvas;
 use crate::client::{utils::context::{Context, OffscreenContext}, web};
 
 
-#[derive(Clone, Copy, Default, PartialEq)]
-pub struct MapBorders {
-    pub min: Vec2,
-    pub max: Vec2,
-}
+
 
 struct RenderConfig {
-
+    
 }
 
 #[derive(Resource)]
@@ -20,7 +16,6 @@ pub struct Viewport {
     pub size: Vec2,
     pub zoom: f32, // lerp(fov * ssz)
     pub offset: Vec2, // cam pos
-    pub borders: MapBorders,
     pub grid_pattern_ctx: OffscreenContext
 }
 
@@ -31,7 +26,6 @@ impl Viewport {
             size: Vec2::new(web::Viewport::viewport_width(), web::Viewport::viewport_height()),
             zoom: 0.55 * web::Viewport::gui_zoom_factor(),
             offset: Vec2::default(),
-            borders: MapBorders::default(),
             grid_pattern_ctx: OffscreenContext::new_with_canvas(OffscreenCanvas::new(50, 50).unwrap()),
         }
     }

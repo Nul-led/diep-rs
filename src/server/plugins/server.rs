@@ -6,7 +6,7 @@ use bevy::{
 };
 use lightyear::{prelude::server::ServerCommands, server::plugin::ServerPlugins};
 
-use crate::{server::{net::config::server_config, systems::routines::{system_orbit_routine, system_rotation_routine}}, shared::{definitions::config::TICK_DURATION, systems::test::{test_system, test_system1}}};
+use crate::{server::{net::config::server_config, systems::routines::{system_orbit_routine, system_rotation_routine}}, shared::{definitions::config::TICK_DURATION, systems::test::{test_system}}};
 
 pub struct ServerInitPlugin;
 
@@ -27,7 +27,6 @@ impl Plugin for ServerInitPlugin {
         app.add_systems(Startup, test_system);
 
         app.add_systems(FixedUpdate, (system_orbit_routine, system_rotation_routine));
-        //app.add_systems(Update, (test_system1));
     }
 }
 
