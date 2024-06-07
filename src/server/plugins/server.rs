@@ -2,11 +2,11 @@ use std::time::Duration;
 
 use bevy::{
     app::{App, FixedUpdate, Plugin, RunMode, ScheduleRunnerPlugin, Startup, Update},
-    diagnostic::SystemInformationDiagnosticsPlugin, ecs::system::Commands,
+    diagnostic::SystemInformationDiagnosticsPlugin, ecs::{schedule::{Condition, IntoSystemConfigs}, system::{Commands, IntoSystem, Local}},
 };
 use lightyear::{prelude::server::ServerCommands, server::plugin::ServerPlugins};
 
-use crate::{server::{net::config::server_config, systems::routines::{system_orbit_routine, system_rotation_routine}}, shared::{definitions::config::TICK_DURATION, systems::test::{test_system}}};
+use crate::{server::{net::config::server_config, systems::routines::{system_orbit_routine, system_rotation_routine}}, shared::{definitions::config::TICK_DURATION, systems::test::{system_spawner, test_system}}};
 
 pub struct ServerInitPlugin;
 
@@ -26,11 +26,21 @@ impl Plugin for ServerInitPlugin {
 
         app.add_systems(Startup, test_system);
 
-        app.add_systems(FixedUpdate, (system_orbit_routine, system_rotation_routine));
+        app.add_systems(FixedUpdate, (system_orbit_routine, system_rotation_routine,
+        
+            system_spawner.run_if(under()),
+        ));
     }
 }
 
+fn under() -> impl Condition<()> {
+    IntoSystem::into_system(|mut flag: Local<usize>| {
+        *flag += 1;
+        *flag <= 1
+    })
+}
 
 fn start_server(mut commands: Commands) {
     commands.start_server();
+    
 }

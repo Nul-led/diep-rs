@@ -19,7 +19,7 @@ use bevy_xpbd_2d::{
 use tracing::Level;
 
 use crate::shared::{
-    definitions::config::TICKS_PER_SECOND, systems::test::minimum_velocity_system,
+    definitions::config::TICKS_PER_SECOND, systems::test::{a, minimum_velocity_system},
 };
 
 #[derive(SystemSet, Debug, Hash, PartialEq, Eq, Clone, Copy)]
@@ -70,6 +70,6 @@ impl Plugin for SharedInitPlugin {
 
         app.insert_resource(Gravity(Vec2::ZERO));
 
-        app.add_systems(FixedUpdate, minimum_velocity_system);
+        app.add_systems(FixedUpdate, (minimum_velocity_system, a));
     }
 }

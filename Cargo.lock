@@ -1028,7 +1028,7 @@ dependencies = [
 [[package]]
 name = "bevy_xpbd_2d"
 version = "0.4.2"
-source = "git+https://github.com/Nul-led/bevy_xpbd.git?branch=main#12b9f07421ccf9b1d38dd5f1a1329422002a720b"
+source = "git+https://github.com/Nul-led/bevy_xpbd.git?branch=main#bfea1db064030572989b73aad58a38841f241e41"
 dependencies = [
  "bevy",
  "bevy_math",
@@ -1046,7 +1046,7 @@ dependencies = [
 [[package]]
 name = "bevy_xpbd_derive"
 version = "0.1.0"
-source = "git+https://github.com/Nul-led/bevy_xpbd.git?branch=main#12b9f07421ccf9b1d38dd5f1a1329422002a720b"
+source = "git+https://github.com/Nul-led/bevy_xpbd.git?branch=main#bfea1db064030572989b73aad58a38841f241e41"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2449,7 +2449,7 @@ dependencies = [
 [[package]]
 name = "lightyear"
 version = "0.15.1"
-source = "git+https://github.com/cBournhonesque/lightyear?branch=main#452a02a72216d33114366825a9a2f11ffe5f618e"
+source = "git+https://github.com/cBournhonesque/lightyear?branch=main#90c48813eb5e1e3aca89c049046be19fd46a61e3"
 dependencies = [
  "async-channel",
  "async-compat",
@@ -2496,7 +2496,7 @@ dependencies = [
 [[package]]
 name = "lightyear_macros"
 version = "0.15.1"
-source = "git+https://github.com/cBournhonesque/lightyear?branch=main#452a02a72216d33114366825a9a2f11ffe5f618e"
+source = "git+https://github.com/cBournhonesque/lightyear?branch=main#90c48813eb5e1e3aca89c049046be19fd46a61e3"
 dependencies = [
  "proc-macro2",
  "quote",

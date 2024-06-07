@@ -1,14 +1,11 @@
 use std::{f32::consts::PI, ops::Range};
 
 use bevy::{
-    ecs::{system::Query, world::World},
-    hierarchy::BuildWorldChildren,
-    math::{Quat, Vec2, Vec3},
-    transform::{components::Transform, TransformBundle},
+    ecs::{entity::Entity, system::{Commands, Query, Res}, world::World}, hierarchy::BuildWorldChildren, math::{Quat, Vec2, Vec3}, time::Time, transform::{components::Transform, TransformBundle}
 };
 use bevy_xpbd_2d::{
     components::{
-        AngularDamping, AngularVelocity, CoefficientCombine, ColliderDensity, ExternalImpulse, Friction, LinearDamping, LinearVelocity, LockedAxes, MassPropertiesBundle, Position, Restitution, RigidBody, Rotation
+        AngularDamping, AngularVelocity, CenterOfMass, CoefficientCombine, ColliderDensity, ExternalImpulse, Friction, Inertia, InverseInertia, InverseMass, LinearDamping, LinearVelocity, LockedAxes, Mass, MassPropertiesBundle, Position, Restitution, RigidBody, Rotation
     },
     plugins::collision::Collider,
     resources::SleepingThreshold,
@@ -18,6 +15,7 @@ use lightyear::{
     shared::replication::{components::ReplicationGroup, network_target::NetworkTarget},
 };
 use rand::{distributions::Distribution, random, thread_rng, Rng};
+use tracing::info;
 
 use crate::{server::{bundles::{camera::CameraBundle, game::GameBundle}, components::{orbit::OrbitRoutine, rotation::RotationRoutine}}, shared::{
     components::{
@@ -56,7 +54,7 @@ pub fn test_system(world: &mut World) {
         },
         Replicate::default()
     ));
-
+    /* 
     world.spawn((
         Collider::segment(
             -map.size / 2.0,
@@ -89,34 +87,41 @@ pub fn test_system(world: &mut World) {
         RigidBody::Static,
     )); // left
 
-    for _ in 0..500 {
-        let shape = Shape::Rect {
-            width: 50.0,
-            height: 50.0,
-        };
+    */
+}
 
-        world.spawn((
-            RigidBody::Dynamic,
-            Collider::from(&shape),
-            ObjectShape(shape),
-            ObjectZIndex(0),
-            ObjectDrawInfo(DrawInfo {
-                fill: Some(Paint::ColorId(Colors::Blue1)),
-                stroke: Some(Stroke {
-                    width: 7.5,
-                    paint: None,
-                }),
+pub fn system_spawner(
+    q_map: Query<&GameMapInfo>,
+    mut commands: Commands
+) {
+    let shape = Shape::Rect {
+        width: 50.0,
+        height: 50.0,
+    };
+
+    commands.spawn((
+        RigidBody::Dynamic,
+        Collider::from(&shape),
+        ObjectShape(shape),
+        ObjectZIndex(0),
+        ObjectDrawInfo(DrawInfo {
+            fill: Some(Paint::ColorId(Colors::Blue1)),
+            stroke: Some(Stroke {
+                width: 7.5,
+                paint: None,
             }),
-            Replicate::default(),
-            LinearDamping(0.1),
-            AngularDamping(0.1),
-            Restitution::new(0.0).with_combine_rule(CoefficientCombine::Multiply),
-            ColliderDensity(0.1),
-            Position::new(random_pos(map.size / -2.0, map.size / 2.0)),
-            OrbitRoutine::default(),
-            RotationRoutine::default(),
-        ));
-    }
+        }),
+        Replicate::default(),
+        //LinearDamping(0.1),
+        //AngularDamping(0.1),
+        Restitution::new(0.1).with_combine_rule(CoefficientCombine::Multiply),
+        ColliderDensity(1.0),
+        Position::from_xy(random::<f32>() * 5.0, random::<f32>() * 5.0),
+        //Position::new(random_pos(map.size / -2.0, map.size / 2.0)),
+        OrbitRoutine::default(),
+        RotationRoutine::default(),
+    ));
+
 }
 
 
@@ -127,8 +132,16 @@ pub fn random_pos(min: Vec2, max: Vec2) -> Vec2 {
 
 pub fn minimum_velocity_system(mut query: Query<&mut LinearVelocity>) {
     for mut velocity in query.iter_mut() {
+        velocity.0 *= 0.9;
+
         if velocity.length_squared() < 0.0001 {
             velocity.0 = Vec2::ZERO;
         }
+    }
+}
+
+pub fn a(q_r: Query<(Entity, &AngularVelocity, &Rotation)>) {
+    for (e, v, r) in q_r.iter() {
+        //info!("{:?} {} {}", e, v.0, r.as_radians());
     }
 }
