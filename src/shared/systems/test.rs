@@ -83,25 +83,28 @@ pub fn system_spawner(
     q_map: Query<&GameMapInfo>,
     mut commands: Commands
 ) {
-    for i in 0..2 {
+    for i in 0..50 {
         let shape = ColliderTrace::RegularPolygon(RegularPolygon {
-            circumcircle: Circle::new(75.0),
-            sides: 5,
-        }, ObjectDrawConfig::Simple { fill: Paint::ColorId(Colors::Blue2) });
+            circumcircle: Circle::new(50.0),
+            sides: 4,
+        }, ObjectDrawConfig::Simple { fill: Paint::ColorId(Colors::Yellow1) });
     
         commands.spawn((
             PhysicsBundle {
                 collider: Collider::from(&shape),
-                impact_potency: ImpactPotency(11.0),
-                impact_resistance: ImpactResistance(0.5),
+                impact_potency: ImpactPotency(8.0),
+                impact_resistance: ImpactResistance(1.0),
                 ..Default::default()
             },
-            MovementBundle::default(),
+            MovementBundle {
+                transform: TransformBundle::from_transform(Transform::from_translation(random_pos(-Vec2::new(500.0, 500.0), Vec2::new(500.0, 500.0)).extend(0.0))),
+                ..Default::default()
+            },
             shape,
             ObjectZIndex(0),
             Replicate::default(),
-            //OrbitRoutine::default(),
-            //RotationRoutine::default(),
+            OrbitRoutine::default(),
+            RotationRoutine::default(),
         ));
     }
 }
@@ -110,12 +113,4 @@ pub fn system_spawner(
 pub fn random_pos(min: Vec2, max: Vec2) -> Vec2 {
     let mut rng = thread_rng();
     Vec2::new(rng.gen_range(min.x .. max.x), rng.gen_range(min.y .. max.y))
-}
-
-pub fn minimum_velocity_system(mut query: Query<&mut LinearVelocity, Without<CameraMarker>>) {
-    for mut velocity in query.iter_mut() {
-        if velocity.length_squared() < 0.0001 {
-            velocity.0 = Vec2::ZERO;
-        }
-    }
 }

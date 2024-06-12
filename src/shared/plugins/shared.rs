@@ -1,21 +1,16 @@
 use bevy::{
-    app::{App, FixedUpdate, Plugin, Update},
+    app::{App, FixedUpdate, Plugin},
     core::{FrameCountPlugin, TaskPoolPlugin, TypeRegistrationPlugin},
     diagnostic::{DiagnosticsPlugin, EntityCountDiagnosticsPlugin, FrameTimeDiagnosticsPlugin},
-    ecs::{
-        change_detection::DetectChanges, entity::Entity, query::{Has, QueryData, Without}, schedule::{IntoSystemConfigs, IntoSystemSetConfigs, ScheduleLabel, SystemSet}, system::{Commands, Query, Res, ResMut}
-    },
+    ecs::schedule::{IntoSystemSetConfigs, ScheduleLabel, SystemSet},
     hierarchy::HierarchyPlugin,
     log::LogPlugin,
-    math::Vec2,
     time::{Fixed, Time, TimePlugin},
     transform::TransformPlugin,
 };
 use tracing::Level;
 
-use crate::shared::{
-    definitions::config::TICKS_PER_SECOND, systems::test::{minimum_velocity_system},
-};
+use crate::shared::definitions::config::TICKS_PER_SECOND;
 
 use super::physics::{PhysicsPlugin, PhysicsSet};
 
@@ -45,11 +40,9 @@ impl Plugin for SharedInitPlugin {
             DiagnosticsPlugin,
             FrameTimeDiagnosticsPlugin,
             EntityCountDiagnosticsPlugin,
-            PhysicsPlugin(FixedUpdate.intern())
+            PhysicsPlugin(FixedUpdate.intern()),
         ));
 
-        
-        
         app.configure_sets(
             FixedUpdate,
             (
@@ -67,10 +60,5 @@ impl Plugin for SharedInitPlugin {
         );
 
         app.insert_resource(Time::<Fixed>::from_hz(TICKS_PER_SECOND));
-
-        //app.insert_resource(Time::new_with(Physics::fixed_once_hz(TICKS_PER_SECOND)));
-
-
-        //app.add_systems(FixedUpdate, (minimum_velocity_system));
     }
 }

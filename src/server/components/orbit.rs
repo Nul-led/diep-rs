@@ -17,7 +17,7 @@ impl Default for OrbitRoutine {
                 true => 0.0048,
                 false => -0.0048
             },
-            velocity: 1.3, // TODO accuracy
+            velocity: 0.2, // TODO accuracy
             current: 0.0
         }
     }

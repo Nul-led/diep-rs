@@ -4,8 +4,8 @@ use bevy::{
         query::Without,
         system::{Local, Query, Res, ResMut},
     },
-    math::Vec2,
-    transform::components::GlobalTransform,
+    math::{EulerRot, Vec2},
+    transform::components::{GlobalTransform, Transform},
 };
 use lightyear::client::{components::Confirmed, interpolation::Interpolated};
 use tracing::info;
@@ -31,6 +31,7 @@ use crate::{
 pub fn system_render_objects(
     q_object_z_index: Query<(Entity, &ObjectZIndex)>,
     q_objects: Query<(
+        &Transform,
         &GlobalTransform,
         Option<&ObjectName>,
         Option<&ObjectScore>,
@@ -48,6 +49,7 @@ pub fn system_render_objects(
     object_entities.sort_by(|a, b| a.1 .0.cmp(&b.1 .0));
     for (entity, _) in object_entities {
         if let Ok((
+            t1,
             transform,
             name,
             score,
@@ -62,7 +64,7 @@ pub fn system_render_objects(
             r_viewport.ctx.save();
             let (_, rot, pos) = transform.to_scale_rotation_translation();
             let pos = pos.truncate();
-            let rot = rot.z;
+            let rot = rot.to_euler(EulerRot::ZYX).0;
 
             r_viewport
                 .ctx

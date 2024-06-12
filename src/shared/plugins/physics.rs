@@ -6,7 +6,7 @@ use bevy::{
         change_detection::DetectChanges, component::Component, entity::{Entity, EntityMapper, MapEntities}, query::{With, Without}, schedule::{IntoSystemConfigs, IntoSystemSetConfigs, ScheduleLabel, SystemSet}, system::{Commands, Query, Res, ResMut, Resource}, world::Ref
     },
     hierarchy::Parent,
-    math::Vec2,
+    math::{EulerRot, Vec2},
     tasks::{ComputeTaskPool, ParallelSlice},
     transform::{
         components::{GlobalTransform, Transform},
@@ -160,13 +160,11 @@ fn system_apply_velocity(
             lin_vel.0 = lin_vel.0.normalize_or_zero() * lin_vel_con.1;
         }
 
-        //info!("{}", lin_vel.0.length());
-
         ang_vel.0 *= ang_vel_ret.0;
 
-        if ang_vel.0 < ang_vel_con.0 {
+        if ang_vel.0.abs() < ang_vel_con.0 {
             ang_vel.0 = 0.0;
-        } else if ang_vel.0 > ang_vel_con.1 {
+        } else if ang_vel.0.abs() > ang_vel_con.1 {
             ang_vel.0 = ang_vel_con.1;
         }
         
@@ -208,9 +206,10 @@ fn system_collect_collisions(
                             transform1.to_scale_rotation_translation();
                         let (_, rotation2, translation2) =
                             transform2.to_scale_rotation_translation();
+                            
                         if check_collision_pair(
-                            (translation1.truncate(), rotation1.z, col1),
-                            (translation2.truncate(), rotation2.z, col2),
+                            (translation1.truncate(), rotation1.to_euler(EulerRot::ZYX).0, col1),
+                            (translation2.truncate(), rotation2.to_euler(EulerRot::ZYX).0, col2),
                         ) {
                             collisions.push((entity1, entity2));
                         }
@@ -326,7 +325,7 @@ fn system_sweep_and_prune(
                 return false;
             }
             let (_, rotation, translation) = transform.to_scale_rotation_translation();
-            *aabb = collider.aabb(translation.truncate(), rotation.z);
+            *aabb = collider.aabb(translation.truncate(), rotation.to_euler(EulerRot::ZYX).0);
             *is_body_inactive = rb.is_static() || !transform.is_changed();
             true
         } else {
@@ -343,7 +342,7 @@ fn system_sweep_and_prune(
             intervals.0.push((
                 entity,
                 rb.is_static(),
-                collider.aabb(translation.truncate(), rotation.z),
+                collider.aabb(translation.truncate(), rotation.to_euler(EulerRot::ZYX).0),
             ));
             commands.entity(entity).insert(IntervalMarker);
         }

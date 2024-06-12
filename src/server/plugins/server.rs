@@ -26,7 +26,7 @@ impl Plugin for ServerInitPlugin {
 
         app.add_systems(Startup, test_system);
 
-        app.add_systems(Update, (system_orbit_routine, system_rotation_routine,
+        app.add_systems(FixedUpdate, (system_orbit_routine, system_rotation_routine,
         
             system_spawner.run_if(under()),
         ));
