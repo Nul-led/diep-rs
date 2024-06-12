@@ -112,3 +112,20 @@ impl From<Context> for OffscreenContext {
         )
     }
 }
+
+impl From<&OffscreenContext> for Context {
+    fn from(value: &OffscreenContext) -> Self {
+        Self(value.0.to_owned().unchecked_into::<CanvasRenderingContext2d>())
+    }
+}
+
+impl From<&Context> for OffscreenContext {
+    fn from(value: &Context) -> Self {
+        Self(
+            value
+                .0
+                .to_owned()
+                .unchecked_into::<OffscreenCanvasRenderingContext2d>(),
+        )
+    }
+}

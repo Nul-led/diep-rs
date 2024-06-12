@@ -1,5 +1,5 @@
 pub mod context;
-pub mod paint;
+pub mod drawing;
 pub mod shapes;
 pub mod prettify;
 pub mod class;

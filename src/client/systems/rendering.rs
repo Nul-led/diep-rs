@@ -7,26 +7,23 @@ use bevy::{
     math::Vec2,
     transform::components::GlobalTransform,
 };
-use bevy_xpbd_2d::{
-    components::{Position, Rotation},
-    plugins::collision::{AnyCollider, Collider},
-};
 use lightyear::client::{components::Confirmed, interpolation::Interpolated};
+use tracing::info;
 use web_sys::Path2d;
 
 use crate::{
-    client::{resources::viewport::Viewport, utils::prettify::prettify_number},
+    client::{resources::viewport::Viewport, utils::{prettify::prettify_number, shapes::trace_collider}},
     shared::{
         components::{
             game::GameMapInfo,
             indicator::IndicatorConfig,
             object::{
-                ObjectDamageMarker, ObjectDrawInfo, ObjectHealth, ObjectInvincibilityMarker,
-                ObjectName, ObjectOpacity, ObjectScore, ObjectShape, ObjectZIndex,
-            },
+                ObjectDamageMarker, ObjectHealth, ObjectInvincibilityMarker,
+                ObjectName, ObjectOpacity, ObjectScore, ObjectZIndex,
+            }, physics::Collider,
         },
         definitions::colors::Colors,
-        util::paint::Paint,
+        util::{drawinfo::DrawConfig, paint::Paint, shape::ColliderTrace},
     },
 };
 
@@ -34,13 +31,12 @@ use crate::{
 pub fn system_render_objects(
     q_object_z_index: Query<(Entity, &ObjectZIndex)>,
     q_objects: Query<(
-        &Position,
-        &Rotation,
+        &GlobalTransform,
         Option<&ObjectName>,
         Option<&ObjectScore>,
         Option<&ObjectOpacity>,
-        Option<&ObjectShape>,
-        Option<&ObjectDrawInfo>,
+        Option<&ColliderTrace>,
+        Option<&Collider>,
         Option<&ObjectHealth>,
         Option<&ObjectDamageMarker>,
         Option<&ObjectInvincibilityMarker>,
@@ -52,19 +48,21 @@ pub fn system_render_objects(
     object_entities.sort_by(|a, b| a.1 .0.cmp(&b.1 .0));
     for (entity, _) in object_entities {
         if let Ok((
-            pos,
-            rot,
+            transform,
             name,
             score,
             opacity,
-            shape,
-            draw_info,
+            trace,
+            collider,
             health,
             damage_marker,
             invincibility_marker,
         )) = q_objects.get(entity)
         {
             r_viewport.ctx.save();
+            let (_, rot, pos) = transform.to_scale_rotation_translation();
+            let pos = pos.truncate();
+            let rot = rot.z;
 
             r_viewport
                 .ctx
@@ -75,105 +73,55 @@ pub fn system_render_objects(
                 r_viewport.ctx.set_global_alpha(opacity.0 as f64);
             }
 
-            r_viewport.ctx.save();
-
-            r_viewport.ctx.rotate(rot.as_radians() as f64).unwrap();
-
-            let (fill_paint, stroke_paint, stroke_width) = if let Some(draw_info) = draw_info {
-                let fill_paint = draw_info.0.fill.unwrap_or(Paint::RGB(0, 0, 0));
-                let (stroke_paint, stroke_width) = match draw_info.0.stroke {
-                    Some(stroke) => (
-                        stroke
-                            .paint
-                            .unwrap_or(fill_paint.blend_with(Paint::RGB(0, 0, 0), 0.4)), // TODO make configurable
-                        stroke.width,
-                    ),
-                    None => (Paint::RGB(0, 0, 0), 0.0),
+            if let Some(trace) = trace {
+                let trace_collider_option: Option<Collider> = match collider.is_none() { true => Some(trace.into()), false => None }; 
+                
+                let collider = match collider {
+                    Some(c) => c,
+                    None => trace_collider_option.as_ref().unwrap()
                 };
-                (fill_paint, stroke_paint, stroke_width)
-            } else {
-                (Paint::RGB(0, 0, 0), Paint::RGB(0, 0, 0), 0.0)
-            };
+      
+                let collider_half_extends: Vec2 = collider.aabb(pos, 0.0).half_extents().into();
 
-            r_viewport.ctx.set_fill_style(&fill_paint.into());
-            r_viewport.ctx.set_stroke_style(&stroke_paint.into());
-            r_viewport.ctx.set_line_width(stroke_width as f64);
-            r_viewport.ctx.set_line_join("round");
+                r_viewport.ctx.save();
 
-            if let Some(shape) = shape {
-                let collider = Collider::from(&shape.0);
-                let size = collider.aabb(pos.0, 0.0).size();
+                r_viewport.ctx.rotate(rot as f64).unwrap();
 
-                let path = Path2d::from(&shape.0);
-                r_viewport.ctx.fill_with_path_2d(&path);
-                r_viewport.ctx.stroke_with_path(&path);
+                trace_collider(&r_viewport.ctx, trace);
 
                 r_viewport.ctx.restore();
 
-                //r_viewport.ctx.set_stroke_style(&Paint::RGB(0, 0, 0).into());
-                //r_viewport.ctx.stroke_rect((-size.x / 2.0) as f64, (-size.y / 2.0) as f64, size.x as f64, size.y as f64);
-
-                r_viewport.ctx.set_text_align("center");
                 r_viewport.ctx.set_text_baseline("middle");
 
                 let offset = if let Some(score) = score {
-                    let font_size = size.max_element() / 2.0 / 50.0 * 25.0;
-                    r_viewport.ctx.set_font(&format!("{}px Ubuntu", font_size));
+                    r_viewport.ctx.save();
+                    
+                    let font_size = collider_half_extends.max_element() / 50.0 * 25.0;
+                    DrawConfig::from_text_draw_config(&score.draw_config, font_size).apply_to_ctx(&r_viewport.ctx);
+
                     let txt = prettify_number(score.score, 1);
 
-                    if let Some(draw_info) = score.draw_info {
-                        if let Some(stroke) = draw_info.stroke {
-                            r_viewport.ctx.set_stroke_style(
-                                &stroke.paint.unwrap_or(Paint::RGB(0, 0, 0)).into(),
-                            );
-                            r_viewport
-                                .ctx
-                                .set_line_width((font_size * stroke.width) as f64);
-                            r_viewport
-                                .ctx
-                                .stroke_text(&txt, 0.0, (size.y / 2.0 * -1.5) as f64)
-                                .unwrap();
-                        }
+                    r_viewport.ctx.stroke_text(&txt, 0.0, (collider_half_extends.y * -1.5) as f64).unwrap();
+                    r_viewport.ctx.fill_text(&txt, 0.0, (collider_half_extends.y * -1.5) as f64).unwrap();
+                    
+                    r_viewport.ctx.restore();
 
-                        if let Some(fill) = draw_info.fill {
-                            r_viewport.ctx.set_fill_style(&fill.into());
-                            r_viewport
-                                .ctx
-                                .fill_text(&txt, 0.0, (size.y / 2.0 * -1.5) as f64)
-                                .unwrap();
-                        }
-                    }
                     (font_size * 1.4).max(0.0)
                 } else {
                     0.0
                 };
 
+
                 if let Some(name) = name {
-                    let font_size = size.max_element() / 2.0 / 50.0 * 40.0;
-                    r_viewport.ctx.set_font(&format!("{}px Ubuntu", font_size));
+                    r_viewport.ctx.save();
 
-                    if let Some(draw_info) = name.draw_info {
-                        if let Some(stroke) = draw_info.stroke {
-                            r_viewport.ctx.set_stroke_style(
-                                &stroke.paint.unwrap_or(Paint::RGB(0, 0, 0)).into(),
-                            );
-                            r_viewport
-                                .ctx
-                                .set_line_width((font_size * stroke.width) as f64);
-                            r_viewport
-                                .ctx
-                                .stroke_text(&name.name, 0.0, (size.y / 2.0 * -1.5 - offset) as f64)
-                                .unwrap();
-                        }
+                    let font_size = collider_half_extends.max_element() / 50.0 * 40.0;
+                    DrawConfig::from_text_draw_config(&name.draw_config, font_size).apply_to_ctx(&r_viewport.ctx);
 
-                        if let Some(fill) = draw_info.fill {
-                            r_viewport.ctx.set_fill_style(&fill.into());
-                            r_viewport
-                                .ctx
-                                .fill_text(&name.name, 0.0, (size.y / 2.0 * -1.5 - offset) as f64)
-                                .unwrap();
-                        }
-                    }
+                    r_viewport.ctx.stroke_text(&name.name, 0.0, (collider_half_extends.y * -1.5 - offset) as f64).unwrap();
+                    r_viewport.ctx.fill_text(&name.name, 0.0, (collider_half_extends.y * -1.5 - offset) as f64).unwrap();
+               
+                    r_viewport.ctx.restore();
                 }
 
                 if let Some(health) = health {
@@ -182,14 +130,14 @@ pub fn system_render_objects(
 
                         r_viewport
                             .ctx
-                            .translate((-size.x / 2.0) as f64, (size.y / 2.0 + 35.0) as f64)
+                            .translate(-collider_half_extends.x as f64, (collider_half_extends.y + 35.0) as f64)
                             .unwrap();
 
                         r_viewport.ctx.set_line_cap("round");
                         r_viewport.ctx.set_line_width(16.0);
                         r_viewport.ctx.begin_path();
                         r_viewport.ctx.move_to(8.0, 8.0);
-                        r_viewport.ctx.line_to(size.x as f64, 8.0); // TODO check if i need to size.x - 8.0
+                        r_viewport.ctx.line_to((collider_half_extends.x * 2.0) as f64, 8.0); // TODO check if i need to size.x - 8.0
                         r_viewport.ctx.set_stroke_style(&Paint::RGB(0, 0, 0).into()); // TODO configurable
                         r_viewport.ctx.stroke();
                         r_viewport.ctx.set_line_width(16.0 * 0.75);
@@ -197,10 +145,10 @@ pub fn system_render_objects(
                         r_viewport.ctx.move_to(8.0, 8.0);
                         r_viewport
                             .ctx
-                            .line_to(8.0_f32.max(size.x * perc) as f64, 8.0);
+                            .line_to(8.0_f32.max((collider_half_extends.x * 2.0) * perc) as f64, 8.0);
                         r_viewport.ctx.set_stroke_style(
                             &health
-                                .custom_healthbar_color
+                                .custom_healthbar_paint
                                 .unwrap_or(Paint::RGB(133, 227, 125))
                                 .into(),
                         );
@@ -210,7 +158,6 @@ pub fn system_render_objects(
                     }
                 }
             }
-
             r_viewport.ctx.restore();
         }
     }
@@ -357,7 +304,7 @@ pub fn system_render_borders(
 }
 
 pub fn system_render_indicators(
-    q_game: Query<(&IndicatorConfig, &Position)>,
+    q_game: Query<(&IndicatorConfig)>,
     mut r_viewport: ResMut<Viewport>,
 ) {
 }

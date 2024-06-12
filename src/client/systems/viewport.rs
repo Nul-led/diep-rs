@@ -1,14 +1,13 @@
-use bevy::{ecs::{query::With, system::{Query, Res, ResMut}}, math::Vec2};
-use bevy_xpbd_2d::components::Position;
+use bevy::{ecs::{query::With, system::{Query, Res, ResMut}}, math::Vec2, transform::components::GlobalTransform};
 
 use crate::{client::{resources::viewport::Viewport, web}, shared::components::{camera::ViewRange, markers::CameraMarker}};
 
-pub fn system_sync_viewport(mut r_viewport: ResMut<Viewport>, q_camera: Query<(&Position, &ViewRange), With<CameraMarker>>) {
+pub fn system_sync_viewport(mut r_viewport: ResMut<Viewport>, q_camera: Query<(&GlobalTransform, &ViewRange), With<CameraMarker>>) {
     r_viewport.size = Vec2::new(web::Viewport::viewport_width(), web::Viewport::viewport_height());
-    if let Ok((position, view_range)) = q_camera.get_single() {
+    if let Ok((transform, view_range)) = q_camera.get_single() {
         let wanted = view_range.0 * web::Viewport::gui_zoom_factor();
         r_viewport.zoom = (r_viewport.zoom * 9.0 + wanted) / 10.0;
-        r_viewport.offset = position.0;
+        r_viewport.offset = transform.translation_vec3a().truncate(); 
     } else {
         r_viewport.zoom = 0.55 * web::Viewport::gui_zoom_factor();
         r_viewport.offset = Vec2::ZERO;

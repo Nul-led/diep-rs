@@ -3,7 +3,7 @@ use bevy::math::Vec2;
 #[cfg(feature = "server")]
 use crate::server::util::class::{CannonConfig, ClassStatsConfig};
 
-use super::{drawinfo::DrawInfo, shape::Shape};
+use super::shape::ColliderTrace;
 
 #[derive(Clone, Default)]
 pub struct ChildObjectConfig {
@@ -25,11 +25,8 @@ pub struct ChildObjectConfig {
     /// Relative position offset from the parent's center
     pub position: Vec2,
 
-    /// Shape of the object
-    pub shape: Option<Shape>,
-
-    /// Fill and stroke of the object
-    pub draw_info: Option<DrawInfo>,
+    /// Collider of the child object
+    pub collider: Option<ColliderTrace>,
 
     /// Contains the next layer of cannons and addons in render order from lowest z to highest
     pub children: Vec<ChildObjectConfig>,
@@ -54,10 +51,7 @@ pub struct ClassConfig {
     pub is_visible: bool,
 
     /// Shape of the class body
-    pub shape: Option<Shape>,
-
-    /// Fill and stroke of the class body
-    pub draw_info: Option<DrawInfo>,
+    pub collider: Option<ColliderTrace>,
 
     /// Contains the first layer of cannons and addons in render order from lowest z to highest
     pub children: Vec<ChildObjectConfig>,

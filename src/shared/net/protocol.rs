@@ -1,8 +1,7 @@
-use bevy::app::{App, Plugin};
-use bevy_xpbd_2d::components::{AngularDamping, AngularVelocity, LinearDamping, LinearVelocity, Position, RigidBody, Rotation};
+use bevy::{app::{App, Plugin}, transform::components::{GlobalTransform, Transform}};
 use lightyear::{channel::builder::ChannelDirection, prelude::AppComponentExt};
 
-use crate::shared::components::{camera::{AvailableClasses, ConsoleCommands, LevelbarProgress, PlayerClassName, PlayerId, PlayerLevel, PlayerName, PlayerScore, PlayerStats, RenderToggles, ScorebarProgress, ViewRange}, game::{GameLobbyInfo, GameMapInfo, GameServerInfo}, indicator::IndicatorConfig, markers::CameraMarker, object::{ObjectDamageMarker, ObjectDrawInfo, ObjectHealth, ObjectInvincibilityMarker, ObjectName, ObjectOpacity, ObjectScore, ObjectShape, ObjectZIndex}};
+use crate::shared::{components::{camera::{AvailableClasses, ConsoleCommands, LevelbarProgress, PlayerClassName, PlayerId, PlayerLevel, PlayerName, PlayerScore, PlayerStats, RenderToggles, ScorebarProgress, ViewRange}, game::{GameLobbyInfo, GameMapInfo, GameServerInfo}, indicator::IndicatorConfig, markers::CameraMarker, object::{ObjectDamageMarker, ObjectHealth, ObjectInvincibilityMarker, ObjectName, ObjectOpacity, ObjectScore, ObjectZIndex}, physics::{AngularVelocity, AngularVelocityRetention, Dominance, IgnoreCollisions, IgnoreMapBorder, IgnoreStaticRigidBodies, ImpactDeflection, ImpactPotency, ImpactResistance, LinearVelocity, LinearVelocityRetention, RigidBody}}, util::shape::ColliderTrace};
 
 pub struct ProtocolPlugin;
 
@@ -39,21 +38,26 @@ impl Plugin for ProtocolPlugin {
         app.register_component::<ObjectName>(ChannelDirection::ServerToClient);
         app.register_component::<ObjectScore>(ChannelDirection::ServerToClient);
         app.register_component::<ObjectOpacity>(ChannelDirection::ServerToClient);
-        app.register_component::<ObjectShape>(ChannelDirection::ServerToClient);
-        app.register_component::<ObjectDrawInfo>(ChannelDirection::ServerToClient);
+        app.register_component::<ColliderTrace>(ChannelDirection::ServerToClient);
         //TODO add interpolation
         app.register_component::<ObjectHealth>(ChannelDirection::ServerToClient);
         app.register_component::<ObjectDamageMarker>(ChannelDirection::ServerToClient);
         app.register_component::<ObjectInvincibilityMarker>(ChannelDirection::ServerToClient);
         app.register_component::<ObjectZIndex>(ChannelDirection::ServerToClient);
         app.register_component::<RigidBody>(ChannelDirection::ServerToClient);
+        app.register_component::<GlobalTransform>(ChannelDirection::ServerToClient);
+        app.register_component::<Transform>(ChannelDirection::ServerToClient);
         //TODO add interpolation
-        app.register_component::<Rotation>(ChannelDirection::ServerToClient);
-        //TODO add interpolation
-        app.register_component::<Position>(ChannelDirection::ServerToClient);
         app.register_component::<LinearVelocity>(ChannelDirection::ServerToClient);
         app.register_component::<AngularVelocity>(ChannelDirection::ServerToClient);
-        app.register_component::<LinearDamping>(ChannelDirection::ServerToClient);
-        app.register_component::<AngularDamping>(ChannelDirection::ServerToClient);
+        app.register_component::<LinearVelocityRetention>(ChannelDirection::ServerToClient);
+        app.register_component::<AngularVelocityRetention>(ChannelDirection::ServerToClient);
+        app.register_component::<IgnoreMapBorder>(ChannelDirection::ServerToClient);
+        app.register_component::<IgnoreStaticRigidBodies>(ChannelDirection::ServerToClient);
+        app.register_component::<IgnoreCollisions>(ChannelDirection::ServerToClient);
+        app.register_component::<Dominance>(ChannelDirection::ServerToClient);
+        app.register_component::<ImpactDeflection>(ChannelDirection::ServerToClient);
+        app.register_component::<ImpactPotency>(ChannelDirection::ServerToClient);
+        app.register_component::<ImpactResistance>(ChannelDirection::ServerToClient);
     }
 }

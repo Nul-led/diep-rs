@@ -13,11 +13,11 @@ pub struct ServerInitPlugin;
 impl Plugin for ServerInitPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins((
-            ScheduleRunnerPlugin {
+            /*ScheduleRunnerPlugin {
                 run_mode: RunMode::Loop {
                     wait: Some(Duration::from_secs_f64(TICK_DURATION)),
                 },
-            },
+            },*/
             SystemInformationDiagnosticsPlugin,
             ServerPlugins::new(server_config()),
         ));
@@ -26,7 +26,7 @@ impl Plugin for ServerInitPlugin {
 
         app.add_systems(Startup, test_system);
 
-        app.add_systems(FixedUpdate, (system_orbit_routine, system_rotation_routine,
+        app.add_systems(Update, (system_orbit_routine, system_rotation_routine,
         
             system_spawner.run_if(under()),
         ));

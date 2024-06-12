@@ -16,19 +16,15 @@ bevy = { version = "0.13.2", default-features = false, features = [
     "multi-threaded",
     "webgl2",
     "x11",
-] }
-bevy_xpbd_2d = { git = "https://github.com/Nul-led/bevy_xpbd.git", branch = "main", default-features = false, features = [
-    "2d",
-    "f32",
-    "parry-f32",
-    "parallel",
-    "serialize",
+    "serialize"
 ] }
 cfg-if = "1.0.0"
 lightyear = { git = "https://github.com/cBournhonesque/lightyear", branch = "main", features = [
     "webtransport",
     "websocket"
 ] }
+parry2d = "0.15.1"
+nalgebra = { version = "0.32.5", features = ["convert-glam025"] }
 rand = "0.8.5"
 serde = { version = "1.0.201", features = ["derive"] }
 tracing = "0.1.40"

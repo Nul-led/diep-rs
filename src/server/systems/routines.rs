@@ -1,11 +1,10 @@
 use bevy::{ecs::system::Query, math::Vec2};
-use bevy_xpbd_2d::components::{AngularDamping, AngularVelocity, LinearDamping, LinearVelocity, Rotation};
 
-use crate::server::components::{orbit::OrbitRoutine, rotation::RotationRoutine};
+use crate::{server::components::{orbit::OrbitRoutine, rotation::RotationRoutine}, shared::components::physics::{AngularVelocity, LinearVelocity}};
 
 pub fn system_orbit_routine(mut query: Query<(&mut LinearVelocity, &mut OrbitRoutine)>) {
     for (mut vel, mut orbit) in query.iter_mut() {
-        vel.0 += Vec2::from_angle(orbit.step()) * orbit.velocity;
+        //vel.0 += Vec2::from_angle(orbit.step()) * orbit.velocity;
     } 
 }
 

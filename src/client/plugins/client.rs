@@ -1,5 +1,4 @@
-use bevy::{a11y::AccessibilityPlugin, app::{App, Plugin, Startup, Update}, ecs::{entity::Entity, query::{Added, Without}, system::{Commands, Query}}, gilrs::GilrsPlugin, input::InputPlugin, transform::{components::GlobalTransform, TransformBundle}, window::{Window, WindowPlugin}, winit::WinitPlugin};
-use bevy_xpbd_2d::components::{Position, Rotation};
+use bevy::{a11y::AccessibilityPlugin, app::{App, Plugin, Startup, Update}, ecs::{entity::Entity, query::{Added, Without}, schedule::States, system::{Commands, Query}}, gilrs::GilrsPlugin, input::InputPlugin, transform::{components::GlobalTransform, TransformBundle}, window::{Window, WindowPlugin}, winit::WinitPlugin};
 use lightyear::{client::plugin::ClientPlugins, prelude::client::ClientCommands};
 
 use crate::{client::net::config::client_config, shared::net::protocol::ProtocolPlugin};
@@ -26,8 +25,20 @@ impl Plugin for ClientInitPlugin {
             ClientPlugins::new(client_config()),
         ));
 
+        app.init_state::<ScreenState>();
+
         app.add_systems(Startup, connect_client);
     }
+}
+
+#[derive(States, Clone, Copy, Debug, Default, Hash, PartialEq, Eq)]
+pub enum ScreenState {
+    #[default]
+    TitleScreen,
+    Playing,
+    PlayerStats,
+    Respawn,
+    Menu,
 }
 
 fn connect_client(mut commands: Commands) {

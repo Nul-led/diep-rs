@@ -4,3 +4,4 @@ pub mod game;
 pub mod indicator;
 pub mod object;
 pub mod markers;
+pub mod physics;

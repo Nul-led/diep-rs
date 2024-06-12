@@ -2,8 +2,10 @@ use serde::{Deserialize, Serialize};
 
 use crate::shared::definitions::colors::Colors;
 
-#[derive(Clone, Copy, Serialize, Deserialize, PartialEq)]
+#[derive(Clone, Copy, Serialize, Deserialize, Default, PartialEq)]
 pub enum Paint {
+    #[default]
+    Transparent,
     /// Using this variant in networked components is highly recommended as we don't need to send over the color to the client
     ColorId(Colors),
     RGBA(u8, u8, u8, f32),
@@ -14,9 +16,11 @@ pub enum Paint {
 impl Paint {
     pub fn blend_with(&self, paint: Paint, factor: f32) -> Paint {
         match paint {
+            Paint::Transparent => Paint::Transparent,
             Paint::ColorId(color) => self.blend_with(Paint::from(color), factor),
             Paint::RGB(r1, g1, b1) => {
                 match self {
+                    Paint::Transparent => Paint::Transparent,
                     Paint::ColorId(color) => Paint::from(*color).blend_with(paint, factor),
                     Paint::RGB(r2, g2, b2) => Paint::RGB(
                         (r1 as f32 * factor + *r2 as f32 * (1.0 - factor)) as u8,
@@ -33,6 +37,7 @@ impl Paint {
             }
             Paint::RGBA(r1, g1, b1, alpha1) => {
                 match self {
+                    Paint::Transparent => Paint::Transparent,
                     Paint::ColorId(color) => Paint::from(*color).blend_with(paint, factor),
                     Paint::RGB(r2, g2, b2) => Paint::RGBA(
                         (r1 as f32 * factor + *r2 as f32 * (1.0 - factor)) as u8,
@@ -52,15 +57,10 @@ impl Paint {
     }
 }
 
-impl Default for Paint {
-    fn default() -> Self {
-        Self::ColorId(Colors::default())
-    }
-}
-
 impl From<Paint> for String {
     fn from(value: Paint) -> Self {
         match value {
+            Paint::Transparent => "transparent".to_string(),
             Paint::ColorId(color) => Paint::from(color).into(),
             Paint::RGBA(r, g, b, a) => format!("rgba({},{},{},{})", r, g, b, a),
             Paint::RGB(r, g, b) => format!("rgb({},{},{})", r, g, b),
