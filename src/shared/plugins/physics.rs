@@ -139,8 +139,6 @@ fn system_apply_velocity(
         )
     >,
 ) {
-    
-    info!("{}", window().unwrap().performance().unwrap().now());
     for (
         rb,
         mut transform,
