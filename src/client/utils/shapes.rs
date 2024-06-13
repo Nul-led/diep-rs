@@ -62,7 +62,7 @@ fn trace_rounded(ctx: &Context, vertices: &Vec<(Vec2, f32)>) {
 
         let pos = vertex2.0 + v2n * len_out + v2n.perp() * rad_dir * radius;
 
-        ctx.arc_with_anticlockwise(pos.x as f64, pos.y as f64, radius as f64, (v1n.to_angle() + FRAC_PI_2 * rad_dir) as f64, (v2n.to_angle() - FRAC_PI_2 * rad_dir) as f64, draw_dir);
+        ctx.arc_with_anticlockwise(pos.x as f64, pos.y as f64, radius as f64, (v1n.to_angle() + FRAC_PI_2 * rad_dir) as f64, (v2n.to_angle() - FRAC_PI_2 * rad_dir) as f64, draw_dir).unwrap();
 
         vertex1 = vertex2;
     }

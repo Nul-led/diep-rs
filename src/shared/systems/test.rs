@@ -1,7 +1,7 @@
 use std::{f32::consts::{FRAC_1_SQRT_2, PI}, ops::Range};
 
 use bevy::{
-    ecs::{entity::Entity, query::Without, system::{Commands, Query, Res}, world::World}, hierarchy::BuildWorldChildren, math::{primitives::{Circle, RegularPolygon}, Quat, Vec2, Vec3}, time::Time, transform::{components::{GlobalTransform, Transform}, TransformBundle}
+    ecs::{entity::Entity, query::Without, system::{Commands, Query, Res}, world::World}, hierarchy::{BuildChildren, BuildWorldChildren}, math::{primitives::{Circle, Rectangle, RegularPolygon}, Quat, Vec2, Vec3}, time::Time, transform::{components::{GlobalTransform, Transform}, TransformBundle}
 };
 use lightyear::{
     prelude::server::{Replicate, SyncTarget},
@@ -79,11 +79,49 @@ pub fn test_system(world: &mut World) {
     */
 }
 
+pub fn hierarchy_spawner(
+    mut commands: Commands,
+) {
+    let shape = ColliderTrace::Circle(Circle::new(50.0), ObjectDrawConfig::Simple { fill: Paint::ColorId(Colors::Blue1) });
+
+    commands.spawn((
+        PhysicsBundle {
+            collider: Collider::from(&shape),
+            ..Default::default()
+        },
+        MovementBundle::default(),
+        shape,
+        ObjectZIndex(0),
+        Replicate::default(),
+        RotationRoutine::default(),
+    )).with_children(|b| {
+        let shape1 = ColliderTrace::Rectangle(Rectangle {
+            half_size: Vec2::new(75.0, 20.0),
+        }, ObjectDrawConfig::Simple { fill: Paint::ColorId(Colors::Gray1) });
+
+        b.spawn((
+            PhysicsBundle {
+                collider: Collider::from(&shape1),
+                ..Default::default()
+            },
+            MovementBundle {
+                transform: TransformBundle::from_transform(Transform::from_xyz(50.0, 0.0, 0.0)),
+                ..Default::default()
+            },
+            shape1,
+            ObjectZIndex(1),
+            Replicate::default(),
+            //RotationRoutine::default(),
+        ));
+    });
+
+}
+
 pub fn system_spawner(
     q_map: Query<&GameMapInfo>,
     mut commands: Commands
 ) {
-    for i in 0..50 {
+    for i in 0..1 {
         let shape = ColliderTrace::RegularPolygon(RegularPolygon {
             circumcircle: Circle::new(50.0),
             sides: 4,
@@ -97,7 +135,7 @@ pub fn system_spawner(
                 ..Default::default()
             },
             MovementBundle {
-                transform: TransformBundle::from_transform(Transform::from_translation(random_pos(-Vec2::new(500.0, 500.0), Vec2::new(500.0, 500.0)).extend(0.0))),
+                //transform: TransformBundle::from_transform(Transform::from_translation(random_pos(-Vec2::new(500.0, 500.0), Vec2::new(500.0, 500.0)).extend(0.0))),
                 ..Default::default()
             },
             shape,

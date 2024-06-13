@@ -6,7 +6,7 @@ use bevy::{
 };
 use lightyear::{prelude::server::ServerCommands, server::plugin::ServerPlugins};
 
-use crate::{server::{net::config::server_config, systems::routines::{system_orbit_routine, system_rotation_routine}}, shared::{definitions::config::TICK_DURATION, systems::test::{system_spawner, test_system}}};
+use crate::{server::{net::config::server_config, systems::routines::{system_orbit_routine, system_rotation_routine}}, shared::{definitions::config::TICK_DURATION, systems::test::{hierarchy_spawner, system_spawner, test_system}}};
 
 pub struct ServerInitPlugin;
 
@@ -24,11 +24,11 @@ impl Plugin for ServerInitPlugin {
 
         app.add_systems(Startup, start_server);
 
-        app.add_systems(Startup, test_system);
+        app.add_systems(Startup, (test_system, hierarchy_spawner));
 
         app.add_systems(FixedUpdate, (system_orbit_routine, system_rotation_routine,
         
-            system_spawner.run_if(under()),
+            //system_spawner.run_if(under()),
         ));
     }
 }
@@ -36,7 +36,7 @@ impl Plugin for ServerInitPlugin {
 fn under() -> impl Condition<()> {
     IntoSystem::into_system(|mut flag: Local<usize>| {
         *flag += 1;
-        *flag <= 1
+        *flag <= 200
     })
 }
 

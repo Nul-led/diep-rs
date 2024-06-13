@@ -27,10 +27,6 @@ impl Plugin for RenderingPlugin {
             web::Viewport::system_viewport_render_components,
             web::Viewport::system_viewport_end_frame,
         ).chain().after(InterpolationSet::Interpolate).after(PredictionSet::VisualCorrection));
-
-        //app.add_systems(Startup, test_system);
-        //app.add_systems(Update, test_system1);
-        
     }
 }
 

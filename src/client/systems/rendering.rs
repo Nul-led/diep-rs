@@ -31,7 +31,6 @@ use crate::{
 pub fn system_render_objects(
     q_object_z_index: Query<(Entity, &ObjectZIndex)>,
     q_objects: Query<(
-        &Transform,
         &GlobalTransform,
         Option<&ObjectName>,
         Option<&ObjectScore>,
@@ -49,7 +48,6 @@ pub fn system_render_objects(
     object_entities.sort_by(|a, b| a.1 .0.cmp(&b.1 .0));
     for (entity, _) in object_entities {
         if let Ok((
-            t1,
             transform,
             name,
             score,

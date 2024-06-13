@@ -159,3 +159,6 @@ pub struct IgnoreStaticRigidBodies;
 
 #[derive(Clone, Copy, Component, Serialize, Deserialize, Default, PartialEq)]
 pub struct IgnoreCollisions;
+
+#[derive(Clone, Copy, Component, Serialize, Deserialize, Default, PartialEq)]
+pub struct IgnoreRotationPropagation;

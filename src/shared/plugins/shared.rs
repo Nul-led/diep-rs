@@ -6,13 +6,12 @@ use bevy::{
     hierarchy::HierarchyPlugin,
     log::LogPlugin,
     time::{Fixed, Time, TimePlugin},
-    transform::TransformPlugin,
 };
 use tracing::Level;
 
 use crate::shared::definitions::config::TICKS_PER_SECOND;
 
-use super::physics::{PhysicsPlugin, PhysicsSet};
+use super::{physics::{PhysicsPlugin, PhysicsSet}, transform::TransformPlugin};
 
 #[derive(SystemSet, Debug, Hash, PartialEq, Eq, Clone, Copy)]
 pub enum FixedSet {
