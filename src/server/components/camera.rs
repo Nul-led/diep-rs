@@ -1,3 +1,4 @@
-use bevy::ecs::entity::Entity;
+use bevy::{ecs::entity::Entity, prelude::{Component, Deref, DerefMut}};
 
-pub struct ObservationAnchor(Entity);
+#[derive(Component, Clone, Copy, PartialEq, Deref, DerefMut)]
+pub struct ObservationAnchor(pub Entity);

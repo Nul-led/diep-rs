@@ -77,7 +77,7 @@ impl DrawConfig {
                     fill_style: Some(Paint::RGB(255, 255, 255)),
                     stroke_style: Some(Paint::RGB(0, 0, 0)),
                     line_width: Some(0.2 * font_size),
-                    font: Some(format!("Ubuntu {}px", font_size)),
+                    font: Some(format!("{}px Ubuntu", font_size)),
                     text_align: Some(TextAlign::Center.into()),
                     ..Default::default()
                 }
@@ -87,7 +87,7 @@ impl DrawConfig {
                     fill_style: Some(*fill),
                     stroke_style: Some(*stroke),
                     line_width: Some(line_width_factor * font_size),
-                    font: Some(format!("Ubuntu {}px", font_size)),
+                    font: Some(format!("{}px Ubuntu", font_size)),
                     text_align: Some(TextAlign::Center.into()),
                     ..Default::default()
                 }
@@ -103,7 +103,7 @@ impl DrawConfig {
                     shadow: *shadow,
                     miter_limit: *miter_limit,
                     text_align: Some(align.unwrap_or(TextAlign::Center).into()),
-                    font: Some(format!("Ubuntu {}px", font_size)),
+                    font: Some(format!("{}px Ubuntu", font_size)),
                     composite_operation: composite_operation.and_then(|v| Some(Into::<&str>::into(v))),
                 }
             }

@@ -174,3 +174,47 @@ impl From<&ColliderTrace> for Collider {
         }
     }
 }
+
+impl ColliderTrace {
+    pub fn scale_by(&mut self, factor: f32) {
+        match self {
+            ColliderTrace::Circle(s, _) => {
+                s.radius *= factor;
+            },
+            ColliderTrace::Rectangle(s, _) => {
+                s.half_size *= factor;
+            },
+            ColliderTrace::Triangle(s, _) => {
+                s.vertices[0] *= factor;
+                s.vertices[1] *= factor;
+                s.vertices[2] *= factor;
+            },
+            ColliderTrace::RegularPolygon(s, _) => {
+                s.circumcircle.radius *= factor;
+            },
+            ColliderTrace::Segment(s, _) => {
+                s.half_length *= factor;
+            },
+            ColliderTrace::Capsule(s, _) => {
+                s.half_length *= factor;
+            },
+            ColliderTrace::Plane(_, _) => {}, // Planes have infinite size, no need to scale
+            ColliderTrace::Line(_, _) => {},
+            ColliderTrace::Polyline(s, _) => {
+                s.vertices.iter_mut().for_each(|v| *v *= factor);
+            },
+            ColliderTrace::Polygon(s, _) => {
+                s.vertices.iter_mut().for_each(|v| *v *= factor);
+            },
+            ColliderTrace::RegularStar(s, _) => {
+                s.regular_polygon.circumcircle.radius *= factor;
+            },
+            ColliderTrace::Compound(shapes) => {
+                shapes.iter_mut().for_each(|(isometry, trace)| {
+                    isometry.0 *= factor;
+                    trace.scale_by(factor);
+                });
+            }
+        }
+    }
+}

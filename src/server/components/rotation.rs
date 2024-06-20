@@ -1,7 +1,7 @@
-use bevy::ecs::component::Component;
+use bevy::{ecs::component::Component, prelude::{Deref, DerefMut}};
 use rand::random;
 
-#[derive(Clone, Copy, PartialEq, Component)]
+#[derive(Component, Clone, Copy, PartialEq, Deref, DerefMut)]
 pub struct RotationRoutine(pub f32);
 
 impl Default for RotationRoutine {

@@ -3,7 +3,7 @@ use std::f32::consts::TAU;
 use bevy::ecs::component::Component;
 use rand::random;
 
-#[derive(Clone, Copy, PartialEq, Component)]
+#[derive(Component, Clone, Copy, PartialEq)]
 pub struct OrbitRoutine {
     pub rate: f32,
     pub velocity: f32,

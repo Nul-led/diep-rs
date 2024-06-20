@@ -9,7 +9,14 @@ client = ["web-sys", "wasm-bindgen"]
 server = []
 
 [dependencies]
+# --- Utils ---
 anyhow = "1.0.83"
+cfg-if = "1.0.0"
+rand = "0.8.5"
+serde = { version = "1.0.201", features = ["derive"] }
+tracing = "0.1.40"
+
+# --- Bevy ---
 bevy = { version = "0.13.2", default-features = false, features = [
     "bevy_gilrs",
     "bevy_winit",
@@ -18,18 +25,25 @@ bevy = { version = "0.13.2", default-features = false, features = [
     "x11",
     "serialize"
 ] }
-cfg-if = "1.0.0"
+
+# --- Inputs ---
+# TODO configure features
+leafwing-input-manager = "0.13.3"
+
+# --- Networking ---
 lightyear = { git = "https://github.com/cBournhonesque/lightyear", branch = "main", features = [
     "webtransport",
     "websocket"
 ] }
+
+# --- Physics ---
 parry2d = "0.15.1"
 nalgebra = { version = "0.32.5", features = ["convert-glam025"] }
-rand = "0.8.5"
-serde = { version = "1.0.201", features = ["derive"] }
-tracing = "0.1.40"
 
-# client
+# --- Animations ---
+bevy_tweening = { version = "0.10.0", default-features = false }
+
+# --- Client / WASM ---
 wasm-bindgen = { version = "0.2.92", optional = true }
 web-sys = { version = "0.3.69", features = [
     "Document",

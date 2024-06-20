@@ -32,22 +32,17 @@ impl RigidBody {
     pub fn is_static(&self) -> bool {
         *self == Self::Static
     }
-
-    /// Checks if the rigid body is kinematic.
-    pub fn is_kinematic(&self) -> bool {
-        *self == Self::Kinematic
-    }
 }
 
 /// The amount of resistance this object has to incoming impulses
+/// Known values from diep:
+/// Small Crasher: 0.5
+/// Square, Triangle: 1
+/// Pentagon: 2
+/// Large Crasher: 10
+/// Alpha Pentagon: 20
 #[derive(Clone, Copy, Component, Serialize, Deserialize, PartialEq, Deref, DerefMut)]
 pub struct ImpactResistance(pub f32);
-
-impl ImpactResistance {
-    pub const ZERO: Self = Self(0.0);
-    pub const ONE: Self = Self(1.0); // Square, Triangle
-    pub const TWO: Self = Self(2.0); // Pentagon (Alpha = 20.0)
-}
 
 impl Default for ImpactResistance {
     fn default() -> Self {
@@ -56,14 +51,12 @@ impl Default for ImpactResistance {
 }
 
 /// The amount of force this object applies to outgoing impulses
+/// Known values from diep:
+/// Square & Triangle & Small Crasher: 8
+/// Pentagon, Alpha Pentagon: 11
+/// Large Crasher: 12
 #[derive(Clone, Copy, Component, Serialize, Deserialize, PartialEq, Deref, DerefMut)]
 pub struct ImpactPotency(pub f32);
-
-impl ImpactPotency {
-    pub const ZERO: Self = Self(0.0);
-    pub const ONE: Self = Self(1.0);
-    pub const TWO: Self = Self(2.0);
-}
 
 impl Default for ImpactPotency {
     fn default() -> Self {
@@ -72,6 +65,7 @@ impl Default for ImpactPotency {
 }
 
 /// Describes the factor by which a colliding object might be reflected at a different (randomized) angle
+/// Default for any normal diep entity is 0
 #[derive(Clone, Copy, Component, Serialize, Deserialize, Default, PartialEq, Deref, DerefMut)]
 pub struct ImpactDeflection(pub f32);
 

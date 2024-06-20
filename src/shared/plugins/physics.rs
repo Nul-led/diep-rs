@@ -1,18 +1,12 @@
 use std::{f32::consts::{FRAC_PI_2, PI, TAU}, ops::Range};
 
 use bevy::{
-    app::Plugin,
-    ecs::{
+    app::Plugin, ecs::{
         change_detection::DetectChanges, component::Component, entity::{Entity, EntityMapper, MapEntities}, query::{With, Without}, schedule::{IntoSystemConfigs, IntoSystemSetConfigs, ScheduleLabel, SystemSet}, system::{Commands, Query, Res, ResMut, Resource}, world::Ref
-    },
-    hierarchy::Parent,
-    math::{EulerRot, Vec2},
-    tasks::{ComputeTaskPool, ParallelSlice},
-    transform::{
+    }, hierarchy::Parent, math::{EulerRot, Vec2}, prelude::{Changed, Deref, DerefMut}, tasks::{ComputeTaskPool, ParallelSlice}, transform::{
         components::{GlobalTransform, Transform},
         TransformSystem,
-    },
-    utils::intern::Interned,
+    }, utils::intern::Interned
 };
 use parry2d::{
     bounding_volume::{Aabb, BoundingVolume},
@@ -23,9 +17,9 @@ use rand::{thread_rng, Rng};
 use tracing::info;
 use web_sys::window;
 
-use crate::shared::components::physics::{
+use crate::shared::{components::physics::{
     AngularVelocity, AngularVelocityConstraints, AngularVelocityRetention, Collider, Dominance, IgnoreCollisions, IgnoreStaticRigidBodies, ImpactDeflection, ImpactPotency, ImpactResistance, LinearVelocity, LinearVelocityConstraints, LinearVelocityRetention, PreSolveLinearVelocity, RigidBody
-};
+}, util::shape::ColliderTrace};
 
 pub struct PhysicsPlugin(pub Interned<dyn ScheduleLabel>);
 
@@ -36,6 +30,7 @@ impl Plugin for PhysicsPlugin {
         app.init_resource::<Collisions>();
 
         app.add_systems(self.0, (
+            system_sync_colliders.in_set(PhysicsSet::SyncColliders),
             system_apply_velocity.in_set(PhysicsSet::ApplyVelocity),
             system_sweep_and_prune.in_set(PhysicsSet::BroadPhase),
             system_collect_collisions.in_set(PhysicsSet::NarrowPhase),
@@ -45,6 +40,7 @@ impl Plugin for PhysicsPlugin {
         app.configure_sets(
             self.0,
             (
+                PhysicsSet::SyncColliders,
                 PhysicsSet::ApplyVelocity,
                 PhysicsSet::BroadPhase,
                 PhysicsSet::NarrowPhase,
@@ -58,10 +54,22 @@ impl Plugin for PhysicsPlugin {
 
 #[derive(SystemSet, Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum PhysicsSet {
+    SyncColliders,
     ApplyVelocity,
     BroadPhase,
     NarrowPhase,
     SolvingPhase,
+}
+
+fn system_sync_colliders(
+    mut query: Query<(
+        &ColliderTrace,
+        &mut Collider
+    ), Changed<ColliderTrace>>
+) {
+    for (trace, mut collider) in query.iter_mut() {
+        *collider = trace.into();
+    }
 }
 
 fn system_solve_collisions(
@@ -238,7 +246,7 @@ pub fn check_collision_pair(
         .unwrap()
 }
 
-#[derive(Resource, Clone, Default, PartialEq)]
+#[derive(Resource, Clone, Default, PartialEq, Deref, DerefMut)]
 pub struct Collisions(pub Vec<(Entity, Entity)>);
 
 impl MapEntities for Collisions {
@@ -284,7 +292,7 @@ impl Collisions {
     }
 }
 
-#[derive(Resource, Default)]
+#[derive(Clone, Resource, Default, Deref, DerefMut, PartialEq)]
 pub struct BroadCollisionPairs(pub Vec<(Entity, Entity)>);
 
 impl MapEntities for BroadCollisionPairs {
@@ -298,7 +306,7 @@ impl MapEntities for BroadCollisionPairs {
 
 type IsBodyInactive = bool;
 
-#[derive(Resource, Default)]
+#[derive(Clone, Resource, Default, Deref, DerefMut, PartialEq)]
 pub struct Intervals(pub Vec<(Entity, IsBodyInactive, Aabb)>);
 
 impl MapEntities for Intervals {

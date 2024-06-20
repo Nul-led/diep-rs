@@ -21,6 +21,7 @@ pub enum FixedSet {
     Physics,
 }
 
+#[derive(Default)]
 pub struct SharedInitPlugin;
 
 impl Plugin for SharedInitPlugin {

@@ -1,7 +1,7 @@
 use std::{f32::consts::{FRAC_1_SQRT_2, PI}, ops::Range};
 
 use bevy::{
-    ecs::{entity::Entity, query::Without, system::{Commands, Query, Res}, world::World}, hierarchy::{BuildChildren, BuildWorldChildren}, math::{primitives::{Circle, Rectangle, RegularPolygon}, Quat, Vec2, Vec3}, time::Time, transform::{components::{GlobalTransform, Transform}, TransformBundle}
+    ecs::{entity::Entity, query::Without, system::{Commands, Query, Res}, world::World}, hierarchy::{BuildChildren, BuildWorldChildren}, math::{primitives::{Circle, Rectangle, RegularPolygon}, Quat, Vec2, Vec3}, prelude::{BoxedPolygon, Capsule2d, Triangle2d}, time::Time, transform::{components::{GlobalTransform, Transform}, TransformBundle}
 };
 use lightyear::{
     prelude::server::{Replicate, SyncTarget},
@@ -11,16 +11,16 @@ use rand::{distributions::Distribution, random, thread_rng, Rng};
 use tracing::info;
 use web_sys::window;
 
-use crate::{server::{bundles::{camera::CameraBundle, game::GameBundle, physics::{MovementBundle, PhysicsBundle}}, components::{orbit::OrbitRoutine, rotation::RotationRoutine}}, shared::{
+use crate::{server::{bundles::{camera::CameraBundle, game::GameBundle, physics::{MovementBundle, PhysicsBundle}}, components::{health::{AttackCooldownMarker, AttackDamage, AttackDeflection, CriticalAttacks, DefensePower, LastDamageTick, Regeneration}, orbit::OrbitRoutine, reward::KillReward, rotation::RotationRoutine}}, shared::{
     components::{
         camera::ViewRange, game::GameMapInfo, markers::CameraMarker, object::{
-            ObjectHealth, ObjectName, ObjectOpacity, ObjectScore,
-            ObjectZIndex,
+            Health, Name, Opacity, Score,
+            ZIndex,
         }, physics::{AngularVelocity, Collider, ImpactPotency, ImpactResistance, LinearVelocity, RigidBody}
     },
     definitions::{colors::Colors, config::TICKS_PER_SECOND},
     util::{
-        drawinfo::ObjectDrawConfig, paint::Paint, shape::ColliderTrace
+        drawinfo::ObjectDrawConfig, paint::Paint, shape::{ColliderTrace, IntoIsometry2}
     },
 }};
 
@@ -82,39 +82,49 @@ pub fn test_system(world: &mut World) {
 pub fn hierarchy_spawner(
     mut commands: Commands,
 ) {
-    let shape = ColliderTrace::Circle(Circle::new(50.0), ObjectDrawConfig::Simple { fill: Paint::ColorId(Colors::Blue1) });
+    let shape = ColliderTrace::RegularPolygon(RegularPolygon {
+        circumcircle: Circle::new(50.0),
+        sides: 4,
+    }, ObjectDrawConfig::Simple { fill: Paint::ColorId(Colors::Yellow1) });
 
     commands.spawn((
         PhysicsBundle {
             collider: Collider::from(&shape),
             ..Default::default()
         },
-        MovementBundle::default(),
+        (
+            Health {
+                max_health: 500.0,
+                health: 250.0,
+                ..Default::default()
+            },
+            Regeneration::default(),
+            LastDamageTick::default(),
+            CriticalAttacks::default(),
+            //AttackCooldownMarker,
+            AttackDamage::default(),
+            AttackDeflection::default(),
+            DefensePower::default(),
+            MovementBundle::default(),
+        ),
+        Score::default(),
+        Name {
+            name: "Square".to_string(),
+            ..Default::default()
+        },
+        KillReward::Exact(50),
         shape,
-        ObjectZIndex(0),
+        ZIndex(0),
         Replicate::default(),
         RotationRoutine::default(),
-    )).with_children(|b| {
-        let shape1 = ColliderTrace::Rectangle(Rectangle {
-            half_size: Vec2::new(75.0, 20.0),
-        }, ObjectDrawConfig::Simple { fill: Paint::ColorId(Colors::Gray1) });
+        OrbitRoutine::default(),
+    ));
+}
 
-        b.spawn((
-            PhysicsBundle {
-                collider: Collider::from(&shape1),
-                ..Default::default()
-            },
-            MovementBundle {
-                transform: TransformBundle::from_transform(Transform::from_xyz(50.0, 0.0, 0.0)),
-                ..Default::default()
-            },
-            shape1,
-            ObjectZIndex(1),
-            Replicate::default(),
-            //RotationRoutine::default(),
-        ));
-    });
-
+pub fn scaler(
+    mut query: Query<&mut ColliderTrace>
+) {
+    //query.iter_mut().for_each(|mut x| x.scale_by(1.005));
 }
 
 pub fn system_spawner(
@@ -126,7 +136,8 @@ pub fn system_spawner(
             circumcircle: Circle::new(50.0),
             sides: 4,
         }, ObjectDrawConfig::Simple { fill: Paint::ColorId(Colors::Yellow1) });
-    
+        
+
         commands.spawn((
             PhysicsBundle {
                 collider: Collider::from(&shape),
@@ -139,7 +150,7 @@ pub fn system_spawner(
                 ..Default::default()
             },
             shape,
-            ObjectZIndex(0),
+            ZIndex(0),
             Replicate::default(),
             OrbitRoutine::default(),
             RotationRoutine::default(),

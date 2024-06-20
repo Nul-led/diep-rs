@@ -18,8 +18,8 @@ use crate::{
             game::GameMapInfo,
             indicator::IndicatorConfig,
             object::{
-                ObjectDamageMarker, ObjectHealth, ObjectInvincibilityMarker,
-                ObjectName, ObjectOpacity, ObjectScore, ObjectZIndex,
+                DamageMarker, Health, InvincibilityMarker,
+                Name, Opacity, Score, ZIndex,
             }, physics::Collider,
         },
         definitions::colors::Colors,
@@ -29,22 +29,22 @@ use crate::{
 
 /// Renders entities, names, scores and healthbar
 pub fn system_render_objects(
-    q_object_z_index: Query<(Entity, &ObjectZIndex)>,
+    q_object_z_index: Query<(Entity, &ZIndex)>,
     q_objects: Query<(
         &GlobalTransform,
-        Option<&ObjectName>,
-        Option<&ObjectScore>,
-        Option<&ObjectOpacity>,
+        Option<&Name>,
+        Option<&Score>,
+        Option<&Opacity>,
         Option<&ColliderTrace>,
         Option<&Collider>,
-        Option<&ObjectHealth>,
-        Option<&ObjectDamageMarker>,
-        Option<&ObjectInvincibilityMarker>,
+        Option<&Health>,
+        Option<&DamageMarker>,
+        Option<&InvincibilityMarker>,
         // TODO cannon
     )>,
     r_viewport: Res<Viewport>,
 ) {
-    let mut object_entities: Vec<(Entity, &ObjectZIndex)> = q_object_z_index.iter().collect();
+    let mut object_entities: Vec<(Entity, &ZIndex)> = q_object_z_index.iter().collect();
     object_entities.sort_by(|a, b| a.1 .0.cmp(&b.1 .0));
     for (entity, _) in object_entities {
         if let Ok((

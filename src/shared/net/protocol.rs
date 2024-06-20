@@ -1,7 +1,7 @@
 use bevy::{app::{App, Plugin}, transform::components::{GlobalTransform, Transform}};
 use lightyear::{channel::builder::ChannelDirection, prelude::AppComponentExt};
 
-use crate::shared::{components::{camera::{AvailableClasses, ConsoleCommands, LevelbarProgress, PlayerClassName, PlayerId, PlayerLevel, PlayerName, PlayerScore, PlayerStats, RenderToggles, ScorebarProgress, ViewRange}, game::{GameLobbyInfo, GameMapInfo, GameServerInfo}, indicator::IndicatorConfig, markers::CameraMarker, object::{ObjectDamageMarker, ObjectHealth, ObjectInvincibilityMarker, ObjectName, ObjectOpacity, ObjectScore, ObjectZIndex}, physics::{AngularVelocity, AngularVelocityRetention, Dominance, IgnoreCollisions, IgnoreMapBorder, IgnoreStaticRigidBodies, ImpactDeflection, ImpactPotency, ImpactResistance, LinearVelocity, LinearVelocityRetention, RigidBody}}, util::shape::ColliderTrace};
+use crate::shared::{components::{camera::{AvailableClasses, ConsoleCommands, LevelbarProgress, PlayerClassName, PlayerId, PlayerLevel, PlayerName, PlayerScore, PlayerStats, RenderToggles, ScorebarProgress, ViewRange}, game::{GameLobbyInfo, GameMapInfo, GameServerInfo}, indicator::IndicatorConfig, markers::CameraMarker, object::{DamageMarker, Health, InvincibilityMarker, Name, Opacity, Score, ZIndex}, physics::{AngularVelocity, AngularVelocityRetention, Dominance, IgnoreCollisions, IgnoreMapBorder, IgnoreStaticRigidBodies, ImpactDeflection, ImpactPotency, ImpactResistance, LinearVelocity, LinearVelocityRetention, RigidBody}}, util::shape::ColliderTrace};
 
 pub struct ProtocolPlugin;
 
@@ -35,15 +35,15 @@ impl Plugin for ProtocolPlugin {
         app.register_component::<IndicatorConfig>(ChannelDirection::ServerToClient);
 
         // object
-        app.register_component::<ObjectName>(ChannelDirection::ServerToClient);
-        app.register_component::<ObjectScore>(ChannelDirection::ServerToClient);
-        app.register_component::<ObjectOpacity>(ChannelDirection::ServerToClient);
+        app.register_component::<Name>(ChannelDirection::ServerToClient);
+        app.register_component::<Score>(ChannelDirection::ServerToClient);
+        app.register_component::<Opacity>(ChannelDirection::ServerToClient);
         app.register_component::<ColliderTrace>(ChannelDirection::ServerToClient);
         //TODO add interpolation
-        app.register_component::<ObjectHealth>(ChannelDirection::ServerToClient);
-        app.register_component::<ObjectDamageMarker>(ChannelDirection::ServerToClient);
-        app.register_component::<ObjectInvincibilityMarker>(ChannelDirection::ServerToClient);
-        app.register_component::<ObjectZIndex>(ChannelDirection::ServerToClient);
+        app.register_component::<Health>(ChannelDirection::ServerToClient);
+        app.register_component::<DamageMarker>(ChannelDirection::ServerToClient);
+        app.register_component::<InvincibilityMarker>(ChannelDirection::ServerToClient);
+        app.register_component::<ZIndex>(ChannelDirection::ServerToClient);
         app.register_component::<RigidBody>(ChannelDirection::ServerToClient);
         app.register_component::<GlobalTransform>(ChannelDirection::ServerToClient);
         app.register_component::<Transform>(ChannelDirection::ServerToClient);
