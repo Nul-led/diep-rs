@@ -8,5 +8,7 @@ pub enum Inputs {
     Down,
     Left,
     Right,
+    Suicide,
+    Godmode,
     Mouse(Vec2),
 }

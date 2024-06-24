@@ -23,7 +23,7 @@ impl Plugin for ServerInitPlugin {
             },
             #[cfg(not(feature = "client"))]
             SystemInformationDiagnosticsPlugin,
-            HealthPlugin(FixedUpdate.intern()),
+            HealthPlugin,
             ServerPlugins::new(server_config()),
         ));
 

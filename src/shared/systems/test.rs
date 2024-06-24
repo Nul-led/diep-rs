@@ -158,7 +158,6 @@ pub fn system_spawner(
     }
 }
 
-
 pub fn random_pos(min: Vec2, max: Vec2) -> Vec2 {
     let mut rng = thread_rng();
     Vec2::new(rng.gen_range(min.x .. max.x), rng.gen_range(min.y .. max.y))

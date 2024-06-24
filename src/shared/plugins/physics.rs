@@ -1,7 +1,7 @@
 use std::{f32::consts::{FRAC_PI_2, PI, TAU}, ops::Range};
 
 use bevy::{
-    app::Plugin, ecs::{
+    app::{App, FixedUpdate, Plugin}, ecs::{
         change_detection::DetectChanges, component::Component, entity::{Entity, EntityMapper, MapEntities}, query::{With, Without}, schedule::{IntoSystemConfigs, IntoSystemSetConfigs, ScheduleLabel, SystemSet}, system::{Commands, Query, Res, ResMut, Resource}, world::Ref
     }, hierarchy::Parent, math::{EulerRot, Vec2}, prelude::{Changed, Deref, DerefMut}, tasks::{ComputeTaskPool, ParallelSlice}, transform::{
         components::{GlobalTransform, Transform},
@@ -21,15 +21,16 @@ use crate::shared::{components::physics::{
     AngularVelocity, AngularVelocityConstraints, AngularVelocityRetention, Collider, Dominance, IgnoreCollisions, IgnoreStaticRigidBodies, ImpactDeflection, ImpactPotency, ImpactResistance, LinearVelocity, LinearVelocityConstraints, LinearVelocityRetention, PreSolveLinearVelocity, RigidBody
 }, util::shape::ColliderTrace};
 
-pub struct PhysicsPlugin(pub Interned<dyn ScheduleLabel>);
+#[derive(Clone, Copy, Default)]
+pub struct PhysicsPlugin;
 
 impl Plugin for PhysicsPlugin {
-    fn build(&self, app: &mut bevy::prelude::App) {
+    fn build(&self, app: &mut App) {
         app.init_resource::<Intervals>();
         app.init_resource::<BroadCollisionPairs>();
         app.init_resource::<Collisions>();
 
-        app.add_systems(self.0, (
+        app.add_systems(FixedUpdate, (
             system_sync_colliders.in_set(PhysicsSet::SyncColliders),
             system_apply_velocity.in_set(PhysicsSet::ApplyVelocity),
             system_sweep_and_prune.in_set(PhysicsSet::BroadPhase),
@@ -38,7 +39,7 @@ impl Plugin for PhysicsPlugin {
         ));
 
         app.configure_sets(
-            self.0,
+            FixedUpdate,
             (
                 PhysicsSet::SyncColliders,
                 PhysicsSet::ApplyVelocity,

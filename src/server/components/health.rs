@@ -1,4 +1,6 @@
-use bevy::prelude::{Component, Deref, DerefMut};
+use bevy::{prelude::{Component, Deref, DerefMut}, time::{Timer, TimerMode}};
+
+use crate::shared::definitions::config::TICK_DURATION;
 
 /// Expresses the ability of an object to negate incoming damage
 #[derive(Component, Copy, Clone, PartialEq, Deref, DerefMut)]
@@ -53,13 +55,13 @@ pub struct AttackCooldownMarker;
 pub struct LastDamageTick(pub u32);
 
 /// Configure normal and boosted regen
-#[derive(Component, Copy, Clone, PartialEq)]
+#[derive(Component, Clone, PartialEq)]
 pub struct Regeneration {
-    /// every tick: health += amount
+    /// regeneration per second
     pub amount: f32,
-    /// timer (in ticks)
-    pub boost_timeout: u32,
-    /// when boosted, health += maxHealth * boost_factor
+    /// timer for regen boost
+    pub boost_timer: Timer,
+    /// boosted regeneration per second (percentage of max health)
     pub boost_factor: f32,
 }
 
@@ -67,14 +69,18 @@ impl Default for Regeneration {
     fn default() -> Self {
         Self {
             amount: 0.0,
-            boost_timeout: 750,
-            boost_factor: 0.004
+            boost_timer: Timer::from_seconds(30.0, TimerMode::Once),
+            boost_factor: 0.1,
         }
     }
 }
 
-/// Marks an entity for despawn
-/// The first field indicates how many tick remain until this entity will be despawned
-/// May be used to run animations
-#[derive(Component, Clone, Copy, PartialEq, Default, Deref, DerefMut)]
-pub struct DespawnMarker(pub u32);
+/// Marks an entity for despawn, may be used to run animations
+#[derive(Component, Clone, PartialEq, Deref, DerefMut)]
+pub struct DespawnMarker(pub Timer);
+
+impl Default for DespawnMarker {
+    fn default() -> Self {
+        Self(Timer::from_seconds(5.0 * TICK_DURATION as f32, TimerMode::Once))
+    }
+}

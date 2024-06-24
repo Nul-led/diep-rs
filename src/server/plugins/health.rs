@@ -1,5 +1,5 @@
 use bevy::{
-    app::{App, Plugin}, core::FrameCount, ecs::{query, schedule::ScheduleLabel}, hierarchy::DespawnRecursiveExt, prelude::{Commands, Entity, EventReader, EventWriter, Has, IntoSystemConfigs, Query, Res, With, Without}, utils::intern::Interned
+    app::{App, FixedUpdate, Plugin, Update}, core::FrameCount, ecs::{query, schedule::ScheduleLabel}, hierarchy::DespawnRecursiveExt, prelude::{Commands, Entity, EventReader, EventWriter, Has, IntoSystemConfigs, Query, Res, With, Without}, time::{Time, Timer, TimerMode}, utils::intern::Interned
 };
 use rand::{thread_rng, Rng};
 
@@ -16,7 +16,8 @@ use crate::{
     },
 };
 
-pub struct HealthPlugin(pub Interned<dyn ScheduleLabel>);
+#[derive(Clone, Copy, Default)]
+pub struct HealthPlugin;
 
 impl Plugin for HealthPlugin {
     fn build(&self, app: &mut App) {
@@ -24,14 +25,15 @@ impl Plugin for HealthPlugin {
         app.add_event::<DeathEvent>();
         app.add_event::<DestroyEvent>();
 
-        app.add_systems(self.0, (
-            system_collision_damage,
+        app.add_systems(FixedUpdate, system_collision_damage.after(PhysicsSet::NarrowPhase));
+
+        app.add_systems(Update, (
             system_regeneration,
             system_process_despawns,
             system_process_destroys,
             system_process_deaths,
-            system_process_kills,
-        ).after(PhysicsSet::NarrowPhase));
+            system_process_kills
+        ));
     }
 }
 
@@ -68,7 +70,7 @@ fn system_process_destroys(
 ) {
     for event in er_destroy.read() {
         if !query.get(event.0).unwrap_or(true) {
-            commands.entity(event.0).insert(DespawnMarker(5));
+            commands.entity(event.0).insert(DespawnMarker::default());
         }
     }
 }
@@ -76,43 +78,41 @@ fn system_process_destroys(
 fn system_process_despawns(
     mut commands: Commands,
     mut query: Query<(Entity, &mut DespawnMarker)>,
+    time: Res<Time>,
 ) {
     for (entity, mut marker) in query.iter_mut() {
-        if marker.0 <= 0 {
+        if marker.0.tick(time.delta()).finished() {
             commands.entity(entity).despawn_recursive();
-            continue;
         }
-        marker.0 -= 1;
     }
 }
 
-// TODO make this framerate independant
 fn system_regeneration(
     mut query: Query<(
         Entity,
         &mut Health,
-        &LastDamageTick,
-        &Regeneration,
+        &mut Regeneration,
         Has<InvincibilityMarker>
     )>,
-    frame: Res<FrameCount>,
+    time: Res<Time>,
     mut ew_death: EventWriter<DeathEvent>,
 ) {
-    for (entity, mut health, ldt, regen, has_invincibility) in query.iter_mut() {
+    for (entity, mut health, mut regen, has_invincibility) in query.iter_mut() {
+        if has_invincibility {
+            health.health = health.max_health;
+        }
+
         if health.health <= 0.0 {
             ew_death.send(DeathEvent(entity));
             continue;
         }
 
-        // regen
         if health.health < health.max_health {
-            health.health += regen.amount;
-            if frame.0 - ldt.0 >= regen.boost_timeout {
-                health.health += health.max_health * regen.boost_factor;
+            health.health += time.delta_seconds() * regen.amount;
+            if regen.boost_timer.tick(time.delta()).finished() {
+                health.health += time.delta_seconds() * health.max_health * regen.boost_factor;
             }
             health.health = health.health.min(health.max_health);
-        } else if has_invincibility {
-            health.health = health.max_health;
         }
     }
 }
@@ -126,6 +126,7 @@ fn system_collision_damage(
             &AttackDamage,
             &CriticalAttacks,
             &mut LastDamageTick,
+            &mut Regeneration,
             Option<&Team>,
             Option<&Owner>,
             Has<AttackCooldownMarker>,
@@ -143,7 +144,7 @@ fn system_collision_damage(
 
     for (ent1, ent2) in &collisions.0 {
         if let Ok(
-            [(mut health1, defense1, deflection1, attack1, critical1, mut ldt1, team1, owner1, has_cooldown_1), (mut health2, defense2, deflection2, attack2, critical2, mut ldt2, team2, owner2, has_cooldown_2)],
+            [(mut health1, defense1, deflection1, attack1, critical1, mut ldt1, mut regen1, team1, owner1, has_cooldown_1), (mut health2, defense2, deflection2, attack2, critical2, mut ldt2, mut regen2, team2, owner2, has_cooldown_2)],
         ) = query.get_many_mut([*ent1, *ent2])
         {
             if owner1.is_some() && owner1 == owner2 || team1.is_some() && team1 == team2 {
@@ -183,6 +184,7 @@ fn system_collision_damage(
             if damage1 != 0.0 {
                 health2.health -= damage1.clamp(0.0, health2.health);
                 ldt2.0 = frame.0;
+                regen2.boost_timer.reset();
 
                 if let Ok((mut opacity, config)) = q_opacity.get_mut(*ent2) {
                     opacity.0 = (opacity.0 + config.on_attacked).clamp(0.0, 1.0);
@@ -209,6 +211,7 @@ fn system_collision_damage(
             if damage2 != 0.0 {
                 health1.health -= damage2.clamp(0.0, health1.health);
                 ldt1.0 = frame.0;
+                regen1.boost_timer.reset();
 
                 if let Ok((mut opacity, config)) = q_opacity.get_mut(*ent1) {
                     opacity.0 = (opacity.0 + config.on_attacked).clamp(0.0, 1.0);

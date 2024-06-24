@@ -40,7 +40,7 @@ impl Plugin for SharedInitPlugin {
             DiagnosticsPlugin,
             FrameTimeDiagnosticsPlugin,
             EntityCountDiagnosticsPlugin,
-            PhysicsPlugin(FixedUpdate.intern()),
+            PhysicsPlugin,
         ));
 
         app.configure_sets(
