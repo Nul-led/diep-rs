@@ -1,3 +1,5 @@
+use bevy::{app::{FixedUpdate, Plugin, Startup}, prelude::{Condition, IntoSystem, IntoSystemConfigs, Local}};
+
 use std::{f32::consts::{FRAC_1_SQRT_2, PI}, ops::Range};
 
 use bevy::{
@@ -23,6 +25,27 @@ use crate::{server::{bundles::{camera::CameraBundle, game::GameBundle, physics::
         drawinfo::ObjectDrawConfig, paint::Paint, shape::{ColliderTrace, IntoIsometry2}
     },
 }};
+
+#[derive(Clone, Copy, Default)]
+pub struct TestPlugin;
+
+impl Plugin for TestPlugin {
+    fn build(&self, app: &mut bevy::prelude::App) {
+        app.add_systems(Startup, (test_system, ));
+
+        app.add_systems(FixedUpdate, (scaler,
+            hierarchy_spawner.run_if(under()),
+            //system_spawner.run_if(under()),
+        ));
+    }
+}
+
+fn under() -> impl Condition<()> {
+    IntoSystem::into_system(|mut flag: Local<usize>| {
+        *flag += 1;
+        *flag <= 100
+    })
+}
 
 pub fn test_system(world: &mut World) {
     world.spawn((
