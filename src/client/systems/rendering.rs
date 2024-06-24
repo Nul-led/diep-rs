@@ -12,7 +12,7 @@ use tracing::info;
 use web_sys::Path2d;
 
 use crate::{
-    client::{resources::viewport::Viewport, utils::{prettify::prettify_number, shapes::trace_collider}},
+    client::{resources::viewport::Viewport, util::{prettify::prettify_number, shapes::trace_collider}},
     shared::{
         components::{
             game::GameMapInfo,

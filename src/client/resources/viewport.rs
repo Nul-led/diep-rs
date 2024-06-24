@@ -1,7 +1,7 @@
 use bevy::{ecs::system::Resource, math::Vec2};
 use web_sys::OffscreenCanvas;
 
-use crate::client::{utils::context::{Context, OffscreenContext}, web};
+use crate::client::{util::context::{Context, OffscreenContext}, web};
 
 
 
