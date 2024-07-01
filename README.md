@@ -7,4 +7,4 @@
 - Camera Control + Logic
 - Environment (Shapes + Bosses)
 - Map Bound Enforcement (+ Fix Border Rendering)
-- 
+- Game management
